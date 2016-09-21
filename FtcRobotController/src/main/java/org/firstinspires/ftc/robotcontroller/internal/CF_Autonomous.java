@@ -100,22 +100,49 @@ public class CF_Autonomous extends LinearOpMode {
         // (driver presses PLAY)
         waitForStart();
 
-        robot.leftMotor.setPower(0.4f);
-        robot.rightMotor.setPower(0.4f);
+        robot.leftMotor.setPower(0.1f);
+        robot.rightMotor.setPower(0.1f);
         robot.leftMotor.setTargetPosition(300);
         robot.rightMotor.setTargetPosition(300);
+
+       robot.leftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.rightMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        while(robot.leftMotor.isBusy() && robot.rightMotor.isBusy()) {
+            double rightPos = robot.rightMotor.getCurrentPosition();
+            double leftPos = robot.leftMotor.getCurrentPosition();
+            telemetry.addData("Right",rightPos);
+            telemetry.addData("Left",leftPos);
+            telemetry.update();
+            idle();
+        }
         robot.leftMotor.setPower(0.0f);
         robot.rightMotor.setPower(0.0f);
         telemetry.addData("One", "1");
-
+        telemetry.update();
         telemetry.addData("Two", "2");
-        robot.leftMotor.setPower(0.1f);
-        robot.rightMotor.setPower(0.1f);
-        robot.leftMotor.setTargetPosition(600);
-        robot.rightMotor.setTargetPosition(600);
+        robot.leftMotor.setPower(-0.1f);
+        robot.rightMotor.setPower(-0.1f);
+        robot.leftMotor.setTargetPosition(-600);
+        robot.rightMotor.setTargetPosition(-600);
+
+        robot.leftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.rightMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        while(robot.leftMotor.isBusy() && robot.rightMotor.isBusy()) {
+            double rightPos = robot.rightMotor.getCurrentPosition();
+            double leftPos = robot.leftMotor.getCurrentPosition();
+            telemetry.addData("Right",rightPos);
+            telemetry.addData("Left",leftPos);
+            telemetry.update();
+            idle();
+        }
+        while(robot.leftMotor.isBusy() && robot.rightMotor.isBusy()) {
+            idle();
+        }
         robot.rightMotor.setPower(0.0f);
         robot.leftMotor.setPower(0.0f);
 
+        robot.leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
 
 
