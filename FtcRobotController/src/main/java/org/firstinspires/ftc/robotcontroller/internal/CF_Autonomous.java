@@ -37,6 +37,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import org.firstinspires.ftc.robotcontroller.internal.CF_Library;
 
 /**
  * This file illustrates the concept of driving a path based on encoder counts.
@@ -48,12 +49,6 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  *
  *  This code ALSO requires that the drive Motors have been configured such that a positive
  *  power command moves them forwards, and causes the encoders to count UP.
- *
- *   The desired path in this example is:
- *   - Drive forward for 48 inches
- *   - Spin right for 12 Inches
- *   - Drive Backwards for 24 inches
- *   - Stop and close the claw.
  *
  *  The code is written using a method called: encoderDrive(speed, leftInches, rightInches, timeoutS)
  *  that performs the actual movement.
@@ -69,9 +64,9 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 //@Disabled
 public class CF_Autonomous extends LinearOpMode {
 
-    int s = 0;
     /* Declare OpMode members. */
     Crossfire_Hardware         robot   = new Crossfire_Hardware();   // Use Crossfire's hardware file
+    public CF_Library crossfire_Library; // Use Crossfire's library file (similar to c libraries)
     private ElapsedTime     runtime = new ElapsedTime();
     @Override
 
@@ -89,7 +84,7 @@ public class CF_Autonomous extends LinearOpMode {
 
         robot.leftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.rightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        idle();
+        //idle();
 
         robot.leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         robot.rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -100,7 +95,7 @@ public class CF_Autonomous extends LinearOpMode {
         // (driver presses PLAY)
         waitForStart();
 
-        robot.leftMotor.setPower(0.1f);
+        /*robot.leftMotor.setPower(0.1f);
         robot.rightMotor.setPower(0.1f);
         robot.leftMotor.setTargetPosition(300);
         robot.rightMotor.setTargetPosition(300);
@@ -116,11 +111,23 @@ public class CF_Autonomous extends LinearOpMode {
             idle();
         }
         robot.leftMotor.setPower(0.0f);
-        robot.rightMotor.setPower(0.0f);
+        robot.rightMotor.setPower(0.0f);*/
+        //try {
+            crossfire_Library.encoderMove(robot, 300, 300, 0.1, 0.1);
+        //}
+        //catch (NullPointerException n) {
+            telemetry.addData("Null", "Null");
+        //}
         telemetry.addData("One", "1");
         telemetry.update();
         telemetry.addData("Two", "2");
-        robot.leftMotor.setPower(-0.1f);
+        try {
+            crossfire_Library.encoderMove(robot, -600, -600, -0.1, -0.1);
+        }
+        catch (NullPointerException n) {
+            telemetry.addData("Null", "Null");
+        }
+        /*robot.leftMotor.setPower(-0.1f);
         robot.rightMotor.setPower(-0.1f);
         robot.leftMotor.setTargetPosition(-600);
         robot.rightMotor.setTargetPosition(-600);
@@ -135,15 +142,8 @@ public class CF_Autonomous extends LinearOpMode {
             telemetry.update();
             idle();
         }
-        while(robot.leftMotor.isBusy() && robot.rightMotor.isBusy()) {
-            idle();
-        }
         robot.rightMotor.setPower(0.0f);
-        robot.leftMotor.setPower(0.0f);
-
-        robot.leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        robot.rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
+        robot.leftMotor.setPower(0.0f);*/
 
 
         telemetry.addData("Path", "Complete");
