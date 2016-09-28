@@ -30,14 +30,13 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
 TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-package org.firstinspires.ftc.robotcontroller.internal;
+package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import org.firstinspires.ftc.robotcontroller.internal.CF_Library;
+import org.firstinspires.ftc.teamcode.Crossfire_Hardware;
 
 /**
  * This file illustrates the concept of driving a path based on encoder counts.
@@ -62,11 +61,11 @@ import org.firstinspires.ftc.robotcontroller.internal.CF_Library;
 
 @Autonomous(name="CF_Autonomous", group="Pushbot")
 //@Disabled
-public class CF_Autonomous extends LinearOpMode {
+public class CF_Autonomous extends CF_Library {
 
     /* Declare OpMode members. */
-    Crossfire_Hardware         robot   = new Crossfire_Hardware();   // Use Crossfire's hardware file
-    public CF_Library crossfire_Library; // Use Crossfire's library file (similar to c libraries)
+    Crossfire_Hardware robot   = new Crossfire_Hardware();   // Use Crossfire's hardware file
+    // Use Crossfire's library file (similar to c libraries)
     private ElapsedTime     runtime = new ElapsedTime();
     @Override
 
@@ -113,7 +112,7 @@ public class CF_Autonomous extends LinearOpMode {
         robot.leftMotor.setPower(0.0f);
         robot.rightMotor.setPower(0.0f);*/
         //try {
-            crossfire_Library.encoderMove(robot, 300, 300, 0.1, 0.1);
+        encoderMove(300, 300, 0.1, 0.1);
         //}
         //catch (NullPointerException n) {
             telemetry.addData("Null", "Null");
@@ -122,7 +121,7 @@ public class CF_Autonomous extends LinearOpMode {
         telemetry.update();
         telemetry.addData("Two", "2");
         try {
-            crossfire_Library.encoderMove(robot, -600, -600, -0.1, -0.1);
+            encoderMove(-600, -600, -0.1, -0.1);
         }
         catch (NullPointerException n) {
             telemetry.addData("Null", "Null");

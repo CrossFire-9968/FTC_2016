@@ -1,19 +1,14 @@
-package org.firstinspires.ftc.robotcontroller.internal;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.hardware.DcMotor;
-
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 /**
  * Created by Ryley on 9/20/16.
  */
 
-public class CF_Library extends LinearOpMode{
-    @Override
-    public void runOpMode() throws InterruptedException {
-
-    }
-
-    public void encoderMove(Crossfire_Hardware robot, int countLeft, int countRight, double leftPower, double rightPower){
+public abstract class CF_Library extends LinearOpMode {
+    Crossfire_Hardware robot   = new Crossfire_Hardware();
+    public void encoderMove(int countLeft, int countRight, double leftPower, double rightPower){
 
         robot.leftMotor.setPower(leftPower);
         robot.rightMotor.setPower(rightPower);
@@ -28,12 +23,12 @@ public class CF_Library extends LinearOpMode{
             telemetry.addData("Right",rightPos);
             telemetry.addData("Left",leftPos);
             telemetry.update();
-            try {
+            /*try {
                 idle();
             }
             catch(InterruptedException e) {
                 telemetry.addData("Idle Failed", "Idle Failed");
-            }
+            }*/
 
         }
         robot.leftMotor.setPower(0.0f);
