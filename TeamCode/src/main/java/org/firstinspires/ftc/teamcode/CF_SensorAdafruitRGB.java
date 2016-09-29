@@ -71,7 +71,7 @@ import com.qualcomm.robotcore.hardware.DigitalChannelController;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 @Autonomous(name = "Sensor: AdafruitRGB", group = "Sensor")
-@Disabled                            // Comment this out to add to the opmode list
+//@Disabled                            // Comment this out to add to the opmode list
 public class CF_SensorAdafruitRGB extends LinearOpMode {
 
   ColorSensor sensorRGB;
@@ -102,7 +102,7 @@ public class CF_SensorAdafruitRGB extends LinearOpMode {
     boolean bLedOn = true;
 
     // get a reference to our DeviceInterfaceModule object.
-    cdim = hardwareMap.deviceInterfaceModule.get("dim");
+    cdim = hardwareMap.deviceInterfaceModule.get("CF_Dim");
 
     // set the digital channel to output mode.
     // remember, the Adafruit sensor is actually two devices.
@@ -110,7 +110,7 @@ public class CF_SensorAdafruitRGB extends LinearOpMode {
     cdim.setDigitalChannelMode(LED_CHANNEL, DigitalChannelController.Mode.OUTPUT);
 
     // get a reference to our ColorSensor object.
-    sensorRGB = hardwareMap.colorSensor.get("color");
+    sensorRGB = hardwareMap.colorSensor.get("AdafruitRGB");
 
     // turn the LED on in the beginning, just so user will know that the sensor is active.
     cdim.setDigitalChannelState(LED_CHANNEL, bLedOn);
@@ -122,19 +122,19 @@ public class CF_SensorAdafruitRGB extends LinearOpMode {
     // Note we use opModeIsActive() as our loop condition because it is an interruptible method.
     while (opModeIsActive())  {
 
-      // check the status of the x button on gamepad.
-      bCurrState = gamepad1.x;
-
-      // check for button-press state transitions.
-      if ((bCurrState == true) && (bCurrState != bPrevState))  {
-
-        // button is transitioning to a pressed state. Toggle the LED.
-        bLedOn = !bLedOn;
-        cdim.setDigitalChannelState(LED_CHANNEL, bLedOn);
-      }
-
-      // update previous state variable.
-      bPrevState = bCurrState;
+//      // check the status of the x button on gamepad.
+//      bCurrState = gamepad1.x;
+//
+//      // check for button-press state transitions.
+//      if ((bCurrState == true) && (bCurrState != bPrevState))  {
+//
+//        // button is transitioning to a pressed state. Toggle the LED.
+//        bLedOn = !bLedOn;
+//        cdim.setDigitalChannelState(LED_CHANNEL, bLedOn);
+//      }
+//
+//      // update previous state variable.
+//      bPrevState = bCurrState;
 
       // convert the RGB values to HSV values.
       Color.RGBToHSV((sensorRGB.red() * 255) / 800, (sensorRGB.green() * 255) / 800, (sensorRGB.blue() * 255) / 800, hsvValues);
