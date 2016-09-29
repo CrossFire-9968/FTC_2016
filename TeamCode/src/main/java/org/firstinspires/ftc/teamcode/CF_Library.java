@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-
 /**
  * Created by Ryley on 9/20/16.
  */
@@ -23,12 +22,12 @@ public abstract class CF_Library extends LinearOpMode {
             telemetry.addData("Right",rightPos);
             telemetry.addData("Left",leftPos);
             telemetry.update();
-            /*try {
+            try {
                 idle();
             }
             catch(InterruptedException e) {
                 telemetry.addData("Idle Failed", "Idle Failed");
-            }*/
+            }
 
         }
         robot.leftMotor.setPower(0.0f);

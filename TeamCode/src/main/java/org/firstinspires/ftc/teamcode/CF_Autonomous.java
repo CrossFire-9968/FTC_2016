@@ -64,9 +64,10 @@ import org.firstinspires.ftc.teamcode.Crossfire_Hardware;
 public class CF_Autonomous extends CF_Library {
 
     /* Declare OpMode members. */
-    Crossfire_Hardware robot   = new Crossfire_Hardware();   // Use Crossfire's hardware file
+    //Crossfire_Hardware robot = new Crossfire_Hardware();   // Use Crossfire's hardware file
     // Use Crossfire's library file (similar to c libraries)
-    private ElapsedTime     runtime = new ElapsedTime();
+    private ElapsedTime runtime = new ElapsedTime();
+
     @Override
 
     public void runOpMode() throws InterruptedException {
@@ -94,38 +95,10 @@ public class CF_Autonomous extends CF_Library {
         // (driver presses PLAY)
         waitForStart();
 
-        /*robot.leftMotor.setPower(0.1f);
-        robot.rightMotor.setPower(0.1f);
-        robot.leftMotor.setTargetPosition(300);
-        robot.rightMotor.setTargetPosition(300);
+        this.encoderMove(4326, 4326, 0.1f, 0.1f);
+        this.encoderMove(5326, 4326, 0.5f, 0.5f);
 
-       robot.leftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.rightMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        while(robot.leftMotor.isBusy() && robot.rightMotor.isBusy()) {
-            double rightPos = robot.rightMotor.getCurrentPosition();
-            double leftPos = robot.leftMotor.getCurrentPosition();
-            telemetry.addData("Right",rightPos);
-            telemetry.addData("Left",leftPos);
-            telemetry.update();
-            idle();
-        }
-        robot.leftMotor.setPower(0.0f);
-        robot.rightMotor.setPower(0.0f);*/
-        //try {
-        encoderMove(300, 300, 0.1, 0.1);
-        //}
-        //catch (NullPointerException n) {
-            telemetry.addData("Null", "Null");
-        //}
-        telemetry.addData("One", "1");
-        telemetry.update();
-        telemetry.addData("Two", "2");
-        try {
-            encoderMove(-600, -600, -0.1, -0.1);
-        }
-        catch (NullPointerException n) {
-            telemetry.addData("Null", "Null");
-        }
+
         /*robot.leftMotor.setPower(-0.1f);
         robot.rightMotor.setPower(-0.1f);
         robot.leftMotor.setTargetPosition(-600);
@@ -145,9 +118,9 @@ public class CF_Autonomous extends CF_Library {
         robot.leftMotor.setPower(0.0f);*/
 
 
-        telemetry.addData("Path", "Complete");
-        telemetry.update();
-    }
+            telemetry.addData("Path", "Complete");
+            telemetry.update();
+        }
 
     /*
      *  Method to perfmorm a relative move, based on encoder counts.
@@ -157,4 +130,4 @@ public class CF_Autonomous extends CF_Library {
      *  2) Move runs out of time
      *  3) Driver stops the opmode running.
      */
-}
+    }
