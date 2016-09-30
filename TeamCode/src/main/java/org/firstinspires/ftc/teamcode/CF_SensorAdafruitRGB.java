@@ -71,10 +71,9 @@ import com.qualcomm.robotcore.hardware.DigitalChannelController;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 @Autonomous(name = "Sensor: AdafruitRGB", group = "Sensor")
-@Disabled                            // Comment this out to add to the opmode list
+//@Disabled                            // Comment this out to add to the opmode list
 public class CF_SensorAdafruitRGB extends LinearOpMode
 {
-
    ColorSensor sensorRGB;
    DeviceInterfaceModule cdim;
 
@@ -104,7 +103,7 @@ public class CF_SensorAdafruitRGB extends LinearOpMode
       boolean bLedOn = true;
 
       // get a reference to our DeviceInterfaceModule object.
-      cdim = hardwareMap.deviceInterfaceModule.get("dim");
+      cdim = hardwareMap.deviceInterfaceModule.get("CF_Dim");
 
       // set the digital channel to output mode.
       // remember, the Adafruit sensor is actually two devices.
@@ -112,7 +111,7 @@ public class CF_SensorAdafruitRGB extends LinearOpMode
       cdim.setDigitalChannelMode(LED_CHANNEL, DigitalChannelController.Mode.OUTPUT);
 
       // get a reference to our ColorSensor object.
-      sensorRGB = hardwareMap.colorSensor.get("color");
+      sensorRGB = hardwareMap.colorSensor.get("AdafruitRGB");
 
       // turn the LED on in the beginning, just so user will know that the sensor is active.
       cdim.setDigitalChannelState(LED_CHANNEL, bLedOn);
