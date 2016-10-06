@@ -32,6 +32,12 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 package org.firstinspires.ftc.teamcode;
 
+import android.content.Context;
+import android.content.Intent;
+import android.hardware.camera2.*;
+
+import android.provider.MediaStore;
+
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -62,10 +68,10 @@ import org.firstinspires.ftc.teamcode.Crossfire_Hardware;
 @Autonomous(name="CF_Autonomous", group="Pushbot")
 //@Disabled
 public class CF_Autonomous extends CF_Library {
-
     /* Declare OpMode members. */
     //Crossfire_Hardware robot = new Crossfire_Hardware();   // Use Crossfire's hardware file
     // Use Crossfire's library file (similar to c libraries)
+    private static Context CF_Context;
     private ElapsedTime runtime = new ElapsedTime();
 
     @Override
@@ -77,7 +83,27 @@ public class CF_Autonomous extends CF_Library {
          * The init() method of the hardware class does all the work here
          */
         robot.init(hardwareMap);
+        initalize();
 
+
+
+        this.encoderMove(4326, 4326, 0.1f, 0.1f);
+        this.encoderMove(5326, 4326, 0.5f, 0.5f);
+
+
+            telemetry.addData("Path", "Complete");
+            telemetry.update();
+        }
+
+    /*
+     *  Method to perfmorm a relative move, based on encoder counts.
+     *  Encoders are not reset as the move is based on the current position.
+     *  Move will stop if any of three conditions occur:
+     *  1) Move gets to the desired position
+     *  2) Move runs out of time
+     *  3) Driver stops the opmode running.
+     */
+    void initalize() throws java.lang.InterruptedException {
         // Send telemetry message to signify robot waiting
         telemetry.addData("Status", "Resetting Encoders");
         telemetry.update();
@@ -94,40 +120,6 @@ public class CF_Autonomous extends CF_Library {
         // Wait for the game to start
         // (driver presses PLAY)
         waitForStart();
+    }
 
-        this.encoderMove(4326, 4326, 0.1f, 0.1f);
-        this.encoderMove(5326, 4326, 0.5f, 0.5f);
-
-
-        /*robot.leftMotor.setPower(-0.1f);
-        robot.rightMotor.setPower(-0.1f);
-        robot.leftMotor.setTargetPosition(-600);
-        robot.rightMotor.setTargetPosition(-600);
-
-        robot.leftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.rightMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        while(robot.leftMotor.isBusy() && robot.rightMotor.isBusy()) {
-            double rightPos = robot.rightMotor.getCurrentPosition();
-            double leftPos = robot.leftMotor.getCurrentPosition();
-            telemetry.addData("Right",rightPos);
-            telemetry.addData("Left",leftPos);
-            telemetry.update();
-            idle();
-        }
-        robot.rightMotor.setPower(0.0f);
-        robot.leftMotor.setPower(0.0f);*/
-
-
-            telemetry.addData("Path", "Complete");
-            telemetry.update();
-        }
-
-    /*
-     *  Method to perfmorm a relative move, based on encoder counts.
-     *  Encoders are not reset as the move is based on the current position.
-     *  Move will stop if any of three conditions occur:
-     *  1) Move gets to the desired position
-     *  2) Move runs out of time
-     *  3) Driver stops the opmode running.
-     */
     }
