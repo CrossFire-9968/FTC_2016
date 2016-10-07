@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.vuforia.HINT;
 import com.vuforia.Vuforia;
 
@@ -13,15 +14,21 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
+import org.firstinspires.ftc.teamcode.Crossfire_Hardware;
 
 /**
  * Created by Ryley on 10/5/16.
  */
 @TeleOp(name="CF_Vuforia", group ="Test")
 //@Disabled
-public class CF_Vuforia extends LinearOpMode {
+public class CF_Vuforia extends CF_Library {
     @Override
     public void runOpMode() throws InterruptedException {
+        robot.init(hardwareMap);
+
+        int x;
+        int y;
+        int z;
         // Makes camera output appear on screen
         VuforiaLocalizer.Parameters params = new VuforiaLocalizer.Parameters(R.id.cameraMonitorViewId);
         // Sets camera direction
@@ -41,7 +48,7 @@ public class CF_Vuforia extends LinearOpMode {
         beacons.get(2).setName("Legos");
         beacons.get(3).setName("Gears");
 
-        waitForStart();
+        initalize();
 
         // Activate tracking
         beacons.activate();
@@ -54,14 +61,59 @@ public class CF_Vuforia extends LinearOpMode {
                 if(pose != null) {
                     VectorF translation = pose.getTranslation();
 
-                    telemetry.addData(beac.getName() + "Translation", translation);
+                    //telemetry.addData(beac.getName() + "Translation", translation);
 
+                    // Get the x, y, and z components, and cast them to ints, because we don't need the full
+                    // float precision
+                    z = (int)translation.get(0);
+                    y = (int)translation.get(1);
+                    x = (int)translation.get(2);
+                    telemetry.addData("x: ", x);
+                    telemetry.addData("y: ", y);
+                    telemetry.addData("z: ", z);
+                    if(y > 10) {
+                        int count = 1;
+                        while(y > 10) {
+                            this.encoderMove(0, count, 0.0f, 0.2f);
+                            y = (int)translation.get(1);
+                            telemetry.addData("y: ", y);
+                            x+= 20;
+                        }
+                    }
+                    if(y < -10) {
+                        int count = 1;
+                        while(y < -10) {
+                            this.encoderMove(count, 0, 0.1f, 0.0f);
+                            y = (int)translation.get(1);
+                            telemetry.addData("y: ", y);
+                            x+= 20;
+                        }
+                    }
                 }
-                telemetry.update();
 
+                telemetry.update();
             }
+
         }
 
 
+    }
+    void initalize() throws java.lang.InterruptedException {
+        // Send telemetry message to signify robot waiting
+        telemetry.addData("Status", "Resetting Encoders");
+        telemetry.update();
+
+        robot.leftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.rightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        //idle();
+
+        robot.leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        // Send telemetry message to indicate successful Encoder reset
+        telemetry.addData("Encoder Reset!", "Encoder Reset");
+        // Wait for the game to start
+        // (driver presses PLAY)
+        waitForStart();
     }
 }

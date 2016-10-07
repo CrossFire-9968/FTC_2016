@@ -71,7 +71,6 @@ public class CF_Autonomous extends CF_Library {
     /* Declare OpMode members. */
     //Crossfire_Hardware robot = new Crossfire_Hardware();   // Use Crossfire's hardware file
     // Use Crossfire's library file (similar to c libraries)
-    private static Context CF_Context;
     private ElapsedTime runtime = new ElapsedTime();
 
     @Override
