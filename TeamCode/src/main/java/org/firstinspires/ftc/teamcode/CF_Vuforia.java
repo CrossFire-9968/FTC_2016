@@ -29,6 +29,15 @@ public class CF_Vuforia extends CF_Library {
         int x;
         int y;
         int z;
+        int error;
+        double kP = 0.001;
+        double power = 0.15;
+        double effort;
+        double leftPower;
+        double rightPower;
+
+        int countRight = 1;
+        int countLeft = 1;
         // Makes camera output appear on screen
         VuforiaLocalizer.Parameters params = new VuforiaLocalizer.Parameters(R.id.cameraMonitorViewId);
         // Sets camera direction
@@ -71,24 +80,47 @@ public class CF_Vuforia extends CF_Library {
                     telemetry.addData("x: ", x);
                     telemetry.addData("y: ", y);
                     telemetry.addData("z: ", z);
-                    if(y > 10) {
-                        int count = 1;
-                        while(y > 10) {
-                            this.encoderMove(0, count, 0.0f, 0.2f);
-                            y = (int)translation.get(1);
+                    /*if(y > 10) {
+                        telemetry.addData("Greater than 10", null);
+                        this.encoderMove(0, countRight, 0.0f, 0.4f);
+                        telemetry.addData("countRight: ", countRight);
+                        countRight+=30;
+                    }
+                    if( y < -10) {
+                        telemetry.addData("Less than -10", null);
+                        this.encoderMove(countLeft, 0, 0.4f, 0.0f);
+                        telemetry.addData("countLeft: ", countLeft);
+                        countLeft+=30;
+                    } else if(y > -10 && y < 10) {
+                        telemetry.addData("Between -10 & 10", null);
+                        //this.encoderMove(countLeft, countRight, 0.0f, 0.0f);
+                        robot.leftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                        robot.rightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                        countRight = 1;
+                        countLeft = 1;
+                    }*/
+                    while (x > 250) {
+                        pose = ((VuforiaTrackableDefaultListener) beac.getListener()).getRawPose();
+                        if (pose != null) {
+                            translation = pose.getTranslation();
+                            y = (int) translation.get(1);
+                            x = (int) translation.get(2);
+                            telemetry.addData("x: ", x);
                             telemetry.addData("y: ", y);
-                            x+= 20;
+                            telemetry.update();
+                            error = y;
+                            effort = kP * error;
+                            rightPower = power - effort;
+                            leftPower = power + effort;
+                            robot.leftMotor.setPower(leftPower);
+                            robot.rightMotor.setPower(rightPower);
                         }
                     }
-                    if(y < -10) {
-                        int count = 1;
-                        while(y < -10) {
-                            this.encoderMove(count, 0, 0.1f, 0.0f);
-                            y = (int)translation.get(1);
-                            telemetry.addData("y: ", y);
-                            x+= 20;
-                        }
+                    if (x < 250) {
+                        robot.leftMotor.setPower(0.0f);
+                        robot.rightMotor.setPower(0.0f);
                     }
+
                 }
 
                 telemetry.update();
