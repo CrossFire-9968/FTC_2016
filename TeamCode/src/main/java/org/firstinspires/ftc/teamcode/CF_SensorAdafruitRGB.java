@@ -43,6 +43,7 @@ import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DeviceInterfaceModule;
 import com.qualcomm.robotcore.hardware.DigitalChannelController;
 
+
 /*
  *
  * This is an example LinearOpMode that shows how to use
@@ -50,7 +51,7 @@ import com.qualcomm.robotcore.hardware.DigitalChannelController;
  * cable for the sensor is connected to an I2C port on the
  * Core Device Interface Module.
  *
- * It also assuems that the LED pin of the sensor is connected
+ * It also assumes that the LED pin of the sensor is connected
  * to the digital signal pin of a digital port on the
  * Core Device Interface Module.
  *
@@ -72,7 +73,21 @@ import com.qualcomm.robotcore.hardware.DigitalChannelController;
  */
 @Autonomous(name = "Sensor: AdafruitRGB", group = "Sensor")
 //@Disabled                            // Comment this out to add to the opmode list
-public class CF_SensorAdafruitRGB extends LinearOpMode {
+public class CF_SensorAdafruitRGB extends LinearOpMode
+{
+    private static final int RedUpperLimit = 360;
+    private static final int RedLowerLimit = 325;
+    private static final int BlueUpperLimit = 270;
+    private static final int BlueLowerLimit = 220;
+//
+//      public enum Colors
+//    {
+//        Red,
+//        Blue,
+//        Unknown
+//    }
+
+//  CF_SensorAdafruitRGB CF_SensorLib = new CF_SensorAdafruitRGB();
 
   ColorSensor sensorRGB;
   DeviceInterfaceModule cdim;
@@ -139,13 +154,22 @@ public class CF_SensorAdafruitRGB extends LinearOpMode {
       // convert the RGB values to HSV values.
       Color.RGBToHSV((sensorRGB.red() * 255) / 800, (sensorRGB.green() * 255) / 800, (sensorRGB.blue() * 255) / 800, hsvValues);
 
-      // send the info back to driver station using telemetry function.
-      telemetry.addData("LED", bLedOn ? "On" : "Off");
-      telemetry.addData("Clear", sensorRGB.alpha());
-      telemetry.addData("Red  ", sensorRGB.red());
-      telemetry.addData("Green", sensorRGB.green());
-      telemetry.addData("Blue ", sensorRGB.blue());
-      telemetry.addData("Hue", hsvValues[0]);
+//      Get sensor color
+      if ((hsvValues[0] >= BlueLowerLimit) && (hsvValues[0] <= BlueUpperLimit))
+      {
+        telemetry.addData("Beacon is ", "Blue");
+      }
+
+      else if ((hsvValues[0] >= RedLowerLimit) && (hsvValues[0] <= RedUpperLimit))
+      {
+        telemetry.addData("Beacon is ", "Red");
+      }
+
+      else
+      {
+        telemetry.addData("Beacon is ", "Unknown");
+      }
+
 
       // change the background color to match the color detected by the RGB sensor.
       // pass a reference to the hue, saturation, and value array as an argument
