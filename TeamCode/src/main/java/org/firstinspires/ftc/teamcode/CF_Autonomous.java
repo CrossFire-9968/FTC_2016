@@ -86,9 +86,7 @@ public class CF_Autonomous extends CF_Library {
 
 
 
-        this.encoderMove(4326, 4326, 0.1f, 0.1f);
-        this.encoderMove(5326, 4326, 0.5f, 0.5f);
-
+        this.encoderMove(1000, 1000, 0.2f, 0.2f);
 
             telemetry.addData("Path", "Complete");
             telemetry.update();

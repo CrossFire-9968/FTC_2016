@@ -5,11 +5,14 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.vuforia.HINT;
+import com.vuforia.TrackerManager;
 import com.vuforia.Vuforia;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
+import org.firstinspires.ftc.robotcore.external.matrices.MatrixF;
 import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
 import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
@@ -30,11 +33,13 @@ public class CF_Vuforia extends CF_Library {
         int y;
         int z;
         int error;
-        double kP = 0.001;
+        double kP = 0.0005;
         double power = 0.15;
         double effort;
         double leftPower;
         double rightPower;
+        boolean seeable;
+        int firstFlag = 0;
 
         int countRight = 1;
         int countLeft = 1;
@@ -61,46 +66,89 @@ public class CF_Vuforia extends CF_Library {
 
         // Activate tracking
         beacons.activate();
+        OpenGLMatrix pose = null;
 
         while (opModeIsActive()) {
-            for(VuforiaTrackable beac : beacons) {
-                // Get position matrix, pose
-                OpenGLMatrix pose = ((VuforiaTrackableDefaultListener) beac.getListener()).getRawPose();
 
-                if(pose != null) {
+            if(firstFlag == 0) {
+                this.encoderMove(4900, 4900, 0.2f, 0.2f);
+                firstFlag = 1;
+            }
+            //for(VuforiaTrackable beac : beacons) {
+                // Get position matrix, pose
+                seeable = ((VuforiaTrackableDefaultListener) beacons.get(1).getListener()).isVisible();
+                if(seeable) {
+                    pose = ((VuforiaTrackableDefaultListener) beacons.get(1).getListener()).getRawPose();
+                    telemetry.addData("pose: ", pose);
+                    telemetry.update();
+                }
+                if(!seeable) {
+                    telemetry.addData()
+                }
+//                    while(seeable) {
+//                        if(isStopRequested()) {
+//                        requestOpModeStop();
+//                    }
+//                        telemetry.addData("seeable", "seeable");
+//                        telemetry.update();
+//                        seeable = ((VuforiaTrackableDefaultListener) beacons.get(1).getListener()).isVisible();
+//
+//                    }
+//                    while(!seeable) {
+//                        telemetry.addData("not Seeable", "not Seeable");
+//                        telemetry.update();
+//                        seeable = ((VuforiaTrackableDefaultListener) beacons.get(1).getListener()).isVisible();
+//
+//
+//                    }
+                while(!seeable) {
+                    telemetry.addData("not visible", "not visible");
+                    telemetry.addData("pose", pose);
+                    telemetry.update();
+                    robot.leftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                    robot.rightMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+//                    robot.rightMotor.setPower(0.1f);
+//                    robot.leftMotor.setPower(-0.1f);
+                    seeable = ((VuforiaTrackableDefaultListener) beacons.get(1).getListener()).isVisible();
+                }
+                while(pose != null) {
+                    if(isStopRequested()) {
+                        requestOpModeStop();
+                    }
+                    pose = ((VuforiaTrackableDefaultListener) beacons.get(1).getListener()).getRawPose();
+                    telemetry.clearAll();
+                    telemetry.addData("visible", "visible");
+                    telemetry.update();
+                    robot.rightMotor.setPower(0.0f);
+                    robot.leftMotor.setPower(0.0f);
                     VectorF translation = pose.getTranslation();
 
-                    //telemetry.addData(beac.getName() + "Translation", translation);
+                    VectorF xPose = pose.getRow(2);
+                    VectorF yPose = pose.getRow(1);
+                    VectorF zPose = pose.getRow(0);
+
+                    double XPose = (double)xPose.get(0);
+                    double cosXPose = Math.toDegrees(Math.acos(XPose));
 
                     // Get the x, y, and z components, and cast them to ints, because we don't need the full
-                    // float precision
-                    z = (int)translation.get(0);
+                    // double precision
+                    z = (int)translation.get(0); //Switch y & z for landscape mode
                     y = (int)translation.get(1);
                     x = (int)translation.get(2);
-                    telemetry.addData("x: ", x);
-                    telemetry.addData("y: ", y);
-                    telemetry.addData("z: ", z);
-                    /*if(y > 10) {
-                        telemetry.addData("Greater than 10", null);
-                        this.encoderMove(0, countRight, 0.0f, 0.4f);
-                        telemetry.addData("countRight: ", countRight);
-                        countRight+=30;
-                    }
-                    if( y < -10) {
-                        telemetry.addData("Less than -10", null);
-                        this.encoderMove(countLeft, 0, 0.4f, 0.0f);
-                        telemetry.addData("countLeft: ", countLeft);
-                        countLeft+=30;
-                    } else if(y > -10 && y < 10) {
-                        telemetry.addData("Between -10 & 10", null);
-                        //this.encoderMove(countLeft, countRight, 0.0f, 0.0f);
-                        robot.leftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                        robot.rightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                        countRight = 1;
-                        countLeft = 1;
-                    }*/
-                    while (x > 250) {
-                        pose = ((VuforiaTrackableDefaultListener) beac.getListener()).getRawPose();
+
+                    telemetry.addData("x: ", x/25.4);
+                    telemetry.addData("y: ", y/25.4);
+                    telemetry.addData("z: ", z/25.4);
+
+                    telemetry.addData("xPose: ", xPose);
+                    telemetry.addData("yPose: ", yPose);
+                    telemetry.addData("zPose: ", zPose);
+                    telemetry.addData("cosXPose: ", cosXPose);
+                    seeable = ((VuforiaTrackableDefaultListener) beacons.get(1).getListener()).isVisible();
+
+                    while (x >= 250) {
+                        pose = ((VuforiaTrackableDefaultListener) beacons.get(1).getListener()).getRawPose();
+                        seeable = ((VuforiaTrackableDefaultListener) beacons.get(1).getListener()).isVisible();
                         if (pose != null) {
                             translation = pose.getTranslation();
                             y = (int) translation.get(1);
@@ -119,12 +167,11 @@ public class CF_Vuforia extends CF_Library {
                     if (x < 250) {
                         robot.leftMotor.setPower(0.0f);
                         robot.rightMotor.setPower(0.0f);
+                        seeable = ((VuforiaTrackableDefaultListener) beacons.get(1).getListener()).isVisible();
                     }
 
                 }
-
                 telemetry.update();
-            }
 
         }
 
