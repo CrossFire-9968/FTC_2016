@@ -89,7 +89,6 @@ public class CF_FollowBeacon extends LinearOpMode
       leftMotor.setPower(0.0f);
       rightMotor.setPower(0.0f);
 
-      waitForStart();
       // while the op mode is active, loop and read the light levels.
       // Note we use opModeIsActive() as our loop condition because it is an interruptable method.
 
@@ -100,7 +99,8 @@ public class CF_FollowBeacon extends LinearOpMode
          // convert the RGB values to HSV values.
          Color.RGBToHSV((sensorRGB.red() * 255) / 800, (sensorRGB.green() * 255) / 800, (sensorRGB.blue() * 255) / 800, hsvValues);
 
-//      Get sensor color
+         // Get sensor color
+
          if ((hsvValues[0] >= BlueLowerLimit) && (hsvValues[0] <= BlueUpperLimit))
          {
             telemetry.addData("Beacon is ", "Blue");
@@ -116,13 +116,6 @@ public class CF_FollowBeacon extends LinearOpMode
             telemetry.addData("Beacon is ", "Unknown");
          }
 
-         runOpMode();
-         this.getLineData();
-         this.runMotors();
-         telemetry.update();
-         idle(); // Always call idle() at the bottom of your while(opModeIsActive()) loop
-
-
          // change the background color to match the color detected by the RGB sensor.
          // pass a reference to the hue, saturation, and value array as an argument
          // to the HSVToColor method.
@@ -134,6 +127,10 @@ public class CF_FollowBeacon extends LinearOpMode
             }
          });
 
+         this.getLineData();
+         this.runMotors();
+         telemetry.update();
+         idle(); // Always call idle() at the bottom of your while(opModeIsActive()) loop
          telemetry.update();
          idle(); // Always call idle() at the bottom of your while(opModeIsActive()) loop
       }
@@ -166,20 +163,20 @@ public class CF_FollowBeacon extends LinearOpMode
    {
       if ((odsSensor1.getRawLightDetected() >= onLine) && (odsSensor2.getRawLightDetected() >= onLine))
       {
-         leftMotor.setPower(0.15f);
-         rightMotor.setPower(0.15f);
+         leftMotor.setPower(0.08f);
+         rightMotor.setPower(0.08f);
       }
 
       else if ((odsSensor1.getRawLightDetected() < offLine) && (odsSensor2.getRawLightDetected() >= onLine))
       {
-         leftMotor.setPower(0.15f);
-         rightMotor.setPower(0.1f);
+         leftMotor.setPower(0.14f);
+         rightMotor.setPower(0.05f);
       }
 
       else if ((odsSensor2.getRawLightDetected() < offLine) && (odsSensor1.getRawLightDetected() >= onLine))
       {
-         leftMotor.setPower(0.1f);
-         rightMotor.setPower(0.15f);
+         leftMotor.setPower(0.05f);
+         rightMotor.setPower(0.14f);
       }
 
       else

@@ -71,7 +71,7 @@ import com.qualcomm.robotcore.hardware.DigitalChannelController;
  * Use Android Studio to Copy this Class, and Paste it into your team's code folder with a new name.
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
-@Autonomous(name = "Sensor: AdafruitRGB", group = "Sensor")
+@Autonomous(name = "Color Sensor", group = "Sensor")
 //@Disabled                            // Comment this out to add to the opmode list
 public class CF_SensorAdafruitRGB extends LinearOpMode
 {
@@ -79,13 +79,6 @@ public class CF_SensorAdafruitRGB extends LinearOpMode
     private static final int RedLowerLimit = 325;
     private static final int BlueUpperLimit = 270;
     private static final int BlueLowerLimit = 220;
-//
-//      public enum Colors
-//    {
-//        Red,
-//        Blue,
-//        Unknown
-//    }
 
 //  CF_SensorAdafruitRGB CF_SensorLib = new CF_SensorAdafruitRGB();
 
@@ -97,7 +90,8 @@ public class CF_SensorAdafruitRGB extends LinearOpMode
   static final int LED_CHANNEL = 5;
 
   @Override
-  public void runOpMode() throws InterruptedException {
+  public void runOpMode() throws InterruptedException
+  {
 
     // hsvValues is an array that will hold the hue, saturation, and value information.
     float hsvValues[] = {0F,0F,0F};
