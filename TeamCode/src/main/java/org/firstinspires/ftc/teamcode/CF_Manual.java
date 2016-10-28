@@ -16,54 +16,62 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 @TeleOp(name = "Manual", group = "Manual")
 // @Disabled
 
-public abstract class CF_Manual extends LinearOpMode
+public abstract class CF_Manual extends OpMode
 {
-   public DcMotor leftMotor = null;
-   public DcMotor rightMotor = null;
-   HardwareMap hwMap = null;
+   Crossfire_Hardware robot = new Crossfire_Hardware();
    public float left_stick_y = 0.0f;
    public float right_stick_y = 0.0f;
 
-   /* Initialize standard Hardware interfaces */
-   public void runOpMode(HardwareMap ahwMap) throws InterruptedException
+   @Override
+   public void init()
    {
-      // Save reference to Hardware map
-      hwMap = ahwMap;
-
-      // Define and Initialize Motors
-      leftMotor = hwMap.dcMotor.get("left_drive");
-      rightMotor = hwMap.dcMotor.get("right_drive");
-      //armMotor    = hwMap.dcMotor.get("left_arm");
-      leftMotor.setDirection(DcMotor.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
-      rightMotor.setDirection(DcMotor.Direction.REVERSE);// Set to FORWARD if using AndyMark motors
-
-      waitForStart();
-      while (opModeIsActive())
-      {
-         // Set all motors to zero power
-         leftMotor.setPower(0);
-         rightMotor.setPower(0);
-         setLeftControls();
-         setRightControls();
-      }
+      robot.init(hardwareMap);
    }
 
+   /*
+  * Code to run REPEATEDLY after the driver hits INIT, but before they hit PLAY
+  */
+   @Override
+   public void init_loop()
+   {
+   }
+
+   /*
+    * Code to run ONCE when the driver hits PLAY
+    */
+   @Override
+   public void start()
+   {
+   }
+
+   /* Initialize standard Hardware interfaces */
+   public void loop()
+   {
+      robot.leftMotor.setDirection(DcMotor.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
+      robot.rightMotor.setDirection(DcMotor.Direction.REVERSE);// Set to FORWARD if using AndyMark motors
+
+      // Set all motors to zero power
+      robot.leftMotor.setPower(0);
+      robot.rightMotor.setPower(0);
+      setLeftControls();
+      setRightControls();
+   }
 
    public void setLeftControls()
    {
       if (left_stick_y > 0.0)
       {
-         leftMotor.setPower(0.50);
+         robot.leftMotor.setPower(0.50);
       }
 
       else if (left_stick_y < 0.0)
       {
-         leftMotor.setPower(-0.50);
+         robot.leftMotor.setPower(-0.50);
       }
 
       else
       {
-         leftMotor.setPower(0.0);
+         robot.leftMotor.setPower(0.0);
       }
    }
 
@@ -71,17 +79,22 @@ public abstract class CF_Manual extends LinearOpMode
    {
       if (right_stick_y > 0.0)
       {
-         rightMotor.setPower(0.50);
+         robot.rightMotor.setPower(0.50);
       }
 
       else if (right_stick_y < 0.0)
       {
-         rightMotor.setPower(-0.50);
+         robot.rightMotor.setPower(-0.50);
       }
 
       else
       {
-         rightMotor.setPower(0.0);
+         robot.rightMotor.setPower(0.0);
       }
+   }
+
+   @Override
+   public void stop()
+   {
    }
 }
