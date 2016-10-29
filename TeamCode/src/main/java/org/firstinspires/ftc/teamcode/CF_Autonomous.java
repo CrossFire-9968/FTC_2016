@@ -39,6 +39,7 @@ import android.hardware.camera2.*;
 import android.provider.MediaStore;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -66,7 +67,7 @@ import org.firstinspires.ftc.teamcode.Crossfire_Hardware;
  */
 
 @Autonomous(name="CF_Autonomous", group="Pushbot")
-//@Disabled
+@Disabled
 public class CF_Autonomous extends CF_Library {
     /* Declare OpMode members. */
     //Crossfire_Hardware robot = new Crossfire_Hardware();   // Use Crossfire's hardware file
