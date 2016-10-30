@@ -3,7 +3,9 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DeviceInterfaceModule;
 import com.vuforia.HINT;
 import com.vuforia.TrackerManager;
 import com.vuforia.Vuforia;
@@ -40,9 +42,17 @@ public class CF_Vuforia extends CF_Library {
         double rightPower;
         boolean seeable;
         int firstFlag = 0;
+        int picFlag = 0;
 
         int countRight = 1;
         int countLeft = 1;
+
+        ColorSensor sensorRGB;
+        DeviceInterfaceModule cdim;
+
+        final int LED_CHANNEL = 5;
+
+
         // Makes camera output appear on screen
         VuforiaLocalizer.Parameters params = new VuforiaLocalizer.Parameters(R.id.cameraMonitorViewId);
         // Sets camera direction
@@ -61,6 +71,7 @@ public class CF_Vuforia extends CF_Library {
         beacons.get(1).setName("Tools");
         beacons.get(2).setName("Legos");
         beacons.get(3).setName("Gears");
+
 
         initalize();
         //waitForStart();
@@ -91,7 +102,7 @@ public class CF_Vuforia extends CF_Library {
 //             }
             int leftCount = robot.leftMotor.getCurrentPosition();
             int rightCount = robot.rightMotor.getCurrentPosition();
-            while(!seeable) {
+            while(!seeable && !isStopRequested()) {
                 leftCount -= 20;
                 rightCount += 20;
                 this.encoderMove(leftCount, rightCount, -0.3f, 0.3f);
@@ -108,7 +119,7 @@ public class CF_Vuforia extends CF_Library {
             }
             pose = ((VuforiaTrackableDefaultListener) beacons.get(3).getListener()).getRawPose();
 
-            while(pose != null) {
+            while(pose != null && picFlag == 0 && !isStopRequested()) {
                     if(isStopRequested()) {
                         requestOpModeStop();
                     }
@@ -140,7 +151,7 @@ public class CF_Vuforia extends CF_Library {
                     telemetry.addData("cosXPose: ", cosXPose);
                     seeable = ((VuforiaTrackableDefaultListener) beacons.get(3).getListener()).isVisible();
 
-                    while (x >= 100) {
+                    while (x >= 100 && !isStopRequested()) {
                         pose = ((VuforiaTrackableDefaultListener) beacons.get(3).getListener()).getRawPose();
                         seeable = ((VuforiaTrackableDefaultListener) beacons.get(3).getListener()).isVisible();
                         if (pose != null) {
@@ -158,15 +169,16 @@ public class CF_Vuforia extends CF_Library {
                             robot.rightMotor.setPower(rightPower);
                         }
                     }
-                    if (x < 100) {
+                    if (x < 100 && !isStopRequested()) {
                         robot.leftMotor.setPower(0.0f);
                         robot.rightMotor.setPower(0.0f);
-                        requestOpModeStop();
+                        picFlag = 1;
                     }
                 pose = ((VuforiaTrackableDefaultListener) beacons.get(3).getListener()).getRawPose();
 
 
             }
+
                 telemetry.update();
 
         }
