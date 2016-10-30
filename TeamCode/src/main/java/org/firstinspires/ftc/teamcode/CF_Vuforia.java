@@ -1,11 +1,14 @@
 package org.firstinspires.ftc.teamcode;
 
+import android.graphics.Color;
+
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DeviceInterfaceModule;
+import com.qualcomm.robotcore.hardware.DigitalChannelController;
 import com.vuforia.HINT;
 import com.vuforia.TrackerManager;
 import com.vuforia.Vuforia;
@@ -72,6 +75,14 @@ public class CF_Vuforia extends CF_Library {
         beacons.get(2).setName("Legos");
         beacons.get(3).setName("Gears");
 
+        float hsvValues[] = {0F,0F,0F};
+        final float values[] = hsvValues;
+
+        cdim = hardwareMap.deviceInterfaceModule.get("CF_Dim");
+
+        cdim.setDigitalChannelMode(LED_CHANNEL, DigitalChannelController.Mode.OUTPUT);
+
+        sensorRGB = hardwareMap.colorSensor.get("AdafruitRGB");
 
         initalize();
         //waitForStart();
@@ -178,8 +189,19 @@ public class CF_Vuforia extends CF_Library {
 
 
             }
-
+            telemetry.update();
+            Color.RGBToHSV((sensorRGB.red() * 255) / 800, (sensorRGB.green() * 255) / 800, (sensorRGB.blue() * 255) / 800, hsvValues);
+            float hue = hsvValues[0];
+            if(hue < 310) {
+                telemetry.addData("Blue", "Blue");
                 telemetry.update();
+            }
+            if(hue >= 310) {
+                telemetry.addData("Red", "Red");
+                telemetry.update();
+            }
+
+
 
         }
 
