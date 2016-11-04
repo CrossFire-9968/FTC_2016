@@ -129,7 +129,8 @@ public class CF_SensorAdafruitRGB extends LinearOpMode
 
     // loop and read the RGB data.
     // Note we use opModeIsActive() as our loop condition because it is an interruptible method.
-    while (opModeIsActive())  {
+    while (opModeIsActive())
+    {
 
 //      // check the status of the x button on gamepad.
 //      bCurrState = gamepad1.x;
@@ -146,7 +147,14 @@ public class CF_SensorAdafruitRGB extends LinearOpMode
 //      bPrevState = bCurrState;
 
       // convert the RGB values to HSV values.
-      Color.RGBToHSV((sensorRGB.red() * 255) / 800, (sensorRGB.green() * 255) / 800, (sensorRGB.blue() * 255) / 800, hsvValues);
+       telemetry.clear();
+       Color.RGBToHSV((sensorRGB.red() * 255) / 800, (sensorRGB.green() * 255) / 800, (sensorRGB.blue() * 255) / 800, hsvValues);
+
+       telemetry.addData("Clear", sensorRGB.alpha());
+       telemetry.addData("Red  ", sensorRGB.red());
+       telemetry.addData("Green", sensorRGB.green());
+       telemetry.addData("Blue ", sensorRGB.blue());
+       telemetry.addData("Hue", hsvValues[0]);
 
 //      Get sensor color
       if ((hsvValues[0] >= BlueLowerLimit) && (hsvValues[0] <= BlueUpperLimit))
@@ -168,6 +176,7 @@ public class CF_SensorAdafruitRGB extends LinearOpMode
       // change the background color to match the color detected by the RGB sensor.
       // pass a reference to the hue, saturation, and value array as an argument
       // to the HSVToColor method.
+
       relativeLayout.post(new Runnable() {
         public void run() {
           relativeLayout.setBackgroundColor(Color.HSVToColor(0xff, values));
