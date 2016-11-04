@@ -3,8 +3,19 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-/**
- * Created by jd72958 on 11/1/2016.
+/***
+ * This file provides basic Telop driving for a robot with mecanum drive
+ * The code is structured as an Iterative OpMode
+ *
+ * This OpMode uses the CrossFire hardware class to define the devices on the robot.
+ * All device access is managed through the Crossfire_Hardware class.
+ *
+ * This OpMode takes joystick values from three independent axis and computes a
+ * desired motor power for each of the mecanum drive motors (one per wheel) to
+ * attain desired velocity, direction, and rotation of robot. If the calculated
+ * desired power for any motor exceeds the maximum power limit (1.0F), then all
+ * motor powers are proportionally reduced.  We do this to retain consistent
+ * driving characteristics at the expense of vehicle speed and total power.
  */
 
 @TeleOp(name = "CF_Mecanaum_Manual", group = "Drivetrain")  // @Autonomous(...) is the other common choice
@@ -13,11 +24,14 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 public class CF_MecanumDrive extends OpMode
 {
    Crossfire_Hardware robot = new Crossfire_Hardware();
-   private static final float joystickThreshold = 0.05f;
    private float LFPower;
    private float RFPower;
    private float LRPower;
    private float RRPower;
+
+   // Minimum joystick position before we assume value is good.
+   // Near center, value could contain noise or offset that we want to ignore.
+   private static final float joystickThreshold = 0.05f;
 
    public void init()
    {
@@ -55,14 +69,21 @@ public class CF_MecanumDrive extends OpMode
          // will set power to 1.0f (100%) and all other powers will be reduced by the same ratio.
          if (maxPower > 1.0f)
          {
-            LFPower = LFPower / maxPower;
-            RFPower = RFPower / maxPower;
-            LRPower = LRPower / maxPower;
-            RRPower = RRPower / maxPower;
+            LFPower /= maxPower; // Shorthand for LFPower = LFPower / maxPower
+            RFPower /= maxPower;
+            LRPower /= maxPower;
+            RRPower /= maxPower;
          }
 
          // Update motor powers with new value.
          robot.setMecanumPowers(LFPower, RFPower, LRPower, RRPower);
+
+         // Send power levels to the phone
+         telemetry.addData("maxPower", "%.2f", maxPower);
+         telemetry.addData("LFPower",  "%.2f", LFPower);
+         telemetry.addData("RFPower",  "%.2f", RFPower);
+         telemetry.addData("LRPower",  "%.2f", LRPower);
+         telemetry.addData("RRPower",  "%.2f", RRPower);
       }
       else
       {
