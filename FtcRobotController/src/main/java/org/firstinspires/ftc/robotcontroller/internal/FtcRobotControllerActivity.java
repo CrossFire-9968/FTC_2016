@@ -38,6 +38,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.res.Configuration;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbManager;
 import android.net.wifi.WifiManager;
@@ -95,7 +99,7 @@ import java.io.File;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-public class FtcRobotControllerActivity extends Activity {
+public class FtcRobotControllerActivity extends Activity implements SensorEventListener {
 
   public static final String TAG = "RCActivity";
 
@@ -193,6 +197,7 @@ public class FtcRobotControllerActivity extends Activity {
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
+
     super.onCreate(savedInstanceState);
     RobotLog.vv(TAG, "onCreate()");
 
@@ -259,6 +264,17 @@ public class FtcRobotControllerActivity extends Activity {
     bindToService();
   }
 
+
+  @Override
+  public void onSensorChanged(SensorEvent sensorEvent){
+  }
+
+  @Override
+  public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
+  }
+
+
   protected UpdateUI createUpdateUI() {
     Restarter restarter = new RobotRestarter();
     UpdateUI result = new UpdateUI(this, dimmer);
@@ -297,6 +313,7 @@ public class FtcRobotControllerActivity extends Activity {
     super.onResume();
     RobotLog.vv(TAG, "onResume()");
     readNetworkType(NETWORK_TYPE_FILENAME);
+
   }
 
   @Override
