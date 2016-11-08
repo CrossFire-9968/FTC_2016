@@ -1,14 +1,11 @@
 package org.firstinspires.ftc.teamcode;
 
+import android.graphics.Color;
+
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
-//<<<<<<< HEAD
-//import com.qualcomm.robotcore.hardware.DcMotorSimple;
-//import com.qualcomm.robotcore.hardware.HardwareMap;
-//=======
 import com.qualcomm.robotcore.hardware.DeviceInterfaceModule;
 import com.qualcomm.robotcore.hardware.DigitalChannelController;
-//>>>>>>> AdaFruitRGB_Develop
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -30,20 +27,6 @@ import com.qualcomm.robotcore.util.Range;
 
 public class Crossfire_Hardware
 {
-//<<<<<<< HEAD
-//    /* Public OpMode members. */
-//    public DcMotor  leftMotor   = null;
-//    public DcMotor  rightMotor  = null;
-//
-//    /* local OpMode members. */
-//    HardwareMap hwMap           =  null;
-//    private ElapsedTime period  = new ElapsedTime();
-//
-//    /* Constructor */
-//    public Crossfire_Hardware(){
-//
-//    }
-//=======
    /* Public OpMode members. */
    public DcMotor MotorMecanumLeftFront;
    public DcMotor MotorMecanumRightFront;
@@ -56,56 +39,6 @@ public class Crossfire_Hardware
    HardwareMap hwMap = null;
    private ElapsedTime period = new ElapsedTime();
 
-//   /* Constructor */
-//   public Crossfire_Hardware()
-//   {
-//>>>>>>> AdaFruitRGB_Develop
-//
-//    /* Initialize standard Hardware interfaces */
-//    public void init(HardwareMap ahwMap) {
-//        // Save reference to Hardware map
-//        hwMap = ahwMap;
-
-//<<<<<<< HEAD
-//        // Define and Initialize Motors
-//        leftMotor   = hwMap.dcMotor.get("left_drive");
-//        rightMotor  = hwMap.dcMotor.get("right_drive");
-//        //armMotor    = hwMap.dcMotor.get("left_arm");
-//        leftMotor.setDirection(DcMotor.Direction.FORWARD);  // Front wheel drive.  Switch for rear-wheel drive
-//        rightMotor.setDirection(DcMotor.Direction.REVERSE);
-//
-//        // Set all motors to zero power
-//        leftMotor.setPower(0);
-//        rightMotor.setPower(0);
-//        //armMotor.setPower(0);
-//
-//        // Set all motors to run without encoders.
-//        // May want to use RUN_USING_ENCODERS if encoders are installed.
-//        leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-//        rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-//    }
-//
-//    /***
-//     *
-//     * waitForTick implements a periodic delay. However, this acts like a metronome with a regular
-//     * periodic tick.  This is used to compensate for varying processing times for each cycle.
-//     * The function looks at the elapsed cycle time, and sleeps for the remaining time interval.
-//     *
-//     * @param periodMs  Length of wait cycle in mSec.
-//     * @throws InterruptedException
-//     */
-//    public void waitForTick(long periodMs) throws InterruptedException {
-//
-//        long  remaining = periodMs - (long)period.milliseconds();
-//
-//        // sleep for the remaining portion of the regular cycle period.
-//        if (remaining > 0)
-//            Thread.sleep(remaining);
-//
-//        // Reset the cycle clock for the next pass.
-//        period.reset();
-//    }
-//=======
 
    /***
     * Initialize standard Hardware interfaces
@@ -125,17 +58,6 @@ public class Crossfire_Hardware
       ButtonPusher = hwMap.servo.get("button_pusher");
       sensorRGB = hwMap.colorSensor.get("AdafruitRGB");
 
-//      // we assume that the LED pin of the RGB sensor is connected to
-//      // digital port 5 (zero indexed).
-//      static final int LED_CHANNEL = 5;
-//      // set the digital channel to output mode.
-//      // remember, the Adafruit sensor is actually two devices.
-//      // It's an I2C sensor and it's also an LED that can be turned on or off.
-//      cdim.setDigitalChannelMode(LED_CHANNEL, DigitalChannelController.Mode.OUTPUT);
-//
-//      // turn the LED on in the beginning, just so user will know that the sensor is active.
-//      cdim.setDigitalChannelState(LED_CHANNEL, bLedOn);
-
       // Set motor polarity.  We are using
       // AndyMark motors so directions are opposite.
       MotorMecanumLeftFront.setDirection(DcMotor.Direction.REVERSE);     // Set to REVERSE if using AndyMark motors
@@ -144,17 +66,18 @@ public class Crossfire_Hardware
       MotorMecanumRightRear.setDirection(DcMotor.Direction.FORWARD);     // Set to FORWARD if using AndyMark motor
       SetButtonPusherPosition(0.45);
 
-
       // Set all motors to zero power
       setMecanumPowers(0.0f, 0.0f, 0.0f, 0.0f);
       GetButtonPusherPosition();
    }
+
 
    public void SetButtonPusherPosition(double servoPositionDesired)
    {
       double servoPositionActual = Range.clip(servoPositionDesired, 0.28, 0.70);
       ButtonPusher.setPosition(servoPositionActual);
    }
+
 
    public double GetButtonPusherPosition()
    {
@@ -166,7 +89,6 @@ public class Crossfire_Hardware
       }
       return position;
    }
-
 
 
    /***
@@ -209,6 +131,5 @@ public class Crossfire_Hardware
       // Reset the cycle clock for the next pass.
       period.reset();
    }
-//>>>>>>> AdaFruitRGB_Develop
 }
 

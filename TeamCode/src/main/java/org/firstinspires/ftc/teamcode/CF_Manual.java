@@ -44,6 +44,9 @@ public class CF_Manual extends OpMode
    private static final float strafePriority = 1.0f;
    private static final float steerPriority = 1.0f;
 
+   // Beacon button pusher servo increment rate
+   private static final double beaconPusherRate = 0.005;
+
    //Sets hue value limits for color sensor
    private static final int RedUpperLimit = 360;
    private static final int RedLowerLimit = 325;
@@ -56,18 +59,43 @@ public class CF_Manual extends OpMode
    // values is a reference to the hsvValues array.
    final float values[] = hsvValues;
 
+
    public void init()
    {
       robot.init(hardwareMap);
    }
 
+
    public void loop()
    {
+      // Calculate and apply motor power to drive wheels
       RunMecanumWheels();
+
+      // Adjust the beacon button servo
       ServiceServo();
+
+      //Determine color of beacon
       RunColorSensor();
    }
 
+
+   /***
+    * This method calculates the individual motor powers required to drive teh mecanum
+    * wheels based off the driver 1 controller.  This drive strategy uses the following
+    * joystick assignments
+    *
+    * Left stick:
+    *    forward (+y)   - Forward drive
+    *    rearward (-y)  - Reverse drive
+    *    right (+x)     - Strafe right
+    *    left (-x)      - Strafe left
+    *
+    * Right stick:
+    *    forward (+y)   - Not used
+    *    rearward (-y)  - Not used
+    *    right (+x)     - Tank turn right
+    *    left (-x)      - Tank turn left
+    */
    public void RunMecanumWheels()
    {
       // Calculate motor powers but only if any of the joystick commands are greater then
@@ -79,15 +107,15 @@ public class CF_Manual extends OpMode
       {
          // Calculate power for each mecanum wheel based on joystick inputs.  Each power is
          // based on three drive components: forward/reverse, strafe, and tank turn.
-         float LFPower = (forwardPriority * gamepad1.left_stick_y) - (strafePriority * gamepad1.left_stick_x) - (steerPriority * gamepad1.right_stick_x);
-         float RFPower = (forwardPriority * gamepad1.left_stick_y) + (strafePriority * gamepad1.left_stick_x) + (steerPriority * gamepad1.right_stick_x);
-         float LRPower = (forwardPriority * gamepad1.left_stick_y) + (strafePriority * gamepad1.left_stick_x) - (steerPriority * gamepad1.right_stick_x);
-         float RRPower = (forwardPriority * gamepad1.left_stick_y) - (strafePriority * gamepad1.left_stick_x) + (steerPriority * gamepad1.right_stick_x);
+         double LFPower = (forwardPriority * gamepad1.left_stick_y) - (strafePriority * gamepad1.left_stick_x) - (steerPriority * gamepad1.right_stick_x);
+         double RFPower = (forwardPriority * gamepad1.left_stick_y) + (strafePriority * gamepad1.left_stick_x) + (steerPriority * gamepad1.right_stick_x);
+         double LRPower = (forwardPriority * gamepad1.left_stick_y) + (strafePriority * gamepad1.left_stick_x) - (steerPriority * gamepad1.right_stick_x);
+         double RRPower = (forwardPriority * gamepad1.left_stick_y) - (strafePriority * gamepad1.left_stick_x) + (steerPriority * gamepad1.right_stick_x);
 
          // Find maximum power commanded to all the mecanum wheels.  Using the above power
          // equations, it is possible to calculate a power command greater than 1.0f (100%).
          // We want to find the max value so we can proportionally reduce motor powers.
-         float maxPower = Math.max(LFPower, Math.max(RFPower, Math.max(LRPower, RRPower)));
+         double maxPower = Math.max(LFPower, Math.max(RFPower, Math.max(LRPower, RRPower)));
 
          // If max power is greater than 1.0f (100% command), then proportionally reduce all motor
          // powers by the maximum power calculated.  This will equally reduce all powers so no
@@ -105,51 +133,46 @@ public class CF_Manual extends OpMode
 
          // Update motor powers with new value.
          robot.setMecanumPowers(LFPower, RFPower, LRPower, RRPower);
-
-         // Send power levels to the phone
-         telemetry.addData("LFPower",  "%.2f", LFPower);
-         telemetry.addData("RFPower",  "%.2f", RFPower);
-         telemetry.addData("LRPower",  "%.2f", LRPower);
-         telemetry.addData("RRPower",  "%.2f", RRPower);
-         updateTelemetry(telemetry);
       }
       else
       {
          // Explicitly set powers to zero.  May not be necessary but is good practice.
-         robot.setMecanumPowers(0.0f, 0.0f, 0.0f, 0.0f);
+         robot.setMecanumPowers(0.0, 0.0, 0.0, 0.0);
       }
    }
 
 
+   /***
+    * Method operates the servo to push the beacon button.  To push
+    * left-hand button, press and hold x to rotate serve CCW. To push
+    * right-hand button, press and hold b button to rotate servo CW.
+    */
    private void ServiceServo()
    {
       double ButtonPusherPosition = robot.GetButtonPusherPosition();
 
+      // Rotate CCW
       if (gamepad1.x)
       {
-         robot.SetButtonPusherPosition(ButtonPusherPosition + 0.005);
+         robot.SetButtonPusherPosition(ButtonPusherPosition + beaconPusherRate);
       }
 
+      // Rotate CW
       else if (gamepad1.b)
       {
-         robot.SetButtonPusherPosition(ButtonPusherPosition - 0.005);
+         robot.SetButtonPusherPosition(ButtonPusherPosition - beaconPusherRate);
       }
-
-//      telemetry.addData("Servo Position" , ButtonPusherPosition);
-//      updateTelemetry(telemetry);
    }
 
+
+   /***
+    * Method determines the color of the beacon by evaluating the hue value returned
+    * by the RGBToHSV method.  If the hue falls within a valid range, the method return
+    * an enumeration of Blue or Red, otherwise it is Unknown.
+    */
    public void RunColorSensor()
    {
-      // convert the RGB values to HSV values.
-      telemetry.clear();
       Color.RGBToHSV((robot.sensorRGB.red() * 255) / 800, (robot.sensorRGB.green() * 255) / 800, (robot.sensorRGB.blue() * 255) / 800, hsvValues);
-
-//      telemetry.addData("Clear", robot.sensorRGB.alpha());
-//      telemetry.addData("Red  ", robot.sensorRGB.red());
-//      telemetry.addData("Green", robot.sensorRGB.green());
-//      telemetry.addData("Blue ", robot.sensorRGB.blue());
-//      telemetry.addData("Hue", hsvValues[0]);
 
 //      Get sensor color
 //      if ((hsvValues[0] >= BlueLowerLimit) && (hsvValues[0] <= BlueUpperLimit))
@@ -166,16 +189,5 @@ public class CF_Manual extends OpMode
 //      {
 //         telemetry.addData("Beacon is ", "Unknown");
 //      }
-
-
-      // change the background color to match the color detected by the RGB sensor.
-      // pass a reference to the hue, saturation, and value array as an argument
-      // to the HSVToColor method.
-
-//      //relativeLayout.post(new Runnable() {
-//         public void run() {
-//            relativeLayout.setBackgroundColor(Color.HSVToColor(0xff, values));
-//         }
-      //}//);
    }
 }
