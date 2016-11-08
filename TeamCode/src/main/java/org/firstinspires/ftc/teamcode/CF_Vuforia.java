@@ -63,6 +63,9 @@ public class CF_Vuforia extends CF_Library implements SensorEventListener{
             int countRight = 1;
             int countLeft = 1;
 
+            final int LEFT = 0;
+            final int RIGHT = 1;
+
             ColorSensor sensorRGB;
             DeviceInterfaceModule cdim;
 
@@ -114,23 +117,13 @@ public class CF_Vuforia extends CF_Library implements SensorEventListener{
             while (opModeIsActive()) {
 
                 if (firstFlag == 0) {
-                    this.encoderMove(4600, 4600, 0.8f, 0.8f);
-                    this.encoderMove(3600, 5600, -0.3f, 0.3f);
+                    //this.encoderMove(4600, 4600, 0.8f, 0.8f);
+                    go(0.8f);
                     firstFlag = 1;
                 }
                 seeable = ((VuforiaTrackableDefaultListener) beacons.get(PICTURE).getListener()).isVisible();
-             while(!seeable) {
-                    telemetry.addData("not visible", "not visible");
-                    telemetry.update();
-                    robot.leftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                    robot.rightMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                    robot.rightMotor.setPower(0.15f);
-                    //robot.leftMotor.setPower(-0.15f);
-                    seeable = ((VuforiaTrackableDefaultListener) beacons.get(3).getListener()).isVisible();
-                    pose = ((VuforiaTrackableDefaultListener) beacons.get(3).getListener()).getRawPose();
-             }
-                int leftCount = robot.leftMotor.getCurrentPosition();
-                int rightCount = robot.rightMotor.getCurrentPosition();
+                int leftCount = robot.LeftFrontMotor.getCurrentPosition();
+                int rightCount = robot.RightFrontMotor.getCurrentPosition();
                 while (!seeable && !isStopRequested() && turnFlag == 0) {
                     leftCount -= 60;
                     rightCount += 60;
@@ -144,9 +137,11 @@ public class CF_Vuforia extends CF_Library implements SensorEventListener{
                 }
 
                 if (seeable) {
-                    robot.rightMotor.setPower(0.0f);
+                    robot.LeftFrontMotor.setPower(0.0f);
+                    robot.RightFrontMotor.setPower(0.0f);
+                    robot.LeftRearMotor.setPower(0.0f);
+                    robot.RightRearMotor.setPower(0.0f);
                     turnFlag = 1;
-                    //robot.leftMotor.setPower(0.0f);
                 }
                 pose = ((VuforiaTrackableDefaultListener) beacons.get(PICTURE).getListener()).getRawPose();
 
@@ -197,13 +192,17 @@ public class CF_Vuforia extends CF_Library implements SensorEventListener{
                             effort = kP * error;
                             rightPower = power + effort;
                             leftPower = power - effort;
-                            robot.leftMotor.setPower(leftPower);
-                            robot.rightMotor.setPower(rightPower);
+                            robot.LeftFrontMotor.setPower(leftPower);
+                            robot.RightFrontMotor.setPower(rightPower);
+                            robot.LeftRearMotor.setPower(leftPower);
+                            robot.RightFrontMotor.setPower(rightPower);
                         }
                     }
                     if ((x < 100 && !isStopRequested()) || !seeable) {
-                        robot.leftMotor.setPower(0.0f);
-                        robot.rightMotor.setPower(0.0f);
+                        robot.LeftFrontMotor.setPower(0.0f);
+                        robot.RightFrontMotor.setPower(0.0f);
+                        robot.LeftRearMotor.setPower(0.0f);
+                        robot.RightRearMotor.setPower(0.0f);
                         if(x < 100 && !isStopRequested()) {
                             picFlag = 1;
                         }
@@ -235,12 +234,16 @@ public class CF_Vuforia extends CF_Library implements SensorEventListener{
         telemetry.addData("Status", "Resetting Encoders");
         telemetry.update();
 
-        robot.leftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        robot.rightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.LeftFrontMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.RightFrontMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.LeftRearMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.RightRearMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         //idle();
 
-        robot.leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        robot.rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.LeftFrontMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.RightFrontMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.LeftRearMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.RightRearMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         // Send telemetry message to indicate successful Encoder reset
         telemetry.addData("Encoder Reset!", "Encoder Reset");

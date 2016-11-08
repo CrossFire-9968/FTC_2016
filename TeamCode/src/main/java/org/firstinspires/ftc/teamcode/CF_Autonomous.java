@@ -106,12 +106,16 @@ public class CF_Autonomous extends CF_Library {
         telemetry.addData("Status", "Resetting Encoders");
         telemetry.update();
 
-        robot.leftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        robot.rightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.LeftFrontMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.RightFrontMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.LeftRearMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.RightRearMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         //idle();
 
-        robot.leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        robot.rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.LeftFrontMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.RightFrontMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.LeftRearMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.RightRearMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         // Send telemetry message to indicate successful Encoder reset
         telemetry.addData("Encoder Reset!", "Encoder Reset");

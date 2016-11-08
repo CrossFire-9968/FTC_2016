@@ -37,9 +37,13 @@ public class CF_Accelerometer extends CF_Library implements SensorEventListener{
 
         while(opModeIsActive()) {
             while (!isStopRequested()) {
-                telemetry.addData("xAccel", xAccel);
-                System.out.println(xAccel);
-                telemetry.update();
+                for(double i = 0.0; i <= 1.0; i+= 0.001) {
+                    robot.LeftFrontMotor.setPower(i);
+                    robot.RightFrontMotor.setPower(i);
+                    robot.LeftRearMotor.setPower(i);
+                    robot.RightRearMotor.setPower(i);
+                    System.out.println(i + "," + xAccel);
+                }
             }
         }
     }
