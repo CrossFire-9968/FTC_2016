@@ -1,10 +1,5 @@
 package org.firstinspires.ftc.teamcode;
 
-import android.app.Activity;
-import android.graphics.Color;
-import android.view.View;
-
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -30,6 +25,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 public class CF_Manual extends OpMode
 {
    Crossfire_Hardware robot = new Crossfire_Hardware();
+   CF_SensorLibrary sensor = new CF_SensorLibrary();
 
    // Minimum joystick position before we assume value is good.
    // Near center, value could contain noise or offset that we want to ignore.
@@ -47,18 +43,6 @@ public class CF_Manual extends OpMode
    // Beacon button pusher servo increment rate
    private static final double beaconPusherRate = 0.005;
 
-   //Sets hue value limits for color sensor
-   private static final int RedUpperLimit = 360;
-   private static final int RedLowerLimit = 325;
-   private static final int BlueUpperLimit = 270;
-   private static final int BlueLowerLimit = 220;
-
-   // hsvValues is an array that will hold the hue, saturation, and value information.
-   float hsvValues[] = {0F,0F,0F};
-
-   // values is a reference to the hsvValues array.
-   final float values[] = hsvValues;
-
 
    public void init()
    {
@@ -68,6 +52,8 @@ public class CF_Manual extends OpMode
 
    public void loop()
    {
+      CF_SensorLibrary.sensorColor beaconColor;
+
       // Calculate and apply motor power to drive wheels
       RunMecanumWheels();
 
@@ -75,7 +61,7 @@ public class CF_Manual extends OpMode
       ServiceServo();
 
       //Determine color of beacon
-      RunColorSensor();
+      beaconColor = sensor.GetAdafruitColor();
    }
 
 
@@ -162,32 +148,5 @@ public class CF_Manual extends OpMode
       {
          robot.SetButtonPusherPosition(ButtonPusherPosition - beaconPusherRate);
       }
-   }
-
-
-   /***
-    * Method determines the color of the beacon by evaluating the hue value returned
-    * by the RGBToHSV method.  If the hue falls within a valid range, the method return
-    * an enumeration of Blue or Red, otherwise it is Unknown.
-    */
-   public void RunColorSensor()
-   {
-      Color.RGBToHSV((robot.sensorRGB.red() * 255) / 800, (robot.sensorRGB.green() * 255) / 800, (robot.sensorRGB.blue() * 255) / 800, hsvValues);
-
-//      Get sensor color
-//      if ((hsvValues[0] >= BlueLowerLimit) && (hsvValues[0] <= BlueUpperLimit))
-//      {
-//         telemetry.addData("Beacon is ", "Blue");
-//      }
-//
-//      else if ((hsvValues[0] >= RedLowerLimit) && (hsvValues[0] <= RedUpperLimit))
-//      {
-//         telemetry.addData("Beacon is ", "Red");
-//      }
-//
-//      else
-//      {
-//         telemetry.addData("Beacon is ", "Unknown");
-//      }
    }
 }
