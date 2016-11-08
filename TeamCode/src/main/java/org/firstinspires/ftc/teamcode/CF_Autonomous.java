@@ -43,81 +43,82 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
+
 import org.firstinspires.ftc.teamcode.Crossfire_Hardware;
 
 /**
  * This file illustrates the concept of driving a path based on encoder counts.
  * It uses the common Pushbot hardware class to define the drive on the robot.
  * The code is structured as a LinearOpMode
- *
+ * <p/>
  * The code REQUIRES that you DO have encoders on the wheels,
- *   otherwise you would use: PushbotAutoDriveByTime;
- *
- *  This code ALSO requires that the drive Motors have been configured such that a positive
- *  power command moves them forwards, and causes the encoders to count UP.
- *
- *  The code is written using a method called: encoderDrive(speed, leftInches, rightInches, timeoutS)
- *  that performs the actual movement.
- *  This methods assumes that each movement is relative to the last stopping place.
- *  There are other ways to perform encoder based moves, but this method is probably the simplest.
- *  This code uses the RUN_TO_POSITION mode to enable the Motor controllers to generate the run profile
- *
+ * otherwise you would use: PushbotAutoDriveByTime;
+ * <p/>
+ * This code ALSO requires that the drive Motors have been configured such that a positive
+ * power command moves them forwards, and causes the encoders to count UP.
+ * <p/>
+ * The code is written using a method called: encoderDrive(speed, leftInches, rightInches, timeoutS)
+ * that performs the actual movement.
+ * This methods assumes that each movement is relative to the last stopping place.
+ * There are other ways to perform encoder based moves, but this method is probably the simplest.
+ * This code uses the RUN_TO_POSITION mode to enable the Motor controllers to generate the run profile
+ * <p/>
  * Use Android Studios to Copy this Class, and Paste it into your team's code folder with a new name.
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="CF_Autonomous", group="Pushbot")
+@Autonomous(name = "CF_Autonomous", group = "Pushbot")
 @Disabled
-public class CF_Autonomous extends CF_Library {
-    /* Declare OpMode members. */
-    //Crossfire_Hardware robot = new Crossfire_Hardware();   // Use Crossfire's hardware file
-    // Use Crossfire's library file (similar to c libraries)
-    private ElapsedTime runtime = new ElapsedTime();
+public class CF_Autonomous extends CF_Library
+{
+   /* Declare OpMode members. */
+   //Crossfire_Hardware robot = new Crossfire_Hardware();   // Use Crossfire's hardware file
+   // Use Crossfire's library file (similar to c libraries)
+   private ElapsedTime runtime = new ElapsedTime();
 
-    @Override
+   
+   @Override
+   public void runOpMode() throws InterruptedException
+   {
+      robot.init(hardwareMap);
+      initalize();
 
-    public void runOpMode() throws InterruptedException {
+      this.encoderMove(1000, 1000, 0.2f, 0.2f);
 
-        /*
-         * Initialize the drive system variables.
-         * The init() method of the hardware class does all the work here
-         */
-        robot.init(hardwareMap);
-        initalize();
+      telemetry.addData("Path", "Complete");
+      telemetry.update();
+   }
 
+   /*
+    *  Method to perfmorm a relative move, based on encoder counts.
+    *  Encoders are not reset as the move is based on the current position.
+    *  Move will stop if any of three conditions occur:
+    *  1) Move gets to the desired position
+    *  2) Move runs out of time
+    *  3) Driver stops the opmode running.
+    */
+   void initalize() throws java.lang.InterruptedException
+   {
+      // Send telemetry message to signify robot waiting
+      telemetry.addData("Status", "Resetting Encoders");
+      telemetry.update();
 
+      robot.MotorMecanumLeftFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+      robot.MotorMecanumLeftRear.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+      robot.MotorMecanumRightFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+      robot.MotorMecanumRightRear.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+      //idle();
 
-        this.encoderMove(1000, 1000, 0.2f, 0.2f);
+      robot.MotorMecanumLeftFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+      robot.MotorMecanumLeftRear.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+      robot.MotorMecanumRightFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+      robot.MotorMecanumRightRear.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-            telemetry.addData("Path", "Complete");
-            telemetry.update();
-        }
+      // Send telemetry message to indicate successful Encoder reset
+      telemetry.addData("Encoder Reset!", "Encoder Reset");
+      // Wait for the game to start
+      // (driver presses PLAY)
+      waitForStart();
+   }
 
-    /*
-     *  Method to perfmorm a relative move, based on encoder counts.
-     *  Encoders are not reset as the move is based on the current position.
-     *  Move will stop if any of three conditions occur:
-     *  1) Move gets to the desired position
-     *  2) Move runs out of time
-     *  3) Driver stops the opmode running.
-     */
-    void initalize() throws java.lang.InterruptedException {
-        // Send telemetry message to signify robot waiting
-        telemetry.addData("Status", "Resetting Encoders");
-        telemetry.update();
-
-        robot.leftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        robot.rightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        //idle();
-
-        robot.leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        robot.rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
-        // Send telemetry message to indicate successful Encoder reset
-        telemetry.addData("Encoder Reset!", "Encoder Reset");
-        // Wait for the game to start
-        // (driver presses PLAY)
-        waitForStart();
-    }
-
-    }
+}

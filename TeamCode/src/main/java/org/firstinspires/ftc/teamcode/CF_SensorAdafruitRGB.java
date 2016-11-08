@@ -72,7 +72,7 @@ import com.qualcomm.robotcore.hardware.DigitalChannelController;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 @Autonomous(name = "Color Sensor", group = "Sensor")
-//@Disabled                            // Comment this out to add to the opmode list
+@Disabled                            // Comment this out to add to the opmode list
 public class CF_SensorAdafruitRGB extends LinearOpMode
 {
     private static final int RedUpperLimit = 360;
@@ -97,7 +97,7 @@ public class CF_SensorAdafruitRGB extends LinearOpMode
     float hsvValues[] = {0F,0F,0F};
 
     // values is a reference to the hsvValues array.
-    final float values[] = hsvValues;
+   final float values[] = hsvValues;
 
     // get a reference to the RelativeLayout so we can change the background
     // color of the Robot Controller app to match the hue detected by the RGB sensor.
@@ -129,7 +129,8 @@ public class CF_SensorAdafruitRGB extends LinearOpMode
 
     // loop and read the RGB data.
     // Note we use opModeIsActive() as our loop condition because it is an interruptible method.
-    while (opModeIsActive())  {
+    while (opModeIsActive())
+    {
 
 //      // check the status of the x button on gamepad.
 //      bCurrState = gamepad1.x;
@@ -146,7 +147,14 @@ public class CF_SensorAdafruitRGB extends LinearOpMode
 //      bPrevState = bCurrState;
 
       // convert the RGB values to HSV values.
-      Color.RGBToHSV((sensorRGB.red() * 255) / 800, (sensorRGB.green() * 255) / 800, (sensorRGB.blue() * 255) / 800, hsvValues);
+       telemetry.clear();
+       Color.RGBToHSV((sensorRGB.red() * 255) / 800, (sensorRGB.green() * 255) / 800, (sensorRGB.blue() * 255) / 800, hsvValues);
+
+       telemetry.addData("Clear", sensorRGB.alpha());
+       telemetry.addData("Red  ", sensorRGB.red());
+       telemetry.addData("Green", sensorRGB.green());
+       telemetry.addData("Blue ", sensorRGB.blue());
+       telemetry.addData("Hue", hsvValues[0]);
 
 //      Get sensor color
       if ((hsvValues[0] >= BlueLowerLimit) && (hsvValues[0] <= BlueUpperLimit))
@@ -168,6 +176,7 @@ public class CF_SensorAdafruitRGB extends LinearOpMode
       // change the background color to match the color detected by the RGB sensor.
       // pass a reference to the hue, saturation, and value array as an argument
       // to the HSVToColor method.
+
       relativeLayout.post(new Runnable() {
         public void run() {
           relativeLayout.setBackgroundColor(Color.HSVToColor(0xff, values));

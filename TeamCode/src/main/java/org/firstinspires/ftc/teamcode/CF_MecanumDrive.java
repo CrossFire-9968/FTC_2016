@@ -1,33 +1,17 @@
 package org.firstinspires.ftc.teamcode;
 
-import android.app.Activity;
-import android.graphics.Color;
-import android.view.View;
-
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-
-/***
- * This file provides basic Telop driving for a robot with mecanum drive
- * The code is structured as an Iterative OpMode
- *
- * This OpMode uses the CrossFire hardware class to define the devices on the robot.
- * All device access is managed through the Crossfire_Hardware class.
- *
- * This OpMode takes joystick values from three independent axis and computes a
- * desired motor power for each of the mecanum drive motors (one per wheel) to
- * attain desired velocity, direction, and rotation of robot. If the calculated
- * desired power for any motor exceeds the maximum power limit (1.0F), then all
- * motor powers are proportionally reduced.  We do this to retain consistent
- * driving characteristics at the expense of vehicle speed and total power.
+/**
+ * Created by jd72958 on 11/7/2016.
  */
 
-@TeleOp(name = "CF_Manual", group = "Drivetrain")
-//Disabled
+@TeleOp(name = "CF_Mecanum_Drive", group = "Drivetrain")
+@Disabled
 
-public class CF_Manual extends OpMode
+public class CF_MecanumDrive extends OpMode
 {
    Crossfire_Hardware robot = new Crossfire_Hardware();
 
@@ -44,18 +28,6 @@ public class CF_Manual extends OpMode
    private static final float strafePriority = 1.0f;
    private static final float steerPriority = 1.0f;
 
-   //Sets hue value limits for color sensor
-   private static final int RedUpperLimit = 360;
-   private static final int RedLowerLimit = 325;
-   private static final int BlueUpperLimit = 270;
-   private static final int BlueLowerLimit = 220;
-
-   // hsvValues is an array that will hold the hue, saturation, and value information.
-   float hsvValues[] = {0F,0F,0F};
-
-   // values is a reference to the hsvValues array.
-   final float values[] = hsvValues;
-
    public void init()
    {
       robot.init(hardwareMap);
@@ -63,19 +35,12 @@ public class CF_Manual extends OpMode
 
    public void loop()
    {
-      RunMecanumWheels();
-      ServiceServo();
-      RunColorSensor();
-   }
-
-   public void RunMecanumWheels()
-   {
       // Calculate motor powers but only if any of the joystick commands are greater then
       // a minimum threshold.  Adjust this threshold if the motor has motion when the joystick
       // is not being used and in the center position.
       if ((Math.abs(gamepad1.left_stick_y) >= joystickThreshold)  ||
-          (Math.abs(gamepad1.left_stick_x) >= joystickThreshold)  ||
-          (Math.abs(gamepad1.right_stick_x) >= joystickThreshold))
+         (Math.abs(gamepad1.left_stick_x) >= joystickThreshold)  ||
+         (Math.abs(gamepad1.right_stick_x) >= joystickThreshold))
       {
          // Calculate power for each mecanum wheel based on joystick inputs.  Each power is
          // based on three drive components: forward/reverse, strafe, and tank turn.
@@ -95,7 +60,7 @@ public class CF_Manual extends OpMode
          // don't, then one or more motor commands will clip, others will not, and the robot will not
          // behave predictably.  The end result of this reduction is the motor requesting max power
          // will set power to 1.0f (100%) and all other powers will be reduced by the same ratio.
-         if (Math.abs(maxPower) > 1.0f)
+         if (maxPower > 1.0f)
          {
             LFPower /= maxPower; // Shorthand for LFPower = LFPower / maxPower
             RFPower /= maxPower;
@@ -107,75 +72,16 @@ public class CF_Manual extends OpMode
          robot.setMecanumPowers(LFPower, RFPower, LRPower, RRPower);
 
          // Send power levels to the phone
+         telemetry.addData("maxPower", "%.2f", maxPower);
          telemetry.addData("LFPower",  "%.2f", LFPower);
          telemetry.addData("RFPower",  "%.2f", RFPower);
          telemetry.addData("LRPower",  "%.2f", LRPower);
          telemetry.addData("RRPower",  "%.2f", RRPower);
-         updateTelemetry(telemetry);
       }
       else
       {
          // Explicitly set powers to zero.  May not be necessary but is good practice.
          robot.setMecanumPowers(0.0f, 0.0f, 0.0f, 0.0f);
       }
-   }
-
-
-   private void ServiceServo()
-   {
-      double ButtonPusherPosition = robot.GetButtonPusherPosition();
-
-      if (gamepad1.x)
-      {
-         robot.SetButtonPusherPosition(ButtonPusherPosition + 0.005);
-      }
-
-      else if (gamepad1.b)
-      {
-         robot.SetButtonPusherPosition(ButtonPusherPosition - 0.005);
-      }
-
-//      telemetry.addData("Servo Position" , ButtonPusherPosition);
-//      updateTelemetry(telemetry);
-   }
-
-   public void RunColorSensor()
-   {
-      // convert the RGB values to HSV values.
-      telemetry.clear();
-      Color.RGBToHSV((robot.sensorRGB.red() * 255) / 800, (robot.sensorRGB.green() * 255) / 800, (robot.sensorRGB.blue() * 255) / 800, hsvValues);
-
-//      telemetry.addData("Clear", robot.sensorRGB.alpha());
-//      telemetry.addData("Red  ", robot.sensorRGB.red());
-//      telemetry.addData("Green", robot.sensorRGB.green());
-//      telemetry.addData("Blue ", robot.sensorRGB.blue());
-//      telemetry.addData("Hue", hsvValues[0]);
-
-//      Get sensor color
-//      if ((hsvValues[0] >= BlueLowerLimit) && (hsvValues[0] <= BlueUpperLimit))
-//      {
-//         telemetry.addData("Beacon is ", "Blue");
-//      }
-//
-//      else if ((hsvValues[0] >= RedLowerLimit) && (hsvValues[0] <= RedUpperLimit))
-//      {
-//         telemetry.addData("Beacon is ", "Red");
-//      }
-//
-//      else
-//      {
-//         telemetry.addData("Beacon is ", "Unknown");
-//      }
-
-
-      // change the background color to match the color detected by the RGB sensor.
-      // pass a reference to the hue, saturation, and value array as an argument
-      // to the HSVToColor method.
-
-//      //relativeLayout.post(new Runnable() {
-//         public void run() {
-//            relativeLayout.setBackgroundColor(Color.HSVToColor(0xff, values));
-//         }
-      //}//);
    }
 }
