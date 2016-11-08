@@ -1,8 +1,13 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DeviceInterfaceModule;
+import com.qualcomm.robotcore.hardware.DigitalChannelController;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.Range;
 
 /**
  * This is NOT an opmode.
@@ -25,6 +30,8 @@ public class Crossfire_Hardware
    public DcMotor MotorMecanumRightFront;
    public DcMotor MotorMecanumLeftRear;
    public DcMotor MotorMecanumRightRear;
+   public Servo ButtonPusher;
+   public ColorSensor sensorRGB;
 
    /* local OpMode members. */
    HardwareMap hwMap = null;
@@ -52,17 +59,51 @@ public class Crossfire_Hardware
       MotorMecanumRightFront = hwMap.dcMotor.get("right_front_drive");
       MotorMecanumLeftRear = hwMap.dcMotor.get("left_rear_drive");
       MotorMecanumRightRear = hwMap.dcMotor.get("right_rear_drive");
+      ButtonPusher = hwMap.servo.get("button_pusher");
+      sensorRGB = hwMap.colorSensor.get("AdafruitRGB");
+
+//      // we assume that the LED pin of the RGB sensor is connected to
+//      // digital port 5 (zero indexed).
+//      static final int LED_CHANNEL = 5;
+//      // set the digital channel to output mode.
+//      // remember, the Adafruit sensor is actually two devices.
+//      // It's an I2C sensor and it's also an LED that can be turned on or off.
+//      cdim.setDigitalChannelMode(LED_CHANNEL, DigitalChannelController.Mode.OUTPUT);
+//
+//      // turn the LED on in the beginning, just so user will know that the sensor is active.
+//      cdim.setDigitalChannelState(LED_CHANNEL, bLedOn);
 
       // Set motor polarity.  We are using
       // AndyMark motors so directions are opposite.
       MotorMecanumLeftFront.setDirection(DcMotor.Direction.REVERSE);     // Set to REVERSE if using AndyMark motors
       MotorMecanumLeftRear.setDirection(DcMotor.Direction.REVERSE);      // Set to REVERSE if using AndyMark motors
       MotorMecanumRightFront.setDirection(DcMotor.Direction.FORWARD);    // Set to FORWARD if using AndyMark motors
-      MotorMecanumRightRear.setDirection(DcMotor.Direction.FORWARD);     // Set to FORWARD if using AndyMark motors
+      MotorMecanumRightRear.setDirection(DcMotor.Direction.FORWARD);     // Set to FORWARD if using AndyMark motor
+      SetButtonPusherPosition(0.45);
+
 
       // Set all motors to zero power
       setMecanumPowers(0.0f, 0.0f, 0.0f, 0.0f);
+      GetButtonPusherPosition();
    }
+
+   public void SetButtonPusherPosition(double servoPositionDesired)
+   {
+      double servoPositionActual = Range.clip(servoPositionDesired, 0.28, 0.70);
+      ButtonPusher.setPosition(servoPositionActual);
+   }
+
+   public double GetButtonPusherPosition()
+   {
+      double position = 0.0;
+
+      if (ButtonPusher != null)
+      {
+         position = ButtonPusher.getPosition();
+      }
+      return position;
+   }
+
 
 
    /***
