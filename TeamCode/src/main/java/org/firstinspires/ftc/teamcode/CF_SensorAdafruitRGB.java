@@ -72,7 +72,7 @@ import com.qualcomm.robotcore.hardware.DigitalChannelController;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 @Autonomous(name = "Color Sensor", group = "Sensor")
-//@Disabled                            // Comment this out to add to the opmode list
+@Disabled                            // Comment this out to add to the opmode list
 public class CF_SensorAdafruitRGB extends LinearOpMode
 {
     private static final int RedUpperLimit = 360;
@@ -97,7 +97,7 @@ public class CF_SensorAdafruitRGB extends LinearOpMode
     float hsvValues[] = {0F,0F,0F};
 
     // values is a reference to the hsvValues array.
-    final float values[] = hsvValues;
+   final float values[] = hsvValues;
 
     // get a reference to the RelativeLayout so we can change the background
     // color of the Robot Controller app to match the hue detected by the RGB sensor.
