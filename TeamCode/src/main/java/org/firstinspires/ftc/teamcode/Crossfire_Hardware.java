@@ -33,6 +33,7 @@ public class Crossfire_Hardware
    public DcMotor MotorMecanumLeftRear;
    public DcMotor MotorMecanumRightRear;
    public Servo ButtonPusher;
+   public Servo Flicker;
    public ColorSensor sensorRGB;
 
    /* local OpMode members. */
@@ -56,6 +57,7 @@ public class Crossfire_Hardware
       MotorMecanumLeftRear = hwMap.dcMotor.get("left_rear_drive");
       MotorMecanumRightRear = hwMap.dcMotor.get("right_rear_drive");
       ButtonPusher = hwMap.servo.get("button_pusher");
+      Flicker = hwMap.servo.get("flicker");
       sensorRGB = hwMap.colorSensor.get("AdafruitRGB");
 
       // Set motor polarity.  We are using
@@ -65,6 +67,7 @@ public class Crossfire_Hardware
       MotorMecanumRightFront.setDirection(DcMotor.Direction.FORWARD);    // Set to FORWARD if using AndyMark motors
       MotorMecanumRightRear.setDirection(DcMotor.Direction.FORWARD);     // Set to FORWARD if using AndyMark motor
       SetButtonPusherPosition(0.45);
+      SetFlickerPosition(0.40);
 
       // Set all motors to zero power
       setMecanumPowers(0.0f, 0.0f, 0.0f, 0.0f);
@@ -90,6 +93,22 @@ public class Crossfire_Hardware
       return position;
    }
 
+   public void SetFlickerPosition(double servoPositionDesired)
+   {
+      double servoPositionActual = Range.clip(servoPositionDesired, 0.20, 1.00);
+      Flicker.setPosition(servoPositionActual);
+   }
+
+   public double GetFlickerPosition()
+   {
+      double position = 0.0;
+
+      if (ButtonPusher != null)
+      {
+         position = Flicker.getPosition();
+      }
+      return position;
+   }
 
    /***
     * Convenience method to assign motor power for mecanum drive.  Each mecanum

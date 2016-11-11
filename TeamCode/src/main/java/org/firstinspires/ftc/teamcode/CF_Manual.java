@@ -58,7 +58,7 @@ public class CF_Manual extends OpMode
       RunMecanumWheels();
 
       // Adjust the beacon button servo
-      ServiceServo();
+      ServiceServos();
 
       //Determine color of beacon
       beaconColor = sensor.GetAdafruitColor();
@@ -133,9 +133,10 @@ public class CF_Manual extends OpMode
     * left-hand button, press and hold x to rotate serve CCW. To push
     * right-hand button, press and hold b button to rotate servo CW.
     */
-   private void ServiceServo()
+   private void ServiceServos()
    {
       double ButtonPusherPosition = robot.GetButtonPusherPosition();
+      double FlickerPosition = robot.GetFlickerPosition();
 
       // Rotate CCW
       if (gamepad1.x)
@@ -147,6 +148,18 @@ public class CF_Manual extends OpMode
       else if (gamepad1.b)
       {
          robot.SetButtonPusherPosition(ButtonPusherPosition - beaconPusherRate);
+      }
+
+      // Up Theoretically
+      if (gamepad1.y)
+      {
+         robot.SetFlickerPosition(FlickerPosition + 0.17);
+      }
+
+      // Down Theoretically
+      else if (gamepad1.a)
+      {
+         robot.SetFlickerPosition(FlickerPosition - 0.17);
       }
    }
 }
