@@ -97,10 +97,10 @@ public class Crossfire_Hardware
     */
    public void setMecanumPowers(double LFPower, double RFPower, double LRPower, double RRPower)
    {
-      MotorMecanumLeftFront.setPower(LFPower);
-      MotorMecanumRightFront.setPower(RFPower);
-      MotorMecanumLeftRear.setPower(LRPower);
-      MotorMecanumRightRear.setPower(RRPower);
+      MotorMecanumLeftFront.setPower(Math.abs(LFPower));
+      MotorMecanumRightFront.setPower(Math.abs(RFPower));
+      MotorMecanumLeftRear.setPower(Math.abs(LRPower));
+      MotorMecanumRightRear.setPower(Math.abs(RRPower));
    }
 
 
@@ -128,10 +128,27 @@ public class Crossfire_Hardware
     */
    public void setMecanumEncoderTargetPosition(int LFcount, int RFcount, int LRcount, int RRcound)
    {
+      // Only want to use absolute values.  Take abs of inputs in case user sent negative value.
       MotorMecanumLeftFront.setTargetPosition(LFcount);
       MotorMecanumRightFront.setTargetPosition(RFcount);
       MotorMecanumLeftRear.setTargetPosition(LRcount);
       MotorMecanumRightRear.setTargetPosition(RRcound);
+   }
+
+
+   public boolean mecanumMotorsBusy()
+   {
+      boolean motorsBusy = false;
+
+      if(MotorMecanumLeftFront.isBusy()  ||
+         MotorMecanumRightFront.isBusy() ||
+         MotorMecanumLeftRear.isBusy()   ||
+         MotorMecanumRightRear.isBusy())
+      {
+         motorsBusy = true;
+      }
+
+      return (motorsBusy);
    }
 
 
