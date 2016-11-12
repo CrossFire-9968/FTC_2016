@@ -103,7 +103,7 @@ public class SensorAdafruitRGB extends LinearOpMode {
     boolean bLedOn = true;
 
     // get a reference to our DeviceInterfaceModule object.
-    cdim = hardwareMap.deviceInterfaceModule.get("dim");
+    cdim = hardwareMap.deviceInterfaceModule.get("CF_Dim");
 
     // set the digital channel to output mode.
     // remember, the Adafruit sensor is actually two devices.
@@ -111,7 +111,7 @@ public class SensorAdafruitRGB extends LinearOpMode {
     cdim.setDigitalChannelMode(LED_CHANNEL, DigitalChannelController.Mode.OUTPUT);
 
     // get a reference to our ColorSensor object.
-    sensorRGB = hardwareMap.colorSensor.get("color");
+    sensorRGB = hardwareMap.colorSensor.get("AdafruitRGB  ");
 
     // turn the LED on in the beginning, just so user will know that the sensor is active.
     cdim.setDigitalChannelState(LED_CHANNEL, bLedOn);

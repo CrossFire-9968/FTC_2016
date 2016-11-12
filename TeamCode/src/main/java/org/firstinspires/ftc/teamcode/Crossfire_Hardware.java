@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.Range;
 
 /**
  * This is NOT an opmode.
@@ -33,6 +34,7 @@ public class Crossfire_Hardware {
     public DcMotor RightFrontMotor;
     public DcMotor LeftRearMotor;
     public DcMotor RightRearMotor;
+    public Servo ButtonPusher;
 
 
 
@@ -59,16 +61,18 @@ public class Crossfire_Hardware {
         RightFrontMotor = hwMap.dcMotor.get("right_front_drive");
         LeftRearMotor = hwMap.dcMotor.get("left_rear_drive");
         RightRearMotor = hwMap.dcMotor.get("right_rear_drive");
+        ButtonPusher = hwMap.servo.get("button_pusher");
 
         // Set motor polarity.  We are using
         // AndyMark motors so directions are opposite.
-        LeftFrontMotor.setDirection(DcMotor.Direction.REVERSE);     // Set to REVERSE if using AndyMark motors
-        LeftRearMotor.setDirection(DcMotor.Direction.REVERSE);      // Set to REVERSE if using AndyMark motors
-        RightFrontMotor.setDirection(DcMotor.Direction.FORWARD);    // Set to FORWARD if using AndyMark motors
-        RightRearMotor.setDirection(DcMotor.Direction.FORWARD);     // Set to FORWARD if using AndyMark motors
+        LeftFrontMotor.setDirection(DcMotor.Direction.FORWARD);     // Set to REVERSE if using AndyMark motors
+        LeftRearMotor.setDirection(DcMotor.Direction.FORWARD);      // Set to REVERSE if using AndyMark motors
+        RightFrontMotor.setDirection(DcMotor.Direction.REVERSE);    // Set to FORWARD if using AndyMark motors
+        RightRearMotor.setDirection(DcMotor.Direction.REVERSE);     // Set to FORWARD if using AndyMark motors
 
         // Set all motors to zero power
         setMecanumPowers(0.0f, 0.0f, 0.0f, 0.0f);
+        SetButtonPusherPosition(0.45);
     }
 
 
@@ -108,6 +112,11 @@ public class Crossfire_Hardware {
 
         // Reset the cycle clock for the next pass.
         period.reset();
+    }
+    public void SetButtonPusherPosition(double servoPositionDesired)
+    {
+        double servoPositionActual = Range.clip(servoPositionDesired, 0.28, 0.70);
+        ButtonPusher.setPosition(servoPositionActual);
     }
 }
 

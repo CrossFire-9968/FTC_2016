@@ -7,6 +7,8 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 
+import com.qualcomm.hardware.adafruit.AdafruitI2cColorSensor;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -32,9 +34,9 @@ import org.firstinspires.ftc.teamcode.Crossfire_Hardware;
 /**
  * Created by Ryley on 10/5/16.
  */
-@TeleOp(name="CF_Vuforia", group ="Test")
+@Autonomous(name="CF_Vuforia_Red_Gears", group ="Red")
 //@Disabled
-public class CF_Vuforia extends CF_Library implements SensorEventListener{
+public class CF_Vuforia_Red_Gears extends CF_Library implements SensorEventListener{
 
         float xAccel = 0;
         float yAccel = 0;
@@ -51,7 +53,7 @@ public class CF_Vuforia extends CF_Library implements SensorEventListener{
             int z;
             int error;
             double kP = 0.0005;
-            double power = 0.3;
+            double power = 0.2;
             double effort;
             double leftPower;
             double rightPower;
@@ -59,6 +61,12 @@ public class CF_Vuforia extends CF_Library implements SensorEventListener{
             int firstFlag = 0;
             int picFlag = 0;
             int turnFlag = 0;
+            final int RedUpperLimit_LowRange = 20;
+            final int RedLowerLimit_LowRange = 0;
+            final int RedUpperLimit_highRange = 360;
+            final int RedLowerLimit_highRange = 325;
+            final int BlueUpperLimit = 270;
+            final int BlueLowerLimit = 220;
 
             int countRight = 1;
             int countLeft = 1;
@@ -71,7 +79,7 @@ public class CF_Vuforia extends CF_Library implements SensorEventListener{
 
 
             final int LED_CHANNEL = 5;
-            final int PICTURE = 0;
+            final int PICTURE = 3;
 
             // Makes camera output appear on screen
             VuforiaLocalizer.Parameters params = new VuforiaLocalizer.Parameters(R.id.cameraMonitorViewId);
@@ -117,30 +125,20 @@ public class CF_Vuforia extends CF_Library implements SensorEventListener{
             while (opModeIsActive()) {
 
                 if (firstFlag == 0) {
-                    //this.encoderMove(4600, 4600, 0.8f, 0.8f);
-                    go(0.8f);
+                    this.encoderStrafeRight(8700, 0.3f);
                     firstFlag = 1;
                 }
                 seeable = ((VuforiaTrackableDefaultListener) beacons.get(PICTURE).getListener()).isVisible();
                 int leftCount = robot.LeftFrontMotor.getCurrentPosition();
                 int rightCount = robot.RightFrontMotor.getCurrentPosition();
                 while (!seeable && !isStopRequested() && turnFlag == 0) {
-                    leftCount -= 60;
-                    rightCount += 60;
-                    this.encoderMove(leftCount, rightCount, -0.2f, 0.2f);
+                    this.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                    this.encoderStrafeRight(60, 0.3f);
                     seeable = ((VuforiaTrackableDefaultListener) beacons.get(PICTURE).getListener()).isVisible();
-                    if (isStopRequested()) {
-                        requestOpModeStop();
-                    }
-
-
                 }
 
                 if (seeable) {
-                    robot.LeftFrontMotor.setPower(0.0f);
-                    robot.RightFrontMotor.setPower(0.0f);
-                    robot.LeftRearMotor.setPower(0.0f);
-                    robot.RightRearMotor.setPower(0.0f);
+                    setPower(0.0f);
                     turnFlag = 1;
                 }
                 pose = ((VuforiaTrackableDefaultListener) beacons.get(PICTURE).getListener()).getRawPose();
@@ -195,7 +193,7 @@ public class CF_Vuforia extends CF_Library implements SensorEventListener{
                             robot.LeftFrontMotor.setPower(leftPower);
                             robot.RightFrontMotor.setPower(rightPower);
                             robot.LeftRearMotor.setPower(leftPower);
-                            robot.RightFrontMotor.setPower(rightPower);
+                            robot.RightRearMotor.setPower(rightPower);
                         }
                     }
                     if ((x < 100 && !isStopRequested()) || !seeable) {
@@ -214,13 +212,16 @@ public class CF_Vuforia extends CF_Library implements SensorEventListener{
 
                 Color.RGBToHSV((sensorRGB.red() * 255) / 800, (sensorRGB.green() * 255) / 800, (sensorRGB.blue() * 255) / 800, hsvValues);
                 float hue = hsvValues[0];
-                if (hue < 310 && picFlag == 1) {
-                    telemetry.addData("Blue", "Blue");
+                if((hue >= BlueLowerLimit) && (hue <= BlueLowerLimit)){
+                    telemetry.addData("blue", "blue");
                     telemetry.update();
+                    robot.SetButtonPusherPosition(0.70);
+
                 }
-                if (hue >= 310 && picFlag == 1) {
-                    telemetry.addData("Red", "Red");
+                else if ((hue >= RedLowerLimit_highRange) && (hue <= RedUpperLimit_highRange) || (hue >= RedLowerLimit_LowRange) && (hue <= RedUpperLimit_LowRange)) {
+                    telemetry.addData("red", "red");
                     telemetry.update();
+                    robot.SetButtonPusherPosition(0.28);
                 }
 
 

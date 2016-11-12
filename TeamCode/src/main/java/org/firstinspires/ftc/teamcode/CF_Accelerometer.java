@@ -8,6 +8,7 @@ import android.hardware.SensorManager;
 
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
 
 
 /**
@@ -28,23 +29,29 @@ public class CF_Accelerometer extends CF_Library implements SensorEventListener{
     @Override
     public void runOpMode ()throws InterruptedException {
         robot.init(hardwareMap);
-        sensorManager = (SensorManager) hardwareMap.appContext.getSystemService(Context.SENSOR_SERVICE);
-        accelSen = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+//        sensorManager = (SensorManager) hardwareMap.appContext.getSystemService(Context.SENSOR_SERVICE);
+//        accelSen = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         waitForStart();
 
 
-        sensorManager.registerListener(this, accelSen, SensorManager.SENSOR_DELAY_NORMAL);
+        //sensorManager.registerListener(this, accelSen, SensorManager.SENSOR_DELAY_NORMAL);
 
-        while(opModeIsActive()) {
-            while (!isStopRequested()) {
-                for(double i = 0.0; i <= 1.0; i+= 0.001) {
-                    robot.LeftFrontMotor.setPower(i);
-                    robot.RightFrontMotor.setPower(i);
-                    robot.LeftRearMotor.setPower(i);
-                    robot.RightRearMotor.setPower(i);
-                    System.out.println(i + "," + xAccel);
-                }
-            }
+//        while(opModeIsActive()) {
+//            while (!isStopRequested()) {
+//                for(double i = 0.0; i <= 1.0; i+= 0.001) {
+//                    robot.LeftFrontMotor.setPower(i);
+//                    robot.RightFrontMotor.setPower(i);
+//                    robot.LeftRearMotor.setPower(i);
+//                    robot.RightRearMotor.setPower(i);
+//                    System.out.println(i + "," + xAccel);
+//                }
+//            }
+//        }
+        if(opModeIsActive()) {
+            this.encoderStrafeRight(5714, 0.2f);
+
         }
     }
 
