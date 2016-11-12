@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
+import android.graphics.Color;
+
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -43,6 +45,32 @@ public class CF_Manual extends OpMode
    // Beacon button pusher servo increment rate
    private static final double beaconPusherRate = 0.005;
 
+   //CF_SensorLibrary.sensorColor beaconColor;
+
+   // Beacon hue thresholds
+   private static final int RedUpperLimit_lowRange = 20;
+   private static final int RedLowerLimit_lowRange = 0;
+   private static final int RedUpperLimit_highRange = 360;
+   private static final int RedLowerLimit_highRange = 325;
+   private static final int BlueUpperLimit = 270;
+   private static final int BlueLowerLimit = 220;
+
+   public enum sensorColor { unknown, blue, red }
+
+   sensorColor color = sensorColor.unknown;
+
+   // hsvValues is an array that will hold the hue, saturation, and value information.
+   float hsvValues[] = {0F, 0F, 0F};
+
+//   private static final int onLine = 2;
+//   private static final int offLine = 2;
+//   OpticalDistanceSensor odsSensor1;
+//   OpticalDistanceSensor odsSensor2;
+
+   // we assume that the LED pin of the RGB sensor is connected to
+   // digital port 5 (zero indexed).
+   static final int LED_CHANNEL = 5;
+
 
    public void init()
    {
@@ -52,16 +80,44 @@ public class CF_Manual extends OpMode
 
    public void loop()
    {
-      CF_SensorLibrary.sensorColor beaconColor;
-
       // Calculate and apply motor power to drive wheels
       RunMecanumWheels();
 
       // Adjust the beacon button servo
       ServiceServos();
 
-      //Determine color of beacon
-      beaconColor = sensor.GetAdafruitColor();
+      // convert the RGB values to HSV values.
+      Color.RGBToHSV((robot.sensorRGB.red() * 255) / 800, (robot.sensorRGB.green() * 255) / 800, (robot.sensorRGB.blue() * 255) / 800, hsvValues);
+
+      // Determine sensor color based on thresholds
+      if ((hsvValues[0] >= BlueLowerLimit) && (hsvValues[0] <= BlueUpperLimit))
+      {
+         color = sensorColor.blue;
+      }
+      else if ((hsvValues[0] >= RedLowerLimit_highRange) && (hsvValues[0] <= RedUpperLimit_highRange) ||
+               (hsvValues[0] >= RedLowerLimit_lowRange) && (hsvValues[0] <= RedUpperLimit_lowRange))
+      {
+         color = sensorColor.red;
+      }
+
+      telemetry.clear();
+
+      telemetry.addData("Hue: ", hsvValues[0]);
+
+      if (color == sensorColor.blue)
+      {
+         telemetry.addData("Color: ", "blue");
+      }
+      else if (color == sensorColor.red)
+      {
+         telemetry.addData("Color: ", "red");
+      }
+      else
+      {
+         telemetry.addData("Color: ", "unknown");
+      }
+
+      telemetry.update();
    }
 
 
@@ -151,15 +207,32 @@ public class CF_Manual extends OpMode
       }
 
       // Up Theoretically
-      if (gamepad1.y)
+      if (gamepad1.a)
       {
-         robot.SetFlickerPosition(FlickerPosition + 0.17);
+         robot.SetFlickerPosition(0.80);
       }
 
       // Down Theoretically
-      else if (gamepad1.a)
+      else if (gamepad1.y)
       {
-         robot.SetFlickerPosition(FlickerPosition - 0.17);
+         robot.SetFlickerPosition(0.80);
       }
    }
+
+
+//   public void GetAdafruitColor()
+//   {
+//      // convert the RGB values to HSV values.
+//      Color.RGBToHSV((robot.sensorRGB.red() * 255) / 800, (robot.sensorRGB.green() * 255) / 800, (robot.sensorRGB.blue() * 255) / 800, hsvValues);
+//
+//      // Determine sensor color based on thresholds
+//      if ((hsvValues[0] >= BlueLowerLimit) && (hsvValues[0] <= BlueUpperLimit))
+//      {
+//         color = sensorColor.blue;
+//      }
+//      else if ((hsvValues[0] >= RedLowerLimit) && (hsvValues[0] <= RedUpperLimit))
+//      {
+//         color = sensorColor.red;
+//      }
+//   }
 }

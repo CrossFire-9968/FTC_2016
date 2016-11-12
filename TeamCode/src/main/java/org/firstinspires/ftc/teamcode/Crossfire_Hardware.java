@@ -72,6 +72,7 @@ public class Crossfire_Hardware
       // Set all motors to zero power
       setMecanumPowers(0.0f, 0.0f, 0.0f, 0.0f);
       GetButtonPusherPosition();
+      GetFlickerPosition();
    }
 
 
@@ -103,7 +104,7 @@ public class Crossfire_Hardware
    {
       double position = 0.0;
 
-      if (ButtonPusher != null)
+      if (Flicker != null)
       {
          position = Flicker.getPosition();
       }

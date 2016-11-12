@@ -15,24 +15,22 @@ import com.qualcomm.robotcore.hardware.ColorSensor;
 
 public class CF_SensorLibrary
 {
-   // Beacon hue thresholds
-   private static final int RedUpperLimit = 360;
-   private static final int RedLowerLimit = 325;
-   private static final int BlueUpperLimit = 270;
-   private static final int BlueLowerLimit = 220;
-
-   public enum sensorColor { unknown, blue, red }
-
-   ColorSensor sensorRGB;
-
-//   private static final int onLine = 2;
-//   private static final int offLine = 2;
-//   OpticalDistanceSensor odsSensor1;
-//   OpticalDistanceSensor odsSensor2;
-
-   // we assume that the LED pin of the RGB sensor is connected to
-   // digital port 5 (zero indexed).
-   static final int LED_CHANNEL = 5;
+//   // Beacon hue thresholds
+//   private static final int RedUpperLimit = 360;
+//   private static final int RedLowerLimit = 325;
+//   private static final int BlueUpperLimit = 270;
+//   private static final int BlueLowerLimit = 220;
+//
+//   public enum sensorColor { unknown, blue, red }
+//
+////   private static final int onLine = 2;
+////   private static final int offLine = 2;
+////   OpticalDistanceSensor odsSensor1;
+////   OpticalDistanceSensor odsSensor2;
+//
+//   // we assume that the LED pin of the RGB sensor is connected to
+//   // digital port 5 (zero indexed).
+//   static final int LED_CHANNEL = 5;
 
 
    /***
@@ -40,28 +38,28 @@ public class CF_SensorLibrary
     * by the RGBToHSV method.  If the hue falls within a valid range, the method return
     * an enumeration of Blue or Red, otherwise it is Unknown.
     */
-   public sensorColor GetAdafruitColor()
-   {
-      sensorColor color = sensorColor.unknown;
-
-      // hsvValues is an array that will hold the hue, saturation, and value information.
-      float hsvValues[] = {0F, 0F, 0F};
-
-      // convert the RGB values to HSV values.
-      Color.RGBToHSV((sensorRGB.red() * 255) / 800, (sensorRGB.green() * 255) / 800, (sensorRGB.blue() * 255) / 800, hsvValues);
-
-      // Determine sensor color based on thresholds
-      if ((hsvValues[0] >= BlueLowerLimit) && (hsvValues[0] <= BlueUpperLimit))
-      {
-         color = sensorColor.blue;
-      }
-      else if ((hsvValues[0] >= RedLowerLimit) && (hsvValues[0] <= RedUpperLimit))
-      {
-         color = sensorColor.red;
-      }
-
-      return(color);
-   }
+//   public sensorColor GetAdafruitColor(Crossfire_Hardware robot)
+//   {
+//      sensorColor color = sensorColor.unknown;
+//
+//      // hsvValues is an array that will hold the hue, saturation, and value information.
+//      float hsvValues[] = {0F, 0F, 0F};
+//
+//      // convert the RGB values to HSV values.
+//      Color.RGBToHSV((robot.sensorRGB.red() * 255) / 800, (robot.sensorRGB.green() * 255) / 800, (robot.sensorRGB.blue() * 255) / 800, hsvValues);
+//
+//      // Determine sensor color based on thresholds
+//      if ((hsvValues[0] >= BlueLowerLimit) && (hsvValues[0] <= BlueUpperLimit))
+//      {
+//         color = sensorColor.blue;
+//      }
+//      else if ((hsvValues[0] >= RedLowerLimit) && (hsvValues[0] <= RedUpperLimit))
+//      {
+//         color = sensorColor.red;
+//      }
+//
+//      return(color);
+//   }
 
 
 //   public void getLineData()
