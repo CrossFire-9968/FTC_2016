@@ -41,6 +41,8 @@ public class Crossfire_Hardware
 
    public enum driveModeEnum {beaconMode, ballKickerMode};
 
+   public enum sensorColor { blue, red, unknown };
+
    driveModeEnum driveMode = driveModeEnum.beaconMode;
 
 
@@ -77,10 +79,22 @@ public class Crossfire_Hardware
       GetButtonPusherPosition();
       GetFlickerPosition();
 
+      // Initialize driver controls to beacon mode or ball kicker mode.
+      // Comment out the mode you don't want to start in.
       setBeaconMode();
+      //setBallKickerMode();
    }
 
 
+   /***
+    * This method sets the position of the beacon button pusher servo.  The drive
+    * holds down the controller button controller button (digital) which increases or
+    * decreases the position value.  This method checks that the driver didn't fall
+    * asleep holding the button making the servo rotate to a position it obviously
+    * should go.  The limits are magic numbers by Lauren...<sigh>!
+    *
+    * @param servoPositionDesired Desired position for beacon button pusher servo
+    */
    public void SetButtonPusherPosition(double servoPositionDesired)
    {
       double servoPositionActual = Range.clip(servoPositionDesired, 0.28, 0.70);
@@ -88,6 +102,11 @@ public class Crossfire_Hardware
    }
 
 
+   /***
+    * If you want to know where the beacon button servo has gone, this is the method for you.
+    *
+    * @return Relative position of servo, range is 0 to 1
+    */
    public double GetButtonPusherPosition()
    {
       double position = 0.0;
@@ -99,12 +118,22 @@ public class Crossfire_Hardware
       return position;
    }
 
+
+   /***
+    *
+    * @param servoPositionDesired
+    */
    public void SetFlickerPosition(double servoPositionDesired)
    {
       double servoPositionActual = Range.clip(servoPositionDesired, 0.00, 1.00);
       Flicker.setPosition(servoPositionActual);
    }
 
+
+   /***
+    *
+    * @return
+    */
    public double GetFlickerPosition()
    {
       double position = 0.0;
@@ -158,26 +187,29 @@ public class Crossfire_Hardware
    }
 
 
+   /***
+    *
+    */
    public void setBallKickerMode()
    {
       driveMode = driveModeEnum.ballKickerMode;
-//      MotorMecanumLeftFront.setDirection(DcMotor.Direction.FORWARD);     // Set to REVERSE if using AndyMark motors
-//      MotorMecanumLeftRear.setDirection(DcMotor.Direction.FORWARD);      // Set to REVERSE if using AndyMark motors
-//      MotorMecanumRightFront.setDirection(DcMotor.Direction.REVERSE);    // Set to FORWARD if using AndyMark motors
-//      MotorMecanumRightRear.setDirection(DcMotor.Direction.REVERSE);     // Set to FORWARD if using AndyMark motor
    }
 
 
+   /***
+    *
+    */
    public void setBeaconMode()
    {
       driveMode = driveModeEnum.beaconMode;
-//      MotorMecanumLeftFront.setDirection(DcMotor.Direction.REVERSE);     // Set to REVERSE if using AndyMark motors
-//      MotorMecanumLeftRear.setDirection(DcMotor.Direction.REVERSE);      // Set to REVERSE if using AndyMark motors
-//      MotorMecanumRightFront.setDirection(DcMotor.Direction.FORWARD);    // Set to FORWARD if using AndyMark motors
-//      MotorMecanumRightRear.setDirection(DcMotor.Direction.FORWARD);     // Set to FORWARD if using AndyMark motor
    }
 
 
+   /***
+    *
+    * @param input
+    * @return
+    */
    public double ScaleJoystickCommand(double input)
    {
       double scaledInput;
