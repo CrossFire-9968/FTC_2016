@@ -212,7 +212,7 @@ public class CF_Vuforia_Blue_Wheels extends CF_Library implements SensorEventLis
             Color.RGBToHSV((sensorRGB.red() * 255) / 800, (sensorRGB.green() * 255) / 800, (sensorRGB.blue() * 255) / 800, hsvValues);
             float hue = hsvValues[0];
             if((hue >= BlueLowerLimit) && (hue <= BlueLowerLimit)){
-                telemetry.addData("blue", "blue");
+                telemetry.addData("blue", "blue");s
                 telemetry.update();
                 robot.SetButtonPusherPosition(0.28);
             }
