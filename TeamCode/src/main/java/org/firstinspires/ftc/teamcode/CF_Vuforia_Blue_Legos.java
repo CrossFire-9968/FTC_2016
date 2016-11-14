@@ -34,7 +34,7 @@ import org.firstinspires.ftc.teamcode.Crossfire_Hardware;
 /**
  * Created by Ryley on 10/5/16.
  */
-@Autonomous(name="CF_Vuforia_Red_Blue_Legos", group ="Blue")
+@Autonomous(name="CF_Vuforia_Blue_Legos", group ="Blue")
 //@Disabled
 public class CF_Vuforia_Blue_Legos extends CF_Library implements SensorEventListener{
 
@@ -48,7 +48,11 @@ public class CF_Vuforia_Blue_Legos extends CF_Library implements SensorEventList
     @Override
     public void runOpMode ()throws InterruptedException {
         robot.init(hardwareMap);
-        int x;
+       robot.MotorMecanumLeftFront.setDirection(DcMotor.Direction.FORWARD);     // Set to REVERSE if using AndyMark motors
+       robot.MotorMecanumLeftRear.setDirection(DcMotor.Direction.FORWARD);      // Set to REVERSE if using AndyMark motors
+       robot.MotorMecanumRightFront.setDirection(DcMotor.Direction.REVERSE);    // Set to FORWARD if using AndyMark motors
+       robot.MotorMecanumRightRear.setDirection(DcMotor.Direction.REVERSE);
+       int x;
         int y;
         int z;
         int error;
@@ -128,8 +132,8 @@ public class CF_Vuforia_Blue_Legos extends CF_Library implements SensorEventList
                 firstFlag = 1;
             }
             seeable = ((VuforiaTrackableDefaultListener) beacons.get(PICTURE).getListener()).isVisible();
-            int leftCount = robot.LeftFrontMotor.getCurrentPosition();
-            int rightCount = robot.RightFrontMotor.getCurrentPosition();
+            int leftCount = robot.MotorMecanumLeftFront.getCurrentPosition();
+            int rightCount = robot.MotorMecanumRightFront.getCurrentPosition();
             while (!seeable && !isStopRequested() && turnFlag == 0) {
                 this.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                 this.encoderStrafeRight(60, 0.3f);
@@ -189,17 +193,17 @@ public class CF_Vuforia_Blue_Legos extends CF_Library implements SensorEventList
                         effort = kP * error;
                         rightPower = power + effort;
                         leftPower = power - effort;
-                        robot.LeftFrontMotor.setPower(leftPower);
-                        robot.RightFrontMotor.setPower(rightPower);
-                        robot.LeftRearMotor.setPower(leftPower);
-                        robot.RightRearMotor.setPower(rightPower);
+                        robot.MotorMecanumLeftFront.setPower(leftPower);
+                        robot.MotorMecanumRightFront.setPower(rightPower);
+                        robot.MotorMecanumLeftRear.setPower(leftPower);
+                        robot.MotorMecanumRightRear.setPower(rightPower);
                     }
                 }
                 if ((x < 100 && !isStopRequested()) || !seeable) {
-                    robot.LeftFrontMotor.setPower(0.0f);
-                    robot.RightFrontMotor.setPower(0.0f);
-                    robot.LeftRearMotor.setPower(0.0f);
-                    robot.RightRearMotor.setPower(0.0f);
+                    robot.MotorMecanumLeftFront.setPower(0.0f);
+                    robot.MotorMecanumRightFront.setPower(0.0f);
+                    robot.MotorMecanumLeftRear.setPower(0.0f);
+                    robot.MotorMecanumRightRear.setPower(0.0f);
                     if(x < 100 && !isStopRequested()) {
                         picFlag = 1;
                     }
@@ -233,16 +237,16 @@ public class CF_Vuforia_Blue_Legos extends CF_Library implements SensorEventList
         telemetry.addData("Status", "Resetting Encoders");
         telemetry.update();
 
-        robot.LeftFrontMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        robot.RightFrontMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        robot.LeftRearMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        robot.RightRearMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.MotorMecanumLeftFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.MotorMecanumRightFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.MotorMecanumLeftRear.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.MotorMecanumRightRear.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         //idle();
 
-        robot.LeftFrontMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        robot.RightFrontMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        robot.LeftRearMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        robot.RightRearMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.MotorMecanumLeftFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.MotorMecanumRightFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.MotorMecanumLeftRear.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.MotorMecanumRightRear.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         // Send telemetry message to indicate successful Encoder reset
         telemetry.addData("Encoder Reset!", "Encoder Reset");

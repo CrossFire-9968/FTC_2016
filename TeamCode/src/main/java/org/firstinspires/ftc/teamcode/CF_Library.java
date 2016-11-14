@@ -6,115 +6,115 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
  */
 
 public abstract class CF_Library extends LinearOpMode {
-    Crossfire_Hardware robot   = new Crossfire_Hardware();
-    public void setPower(float power) {
-        robot.LeftFrontMotor.setPower(power);
-        robot.RightFrontMotor.setPower(power);
-        robot.LeftRearMotor.setPower(power);
-        robot.RightRearMotor.setPower(power);
-    }
+   Crossfire_Hardware robot   = new Crossfire_Hardware();
+   public void setPower(float power) {
+      robot.MotorMecanumLeftFront.setPower(power);
+      robot.MotorMecanumRightFront.setPower(power);
+      robot.MotorMecanumLeftRear.setPower(power);
+      robot.MotorMecanumRightRear.setPower(power);
+   }
 
-    public void setLeftPower(float power) {
-        robot.LeftFrontMotor.setPower(power);
-        robot.LeftRearMotor.setPower(power);
-    }
+   public void setLeftPower(float power) {
+      robot.MotorMecanumLeftFront.setPower(power);
+      robot.MotorMecanumLeftRear.setPower(power);
+   }
 
-    public void setRightPower(float rpower) {
-        robot.RightFrontMotor.setPower(rpower);
-        robot.RightRearMotor.setPower(rpower);
-    }
+   public void setRightPower(float rpower) {
+      robot.MotorMecanumRightFront.setPower(rpower);
+      robot.MotorMecanumRightRear.setPower(rpower);
+   }
 
-    public void setMode(DcMotor.RunMode mode) {
-        robot.LeftFrontMotor.setMode(mode);
-        robot.RightFrontMotor.setMode(mode);
-        robot.LeftRearMotor.setMode(mode);
-        robot.RightRearMotor.setMode(mode);
-    }
+   public void setMode(DcMotor.RunMode mode) {
+      robot.MotorMecanumLeftFront.setMode(mode);
+      robot.MotorMecanumRightFront.setMode(mode);
+      robot.MotorMecanumLeftRear.setMode(mode);
+      robot.MotorMecanumRightRear.setMode(mode);
+   }
 
-    public void encoderMove(int countLeft, int countRight, double leftPower, double rightPower){
+   public void encoderMove(int countLeft, int countRight, double leftPower, double rightPower){
 
-        robot.LeftFrontMotor.setPower(leftPower);
-        robot.RightFrontMotor.setPower(rightPower);
-        robot.LeftRearMotor.setPower(leftPower);
-        robot.RightRearMotor.setPower(rightPower);
+      robot.MotorMecanumLeftFront.setPower(leftPower);
+      robot.MotorMecanumRightFront.setPower(rightPower);
+      robot.MotorMecanumLeftRear.setPower(leftPower);
+      robot.MotorMecanumRightRear.setPower(rightPower);
 
-        setMode(DcMotor.RunMode.RUN_TO_POSITION);
+      setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-        robot.LeftFrontMotor.setTargetPosition(countLeft);
-        robot.RightFrontMotor.setTargetPosition(countRight);
-        robot.LeftRearMotor.setTargetPosition(countLeft);
-        robot.RightRearMotor.setTargetPosition(countRight);
+      robot.MotorMecanumLeftFront.setTargetPosition(countLeft);
+      robot.MotorMecanumRightFront.setTargetPosition(countRight);
+      robot.MotorMecanumLeftRear.setTargetPosition(countLeft);
+      robot.MotorMecanumRightRear.setTargetPosition(countRight);
 
-        while(robot.LeftFrontMotor.isBusy() && robot.RightFrontMotor.isBusy() && robot.LeftRearMotor.isBusy() && robot.RightRearMotor.isBusy()) {
-            double leftPos = robot.LeftFrontMotor.getCurrentPosition();
-            double rightPos = robot.RightFrontMotor.getCurrentPosition();
-            telemetry.addData("Right",rightPos);
-            telemetry.addData("Left",leftPos);
-            telemetry.update();
-            try {
-                idle();
-            }
-            catch(InterruptedException e) {
-                telemetry.addData("Idle Failed", "Idle Failed");
-            }
+      while(robot.MotorMecanumLeftFront.isBusy() && robot.MotorMecanumRightFront.isBusy() && robot.MotorMecanumLeftRear.isBusy() && robot.MotorMecanumRightRear.isBusy()) {
+         double leftPos = robot.MotorMecanumLeftFront.getCurrentPosition();
+         double rightPos = robot.MotorMecanumRightFront.getCurrentPosition();
+         telemetry.addData("Right",rightPos);
+         telemetry.addData("Left",leftPos);
+         telemetry.update();
+         try {
+            idle();
+         }
+         catch(InterruptedException e) {
+            telemetry.addData("Idle Failed", "Idle Failed");
+         }
 
-        }
-        setPower(0.0f);
-        setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-    }
-    public void encoderStrafeRight(int count, float power) throws InterruptedException{
-        setLeftPower(power);
-        setRightPower(power);
-        setPower(power);
-        robot.LeftFrontMotor.setTargetPosition(count);
-        robot.RightFrontMotor.setTargetPosition(count * -1);
-        robot.LeftRearMotor.setTargetPosition(count * -1);
-        robot.RightRearMotor.setTargetPosition(count);
-        setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        while(robot.LeftFrontMotor.isBusy() && robot.RightFrontMotor.isBusy() && robot.LeftRearMotor.isBusy() && robot.RightRearMotor.isBusy()) {
-            double leftPos = robot.LeftRearMotor.getCurrentPosition();
-            double rightPos = robot.RightRearMotor.getCurrentPosition();
-            telemetry.addData("Right",rightPos);
-            telemetry.addData("Left",leftPos);
-            telemetry.update();
-            try {
-                idle();
-            }
-            catch(InterruptedException e) {
-                telemetry.addData("Idle Failed", "Idle Failed");
-            }
-        }
+      }
+      setPower(0.0f);
+      setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+   }
+   public void encoderStrafeRight(int count, float power) throws InterruptedException{
+      setLeftPower(power);
+      setRightPower(power);
+      setPower(power);
+      robot.MotorMecanumLeftFront.setTargetPosition(count);
+      robot.MotorMecanumRightFront.setTargetPosition(count * -1);
+      robot.MotorMecanumLeftRear.setTargetPosition(count * -1);
+      robot.MotorMecanumRightRear.setTargetPosition(count);
+      setMode(DcMotor.RunMode.RUN_TO_POSITION);
+      while(robot.MotorMecanumLeftFront.isBusy() && robot.MotorMecanumRightFront.isBusy() && robot.MotorMecanumLeftRear.isBusy() && robot.MotorMecanumRightRear.isBusy()) {
+         double leftPos = robot.MotorMecanumLeftRear.getCurrentPosition();
+         double rightPos = robot.MotorMecanumRightRear.getCurrentPosition();
+         telemetry.addData("Right",rightPos);
+         telemetry.addData("Left",leftPos);
+         telemetry.update();
+         try {
+            idle();
+         }
+         catch(InterruptedException e) {
+            telemetry.addData("Idle Failed", "Idle Failed");
+         }
+      }
 
-        setPower(0.0f);
-        setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+      setPower(0.0f);
+      setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-    }
-    public void encoderStrafeLeft(int count, float power) throws InterruptedException{
-        setLeftPower(power);
-        setRightPower(power);
-        setPower(power);
-        robot.LeftFrontMotor.setTargetPosition(count * -1);
-        robot.RightFrontMotor.setTargetPosition(count);
-        robot.LeftRearMotor.setTargetPosition(count);
-        robot.RightRearMotor.setTargetPosition(count * -1);
-        setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        while(robot.LeftFrontMotor.isBusy() && robot.RightFrontMotor.isBusy() && robot.LeftRearMotor.isBusy() && robot.RightRearMotor.isBusy()) {
-            double leftPos = robot.LeftRearMotor.getCurrentPosition();
-            double rightPos = robot.RightRearMotor.getCurrentPosition();
-            telemetry.addData("Right",rightPos);
-            telemetry.addData("Left",leftPos);
-            telemetry.update();
-            try {
-                idle();
-            }
-            catch(InterruptedException e) {
-                telemetry.addData("Idle Failed", "Idle Failed");
-            }
-        }
+   }
+   public void encoderStrafeLeft(int count, float power) throws InterruptedException{
+      setLeftPower(power);
+      setRightPower(power);
+      setPower(power);
+      robot.MotorMecanumLeftFront.setTargetPosition(count * -1);
+      robot.MotorMecanumRightFront.setTargetPosition(count);
+      robot.MotorMecanumLeftRear.setTargetPosition(count);
+      robot.MotorMecanumRightRear.setTargetPosition(count * -1);
+      setMode(DcMotor.RunMode.RUN_TO_POSITION);
+      while(robot.MotorMecanumLeftFront.isBusy() && robot.MotorMecanumRightFront.isBusy() && robot.MotorMecanumLeftRear.isBusy() && robot.MotorMecanumRightRear.isBusy()) {
+         double leftPos = robot.MotorMecanumLeftRear.getCurrentPosition();
+         double rightPos = robot.MotorMecanumRightRear.getCurrentPosition();
+         telemetry.addData("Right",rightPos);
+         telemetry.addData("Left",leftPos);
+         telemetry.update();
+         try {
+            idle();
+         }
+         catch(InterruptedException e) {
+            telemetry.addData("Idle Failed", "Idle Failed");
+         }
+      }
 
-        setPower(0.0f);
-        setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+      setPower(0.0f);
+      setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-    }
+   }
 
 }
