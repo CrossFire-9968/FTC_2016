@@ -23,7 +23,7 @@ import org.firstinspires.ftc.teamcode.Crossfire_Hardware.sensorColor;
  */
 
 @TeleOp(name = "CF_Manual", group = "Drivetrain")
-@Disabled
+//@Disabled
 
 public class CF_Manual extends OpMode
 {
