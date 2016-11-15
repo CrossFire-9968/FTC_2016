@@ -46,15 +46,7 @@ public class CF_Manual extends OpMode
    // Beacon button pusher servo increment rate
    private static final double beaconPusherRate = 0.005;
 
-   // Beacon hue thresholds
-   private static final int RedUpperLimit_lowRange = 20;
-   private static final int RedLowerLimit_lowRange = 0;
-   private static final int RedUpperLimit_highRange = 360;
-   private static final int RedLowerLimit_highRange = 325;
-   private static final int BlueUpperLimit = 270;
-   private static final int BlueLowerLimit = 220;
-
-   sensorColor color = sensorColor.unknown;
+   private sensorColor beaconColor = sensorColor.unknown;
 
 
    /***
@@ -78,7 +70,7 @@ public class CF_Manual extends OpMode
       // Adjust the beacon button servo
       ServiceServos();
 
-      color = colorSensor.GetAdafruitColor(robot);
+      beaconColor = colorSensor.GetAdafruitColor(robot);
 
       // Set steering to ball kicker driving mode
       if (gamepad1.right_bumper)
