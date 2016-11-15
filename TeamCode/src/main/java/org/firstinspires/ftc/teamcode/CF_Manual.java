@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -20,7 +21,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
  */
 
 @TeleOp(name = "CF_Manual", group = "Drivetrain")
-//Disabled
+@Disabled
 
 public class CF_Manual extends OpMode
 {
@@ -52,7 +53,7 @@ public class CF_Manual extends OpMode
 
    public void loop()
    {
-      CF_SensorLibrary.sensorColor beaconColor;
+      //CF_SensorLibrary.sensorColor beaconColor;
 
       // Calculate and apply motor power to drive wheels
       RunMecanumWheels();
@@ -61,7 +62,7 @@ public class CF_Manual extends OpMode
       ServiceServo();
 
       //Determine color of beacon
-      beaconColor = colorSensor.GetAdafruitColor();
+      //beaconColor = colorSensor.GetAdafruitColor();
    }
 
 

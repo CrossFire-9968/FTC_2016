@@ -61,7 +61,7 @@ public class Crossfire_Hardware
       MotorMecanumRightRear.setDirection(DcMotor.Direction.FORWARD);     // Set to FORWARD if using AndyMark motor
       SetButtonPusherPosition(0.45);
 
-      // Set all motors to zero power
+       //Set all motors to zero power
       setMecanumPowers(0.0f, 0.0f, 0.0f, 0.0f);
       GetButtonPusherPosition();
    }
@@ -136,16 +136,56 @@ public class Crossfire_Hardware
    }
 
 
+   /***
+    * Method determines if the mecanum motors are still busy trying to reach the target position.
+    * As each encoder reaches it's target position, it is run mode is changed to RUN_WITHOUT_ENCODERS.
+    * This is to disable the PID position control loop and de-energize the motor.  If this is not
+    * done and the motors continue to hold position, we have seen cases where one or more motors
+    * remain a few counts away from reaching their target due to having to overcome torque
+    * applied by motors holding a static position.  This keeps the state machine from advancing
+    * to the next state.  This method is a bit jerky looking at the end of a state but works.
+    * Alternatively, you could just watch one motor or a pair (e.g. the fronts) and assume the
+    * other wheels are close enough.  This method may not work well if the encoder counts and
+    * motor power are not synchronized to turn off at roughly the same time.
+    *
+    * @return boolean flag TRUE - motors busy or FALSE - meaning all motors have reached target position
+    */
    public boolean mecanumMotorsBusy()
    {
-      boolean motorsBusy = false;
+      boolean motorsBusy = true;
 
-      if(MotorMecanumLeftFront.isBusy()  ||
-         MotorMecanumRightFront.isBusy() ||
-         MotorMecanumLeftRear.isBusy()   ||
-         MotorMecanumRightRear.isBusy())
+      // Turn off left front motor when target position reached
+      if(!MotorMecanumLeftFront.isBusy())
       {
-         motorsBusy = true;
+         MotorMecanumLeftFront.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+      }
+
+      // Turn off right front motor when target position reached
+      if(!MotorMecanumRightFront.isBusy())
+      {
+         MotorMecanumRightFront.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+      }
+
+      // Turn off left rear motor when target position reached
+      if(!MotorMecanumLeftRear.isBusy())
+      {
+         MotorMecanumLeftRear.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+      }
+
+      // Turn off right rear motor when target position reached
+      if(!MotorMecanumRightRear.isBusy())
+      {
+         MotorMecanumRightRear.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+      }
+
+      // If all the motors are set to RUN_WITHOUT_ENCODERS, then we assume that the robot
+      // has reached it's final destination and we can transition to the next state.
+      if((MotorMecanumLeftFront.getMode() == DcMotor.RunMode.RUN_WITHOUT_ENCODER)   ||
+         (MotorMecanumRightFront.getMode() == DcMotor.RunMode.RUN_WITHOUT_ENCODER)  ||
+         (MotorMecanumLeftRear.getMode() == DcMotor.RunMode.RUN_WITHOUT_ENCODER)    ||
+         (MotorMecanumRightRear.getMode() == DcMotor.RunMode.RUN_WITHOUT_ENCODER))
+      {
+         motorsBusy = false;
       }
 
       return (motorsBusy);
