@@ -1,12 +1,9 @@
 package org.firstinspires.ftc.teamcode;
 
-import android.graphics.Color;
-
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
@@ -23,7 +20,6 @@ import com.qualcomm.robotcore.util.Range;
  * Motor channel:  Left rear drive motor:       "left_rear_drive"
  * Motor channel:  Right rear drive motor:      "right_rear_drive"
  */
-
 public class Crossfire_Hardware
 {
    /* Public OpMode members. */
@@ -74,7 +70,7 @@ public class Crossfire_Hardware
       SetButtonPusherPosition(0.45);
       SetFlickerPosition(0.55);
 
-      // Set all motors to zero power
+       //Set all motors to zero power
       setMecanumPowers(0.0f, 0.0f, 0.0f, 0.0f);
       GetButtonPusherPosition();
       GetFlickerPosition();
@@ -156,10 +152,98 @@ public class Crossfire_Hardware
     */
    public void setMecanumPowers(double LFPower, double RFPower, double LRPower, double RRPower)
    {
-      MotorMecanumLeftFront.setPower(LFPower);
-      MotorMecanumRightFront.setPower(RFPower);
-      MotorMecanumLeftRear.setPower(LRPower);
-      MotorMecanumRightRear.setPower(RRPower);
+      MotorMecanumLeftFront.setPower(Math.abs(LFPower));
+      MotorMecanumRightFront.setPower(Math.abs(RFPower));
+      MotorMecanumLeftRear.setPower(Math.abs(LRPower));
+      MotorMecanumRightRear.setPower(Math.abs(RRPower));
+   }
+
+
+   /***
+    * Convenience method for setting encoder runmode for all four mecanum drive motors
+    *
+    * @param mode Encoder run mode
+    */
+   public void setMecanumEncoderMode(DcMotor.RunMode mode)
+   {
+      MotorMecanumLeftFront.setMode(mode);
+      MotorMecanumRightFront.setMode(mode);
+      MotorMecanumLeftRear.setMode(mode);
+      MotorMecanumRightRear.setMode(mode);
+   }
+
+
+   /***
+    * Convenience method for setting encoder counts to all four mecanum drive motors
+    *
+    * @param LFcount Left front encoder counts
+    * @param RFcount Right front encoder counts
+    * @param LRcount Left rear encoder counts
+    * @param RRcound Right rear encoder counts
+    */
+   public void setMecanumEncoderTargetPosition(int LFcount, int RFcount, int LRcount, int RRcound)
+   {
+      // Only want to use absolute values.  Take abs of inputs in case user sent negative value.
+      MotorMecanumLeftFront.setTargetPosition(LFcount);
+      MotorMecanumRightFront.setTargetPosition(RFcount);
+      MotorMecanumLeftRear.setTargetPosition(LRcount);
+      MotorMecanumRightRear.setTargetPosition(RRcound);
+   }
+
+
+   /***
+    * Method determines if the mecanum motors are still busy trying to reach the target position.
+    * As each encoder reaches it's target position, it is run mode is changed to RUN_WITHOUT_ENCODERS.
+    * This is to disable the PID position control loop and de-energize the motor.  If this is not
+    * done and the motors continue to hold position, we have seen cases where one or more motors
+    * remain a few counts away from reaching their target due to having to overcome torque
+    * applied by motors holding a static position.  This keeps the state machine from advancing
+    * to the next state.  This method is a bit jerky looking at the end of a state but works.
+    * Alternatively, you could just watch one motor or a pair (e.g. the fronts) and assume the
+    * other wheels are close enough.  This method may not work well if the encoder counts and
+    * motor power are not synchronized to turn off at roughly the same time.
+    *
+    * @return boolean flag TRUE - motors busy or FALSE - meaning all motors have reached target position
+    */
+   public boolean mecanumMotorsBusy()
+   {
+      boolean motorsBusy = true;
+
+      // Turn off left front motor when target position reached
+      if(!MotorMecanumLeftFront.isBusy())
+      {
+         MotorMecanumLeftFront.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+      }
+
+      // Turn off right front motor when target position reached
+      if(!MotorMecanumRightFront.isBusy())
+      {
+         MotorMecanumRightFront.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+      }
+
+      // Turn off left rear motor when target position reached
+      if(!MotorMecanumLeftRear.isBusy())
+      {
+         MotorMecanumLeftRear.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+      }
+
+      // Turn off right rear motor when target position reached
+      if(!MotorMecanumRightRear.isBusy())
+      {
+         MotorMecanumRightRear.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+      }
+
+      // If all the motors are set to RUN_WITHOUT_ENCODERS, then we assume that the robot
+      // has reached it's final destination and we can transition to the next state.
+      if((MotorMecanumLeftFront.getMode() == DcMotor.RunMode.RUN_WITHOUT_ENCODER)   ||
+         (MotorMecanumRightFront.getMode() == DcMotor.RunMode.RUN_WITHOUT_ENCODER)  ||
+         (MotorMecanumLeftRear.getMode() == DcMotor.RunMode.RUN_WITHOUT_ENCODER)    ||
+         (MotorMecanumRightRear.getMode() == DcMotor.RunMode.RUN_WITHOUT_ENCODER))
+      {
+         motorsBusy = false;
+      }
+
+      return (motorsBusy);
    }
 
 

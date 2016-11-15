@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -22,12 +23,12 @@ import org.firstinspires.ftc.teamcode.Crossfire_Hardware.sensorColor;
  */
 
 @TeleOp(name = "CF_Manual", group = "Drivetrain")
-//Disabled
+@Disabled
 
 public class CF_Manual extends OpMode
 {
    Crossfire_Hardware robot = new Crossfire_Hardware();
-   CF_SensorLibrary sensor = new CF_SensorLibrary();
+   CF_SensorLibrary colorSensor = new CF_SensorLibrary();
 
    // Minimum joystick position before we assume value is good.
    // Near center, value could contain noise or offset that we want to ignore.
@@ -77,7 +78,7 @@ public class CF_Manual extends OpMode
       // Adjust the beacon button servo
       ServiceServos();
 
-      color = sensor.GetAdafruitColor(robot);
+      color = colorSensor.GetAdafruitColor(robot);
 
       // Set steering to ball kicker driving mode
       if (gamepad1.right_bumper)
