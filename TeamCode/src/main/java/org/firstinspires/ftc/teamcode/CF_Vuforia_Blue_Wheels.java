@@ -31,6 +31,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefau
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
 import org.firstinspires.ftc.teamcode.Crossfire_Hardware;
 
+import java.util.concurrent.TimeUnit;
+
 /**
  * Created by Ryley on 10/5/16.
  */
@@ -65,12 +67,13 @@ public class CF_Vuforia_Blue_Wheels extends CF_Library implements SensorEventLis
         int firstFlag = 0;
         int picFlag = 0;
         int turnFlag = 0;
+        int beaconFlag = 0;
         final int RedUpperLimit_LowRange = 20;
         final int RedLowerLimit_LowRange = 0;
         final int RedUpperLimit_highRange = 360;
         final int RedLowerLimit_highRange = 325;
         final int BlueUpperLimit = 270;
-        final int BlueLowerLimit = 220;
+        final int BlueLowerLimit = 200;
 
         int countRight = 1;
         int countLeft = 1;
@@ -128,7 +131,7 @@ public class CF_Vuforia_Blue_Wheels extends CF_Library implements SensorEventLis
 
         while (opModeIsActive()) {
             if (firstFlag == 0) {
-                this.encoderStrafeLeft(5000, 0.3f);
+                this.encoderStrafeLeft(5060, 0.3f);
                 firstFlag = 1;
             }
             seeable = ((VuforiaTrackableDefaultListener) beacons.get(PICTURE).getListener()).isVisible();
@@ -179,7 +182,7 @@ public class CF_Vuforia_Blue_Wheels extends CF_Library implements SensorEventLis
                 telemetry.addData("cosXPose: ", cosXPose);
                 seeable = ((VuforiaTrackableDefaultListener) beacons.get(PICTURE).getListener()).isVisible();
 
-                while (x >= 75 && !isStopRequested() && seeable) {
+                while (x >= 100 && !isStopRequested() && seeable) {
                     pose = ((VuforiaTrackableDefaultListener) beacons.get(PICTURE).getListener()).getRawPose();
                     seeable = ((VuforiaTrackableDefaultListener) beacons.get(PICTURE).getListener()).isVisible();
                     if (pose != null) {
@@ -189,7 +192,7 @@ public class CF_Vuforia_Blue_Wheels extends CF_Library implements SensorEventLis
                         telemetry.addData("x: ", x);
                         telemetry.addData("y: ", y);
                         telemetry.update();
-                        error = y;
+                        error = y + 10;
                         effort = kP * error;
                         rightPower = power + effort;
                         leftPower = power - effort;
@@ -199,12 +202,12 @@ public class CF_Vuforia_Blue_Wheels extends CF_Library implements SensorEventLis
                         robot.MotorMecanumRightRear.setPower(rightPower);
                     }
                 }
-                if ((x < 75 && !isStopRequested()) || !seeable) {
+                if ((x < 100 && !isStopRequested()) || !seeable) {
                     robot.MotorMecanumLeftFront.setPower(0.0f);
                     robot.MotorMecanumRightFront.setPower(0.0f);
                     robot.MotorMecanumLeftRear.setPower(0.0f);
                     robot.MotorMecanumRightRear.setPower(0.0f);
-                    if(x < 75 && !isStopRequested()) {
+                    if(x < 100 && !isStopRequested()) {
                         picFlag = 1;
                     }
                 }
@@ -213,17 +216,34 @@ public class CF_Vuforia_Blue_Wheels extends CF_Library implements SensorEventLis
 
             }
 
-            Color.RGBToHSV((sensorRGB.red() * 255) / 800, (sensorRGB.green() * 255) / 800, (sensorRGB.blue() * 255) / 800, hsvValues);
-            float hue = hsvValues[0];
-            if((hue >= BlueLowerLimit) && (hue <= BlueLowerLimit)){
-                telemetry.addData("blue", "blue");s
-                telemetry.update();
-                robot.SetButtonPusherPosition(0.28);
-            }
-            else if ((hue >= RedLowerLimit_highRange) && (hue <= RedUpperLimit_highRange) || (hue >= RedLowerLimit_LowRange) && (hue <= RedUpperLimit_LowRange)) {
-                telemetry.addData("red", "red");
-                telemetry.update();
-                robot.SetButtonPusherPosition(0.70);
+            //Change Here
+            if(beaconFlag == 0) {
+                Color.RGBToHSV((sensorRGB.red() * 255) / 800, (sensorRGB.green() * 255) / 800, (sensorRGB.blue() * 255) / 800, hsvValues);
+                float hue = hsvValues[0];
+                if ((hue >= BlueLowerLimit) && (hue <= BlueUpperLimit)) {
+                    telemetry.addData("blue", hsvValues[0]);
+                    telemetry.update();
+                    robot.SetButtonPusherPosition(0.00);
+                    this.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                    TimeUnit.SECONDS.sleep(1);
+                    this.encoderMove(210, 210, 0.2f, 0.2f);
+                    beaconFlag = 1;
+                    TimeUnit.SECONDS.sleep(1);
+                    requestOpModeStop();
+                } else if ((hue >= RedLowerLimit_highRange) && (hue <= RedUpperLimit_highRange) || (hue >= RedLowerLimit_LowRange) && (hue <= RedUpperLimit_LowRange)) {
+                    telemetry.addData("red", hsvValues[0]);
+                    telemetry.update();
+                    robot.SetButtonPusherPosition(0.90);
+                    this.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                    TimeUnit.SECONDS.sleep(1);
+                    this.encoderMove(210, 210, 0.2f, 0.2f);
+                    beaconFlag = 1;
+                    TimeUnit.SECONDS.sleep(1);
+                    requestOpModeStop();
+                } else {
+                    telemetry.addData("unknown", hsvValues[0]);
+                    telemetry.update();
+                }
             }
 
 
