@@ -68,7 +68,7 @@ public class CF_Manual extends OpMode
       RunMecanumWheels();
 
       // Adjust the beacon button servo
-      ServiceServos();
+      ServiceServo();
 
       beaconColor = colorSensor.GetAdafruitColor(robot);
 
@@ -83,6 +83,8 @@ public class CF_Manual extends OpMode
       {
          robot.setBeaconMode();
       }
+
+      SetBallLifterControls();
    }
 
 
@@ -109,9 +111,9 @@ public class CF_Manual extends OpMode
       double RFPower = 0.0;
       double LRPower = 0.0;
       double RRPower = 0.0;
-      double leftStickY = 0.0;
-      double leftStickX = 0.0;
-      double rightStickX = 0.0;
+      double leftStickY;
+      double leftStickX;
+      double rightStickX;
       // Calculate motor powers but only if any of the joystick commands are greater then
       // a minimum threshold.  Adjust this threshold if the motor has motion when the joystick
       // is not being used and in the center position.
@@ -176,13 +178,32 @@ public class CF_Manual extends OpMode
       }
    }
 
+   public void SetBallLifterControls()
+   {
+      if (gamepad2.right_bumper)
+      {
+         robot.BallLifterMotor.setPower(0.30);
+
+      }
+
+      else if (gamepad2.left_bumper)
+      {
+         robot.BallLifterMotor.setPower(-0.30);
+      }
+
+      else
+      {
+         robot.BallLifterMotor.setPower(0.0);
+      }
+   }
+
 
    /***
     * Method operates the servo to push the beacon button.  To push
     * left-hand button, press and hold x to rotate serve CCW. To push
     * right-hand button, press and hold b button to rotate servo CW.
     */
-   private void ServiceServos()
+   private void ServiceServo()
    {
       double ButtonPusherPosition = robot.GetButtonPusherPosition();
 
@@ -196,18 +217,6 @@ public class CF_Manual extends OpMode
       else if (gamepad2.b)
       {
          robot.SetButtonPusherPosition(ButtonPusherPosition - beaconPusherRate);
-      }
-
-      // Up Theoretically
-      if (gamepad2.a)
-      {
-         robot.SetFlickerPosition(0.08);
-      }
-
-      // Down Theoretically
-      else if (gamepad2.y)
-      {
-         robot.SetFlickerPosition(0.90);
       }
    }
 }

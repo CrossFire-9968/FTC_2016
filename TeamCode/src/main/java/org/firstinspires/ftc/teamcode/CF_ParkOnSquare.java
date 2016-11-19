@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -10,8 +11,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  */
 
 @Autonomous(name = "Lauren's_Auto", group = "Jeff")  // @Autonomous(...) is the other common choice
-//@Disabled
-
+@Disabled
 public class CF_ParkOnSquare extends LinearOpMode
 {
    Crossfire_Hardware robot = new Crossfire_Hardware();
@@ -77,22 +77,22 @@ public class CF_ParkOnSquare extends LinearOpMode
 
       // Set motor powers and start motion
       robot.setMecanumPowers(0.3, 0.3, 0.3, 0.3);
-
+   }
       // Check to see if any of the mecanum drive motors are busy.
       // If not, the we can move to the next state.
-      while (opModeIsActive() && robot.mecanumMotorsBusy())
-      {
-         // Add encoder position to telemetry
-         telemetry.clear();
-         telemetry.addData("State: ", "Drive From Wall");
-         telemetry.update();
-
-         idle();
-      }
-
-      // Turn off motors
-      robot.setMecanumEncoderMode(DcMotor.RunMode.RUN_USING_ENCODER);
-   }
+//      while (opModeIsActive() && robot.mecanumMotorsBusy())
+//      {
+//         // Add encoder position to telemetry
+//         telemetry.clear();
+//         telemetry.addData("State: ", "Drive From Wall");
+//         telemetry.update();
+//
+//         idle();
+//      }
+//
+//      // Turn off motors
+//      robot.setMecanumEncoderMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//   }
 
 
 //   /***
@@ -113,15 +113,15 @@ public class CF_ParkOnSquare extends LinearOpMode
 
       // Check to see if any of the mecanum drive motors are busy.
       // If not, the we can move to the next state.
-      while (opModeIsActive() && robot.mecanumMotorsBusy())
-      {
-         // Add encoder position to telemetry
-         telemetry.clear();
-         telemetry.addData("State: ", "Turn To Ball");
-         telemetry.update();
-
-         idle();
-      }
+//      while (opModeIsActive() && robot.mecanumMotorsBusy())
+//      {
+//         // Add encoder position to telemetry
+//         telemetry.clear();
+//         telemetry.addData("State: ", "Turn To Ball");
+//         telemetry.update();
+//
+//         idle();
+//      }
 
       // Turn off motors
       robot.setMecanumEncoderMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -141,15 +141,15 @@ public class CF_ParkOnSquare extends LinearOpMode
 
       // Check to see if any of the mecanum drive motors are busy.
       // If not, the we can move to the next state.
-      while (opModeIsActive() && robot.mecanumMotorsBusy())
-      {
-         // Add encoder position to telemetry
-         telemetry.clear();
-         telemetry.addData("State: ", "Hit Ball");
-         telemetry.update();
-
-         idle();
-      }
+//      while (opModeIsActive() && robot.mecanumMotorsBusy())
+//      {
+//         // Add encoder position to telemetry
+//         telemetry.clear();
+//         telemetry.addData("State: ", "Hit Ball");
+//         telemetry.update();
+//
+//         idle();
+//      }
 
       // Turn off motors
       robot.setMecanumEncoderMode(DcMotor.RunMode.RUN_USING_ENCODER);

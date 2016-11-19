@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -28,7 +29,7 @@ public class Crossfire_Hardware
    public DcMotor MotorMecanumLeftRear;
    public DcMotor MotorMecanumRightRear;
    public Servo ButtonPusher;
-   public Servo Flicker;
+   public DcMotor BallLifterMotor;
    public ColorSensor sensorRGB;
 
    /* local OpMode members. */
@@ -58,22 +59,24 @@ public class Crossfire_Hardware
       MotorMecanumLeftRear = hwMap.dcMotor.get("left_rear_drive");
       MotorMecanumRightRear = hwMap.dcMotor.get("right_rear_drive");
       ButtonPusher = hwMap.servo.get("button_pusher");
-      Flicker = hwMap.servo.get("flicker");
+      BallLifterMotor = hwMap.dcMotor.get("ball_lifter");
       sensorRGB = hwMap.colorSensor.get("AdafruitRGB");
+
+      BallLifterMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+      BallLifterMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
       // Set motor polarity.  We are using
       // AndyMark motors so directions are opposite.
       MotorMecanumLeftFront.setDirection(DcMotor.Direction.REVERSE);     // Set to REVERSE if using AndyMark motors
       MotorMecanumLeftRear.setDirection(DcMotor.Direction.REVERSE);      // Set to REVERSE if using AndyMark motors
       MotorMecanumRightFront.setDirection(DcMotor.Direction.FORWARD);    // Set to FORWARD if using AndyMark motors
-      MotorMecanumRightRear.setDirection(DcMotor.Direction.FORWARD);     // Set to FORWARD if using AndyMark motor
+      MotorMecanumRightRear.setDirection(DcMotor.Direction.FORWARD);  // Set to FORWARD if using AndyMark motor
+      BallLifterMotor.setDirection(DcMotor.Direction.FORWARD);
       SetButtonPusherPosition(0.45);
-      SetFlickerPosition(0.55);
 
        //Set all motors to zero power
       setMecanumPowers(0.0f, 0.0f, 0.0f, 0.0f);
       GetButtonPusherPosition();
-      GetFlickerPosition();
 
       // Initialize driver controls to beacon mode or ball kicker mode.
       // Comment out the mode you don't want to start in.
@@ -114,33 +117,6 @@ public class Crossfire_Hardware
       return position;
    }
 
-
-   /***
-    *
-    * @param servoPositionDesired
-    */
-   public void SetFlickerPosition(double servoPositionDesired)
-   {
-      double servoPositionActual = Range.clip(servoPositionDesired, 0.00, 1.00);
-      Flicker.setPosition(servoPositionActual);
-   }
-
-
-   /***
-    *
-    * @return
-    */
-   public double GetFlickerPosition()
-   {
-      double position = 0.0;
-
-      if (Flicker != null)
-      {
-         position = Flicker.getPosition();
-      }
-      return position;
-   }
-
    /***
     * Convenience method to assign motor power for mecanum drive.  Each mecanum
     * wheel is independently driven.
@@ -152,10 +128,10 @@ public class Crossfire_Hardware
     */
    public void setMecanumPowers(double LFPower, double RFPower, double LRPower, double RRPower)
    {
-      MotorMecanumLeftFront.setPower(Math.abs(LFPower));
-      MotorMecanumRightFront.setPower(Math.abs(RFPower));
-      MotorMecanumLeftRear.setPower(Math.abs(LRPower));
-      MotorMecanumRightRear.setPower(Math.abs(RRPower));
+      MotorMecanumLeftFront.setPower(LFPower);
+      MotorMecanumRightFront.setPower(RFPower);
+      MotorMecanumLeftRear.setPower(LRPower);
+      MotorMecanumRightRear.setPower(RRPower);
    }
 
 
@@ -179,15 +155,15 @@ public class Crossfire_Hardware
     * @param LFcount Left front encoder counts
     * @param RFcount Right front encoder counts
     * @param LRcount Left rear encoder counts
-    * @param RRcound Right rear encoder counts
+    * @param RRcount Right rear encoder counts
     */
-   public void setMecanumEncoderTargetPosition(int LFcount, int RFcount, int LRcount, int RRcound)
+   public void setMecanumEncoderTargetPosition(int LFcount, int RFcount, int LRcount, int RRcount)
    {
       // Only want to use absolute values.  Take abs of inputs in case user sent negative value.
-      MotorMecanumLeftFront.setTargetPosition(LFcount);
-      MotorMecanumRightFront.setTargetPosition(RFcount);
-      MotorMecanumLeftRear.setTargetPosition(LRcount);
-      MotorMecanumRightRear.setTargetPosition(RRcound);
+      MotorMecanumLeftFront.setTargetPosition(Math.abs(LFcount));
+      MotorMecanumRightFront.setTargetPosition(Math.abs(RFcount));
+      MotorMecanumLeftRear.setTargetPosition(Math.abs(LRcount));
+      MotorMecanumRightRear.setTargetPosition(Math.abs(RRcount));
    }
 
 
@@ -204,7 +180,7 @@ public class Crossfire_Hardware
     * motor power are not synchronized to turn off at roughly the same time.
     *
     * @return boolean flag TRUE - motors busy or FALSE - meaning all motors have reached target position
-    */
+    *
    public boolean mecanumMotorsBusy()
    {
       boolean motorsBusy = true;
