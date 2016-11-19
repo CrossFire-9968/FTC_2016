@@ -73,7 +73,8 @@ public class CF_Vuforia_Red_Gears extends CF_Library implements SensorEventListe
             final int RedUpperLimit_highRange = 360;
             final int RedLowerLimit_highRange = 325;
             final int BlueUpperLimit = 270;
-            final int BlueLowerLimit = 220;
+            final int BlueLowerLimit = 200;
+           final int stopCount = 200;
 
             int countRight = 1;
             int countLeft = 1;
@@ -132,7 +133,7 @@ public class CF_Vuforia_Red_Gears extends CF_Library implements SensorEventListe
             while (opModeIsActive()) {
 
                 if (firstFlag == 0) {
-                    this.encoderStrafeRight(5000, 0.3f);
+                    this.encoderStrafeRight(4800, 0.3f);
                     firstFlag = 1;
                 }
                 seeable = ((VuforiaTrackableDefaultListener) beacons.get(PICTURE).getListener()).isVisible();
@@ -183,7 +184,7 @@ public class CF_Vuforia_Red_Gears extends CF_Library implements SensorEventListe
                     telemetry.addData("cosXPose: ", cosXPose);
                     seeable = ((VuforiaTrackableDefaultListener) beacons.get(PICTURE).getListener()).isVisible();
 
-                    while (x >= 300 && !isStopRequested() && seeable) {
+                    while (x >= stopCount && !isStopRequested() && seeable) {
                         pose = ((VuforiaTrackableDefaultListener) beacons.get(PICTURE).getListener()).getRawPose();
                         seeable = ((VuforiaTrackableDefaultListener) beacons.get(PICTURE).getListener()).isVisible();
                         if (pose != null) {
@@ -193,7 +194,7 @@ public class CF_Vuforia_Red_Gears extends CF_Library implements SensorEventListe
                             telemetry.addData("x: ", x);
                             telemetry.addData("y: ", y);
                             telemetry.update();
-                            error = y;
+                            error = y + 10;
                             effort = kP * error;
                             rightPower = power + effort;
                             leftPower = power - effort;
@@ -203,12 +204,12 @@ public class CF_Vuforia_Red_Gears extends CF_Library implements SensorEventListe
                             robot.MotorMecanumRightRear.setPower(rightPower);
                         }
                     }
-                    if ((x > 300 && !isStopRequested()) || !seeable) {
+                    if ((x > stopCount && !isStopRequested()) || !seeable) {
                         robot.MotorMecanumLeftFront.setPower(0.0f);
                         robot.MotorMecanumRightFront.setPower(0.0f);
                         robot.MotorMecanumLeftRear.setPower(0.0f);
                         robot.MotorMecanumRightRear.setPower(0.0f);
-                        if(x < 300 && !isStopRequested()) {
+                        if(x < stopCount && !isStopRequested()) {
                             picFlag = 1;
                         }
                     }
@@ -220,8 +221,9 @@ public class CF_Vuforia_Red_Gears extends CF_Library implements SensorEventListe
                 if(beaconFlag == 0) {
                     Color.RGBToHSV((sensorRGB.red() * 255) / 800, (sensorRGB.green() * 255) / 800, (sensorRGB.blue() * 255) / 800, hsvValues);
                     float hue = hsvValues[0];
-                    if ((hue >= BlueLowerLimit) && (hue <= BlueLowerLimit)) {
+                    if ((hue >= BlueLowerLimit) && (hue <= BlueUpperLimit)) {
                         telemetry.addData("blue", "blue");
+                       telemetry.addData("Color: ", hsvValues[0]);
                         telemetry.update();
                         robot.SetButtonPusherPosition(0.90);
                         this.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -233,6 +235,7 @@ public class CF_Vuforia_Red_Gears extends CF_Library implements SensorEventListe
 
                     } else if ((hue >= RedLowerLimit_highRange) && (hue <= RedUpperLimit_highRange) || (hue >= RedLowerLimit_LowRange) && (hue <= RedUpperLimit_LowRange)) {
                         telemetry.addData("red", "red");
+                       telemetry.addData("Color: ", hsvValues[0]);
                         telemetry.update();
                         robot.SetButtonPusherPosition(0.28);
                         robot.SetButtonPusherPosition(0.00);

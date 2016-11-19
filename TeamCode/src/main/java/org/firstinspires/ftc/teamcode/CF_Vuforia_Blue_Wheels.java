@@ -73,7 +73,9 @@ public class CF_Vuforia_Blue_Wheels extends CF_Library implements SensorEventLis
         final int RedUpperLimit_highRange = 360;
         final int RedLowerLimit_highRange = 325;
         final int BlueUpperLimit = 270;
-        final int BlueLowerLimit = 200;
+        final int BlueLowerLimit = 0;
+       final int stopCount =100;
+       int encoderCounts = 0;
 
         int countRight = 1;
         int countLeft = 1;
@@ -150,6 +152,8 @@ public class CF_Vuforia_Blue_Wheels extends CF_Library implements SensorEventLis
             pose = ((VuforiaTrackableDefaultListener) beacons.get(PICTURE).getListener()).getRawPose();
 
 
+           // NOTE: If picture not seen is pose = NULL?
+           // Is "visible" on screen with light?
             while(pose != null && picFlag == 0 && !isStopRequested()) {
                 if(isStopRequested()) {
                     requestOpModeStop();
@@ -182,14 +186,15 @@ public class CF_Vuforia_Blue_Wheels extends CF_Library implements SensorEventLis
                 telemetry.addData("cosXPose: ", cosXPose);
                 seeable = ((VuforiaTrackableDefaultListener) beacons.get(PICTURE).getListener()).isVisible();
 
-                while (x >= 100 && !isStopRequested() && seeable) {
+                while (x >= stopCount && !isStopRequested() && seeable && encoderCounts < 5000 ) {
                     pose = ((VuforiaTrackableDefaultListener) beacons.get(PICTURE).getListener()).getRawPose();
                     seeable = ((VuforiaTrackableDefaultListener) beacons.get(PICTURE).getListener()).isVisible();
+                   encoderCounts = robot.MotorMecanumLeftFront.getCurrentPosition();
                     if (pose != null) {
                         translation = pose.getTranslation();
                         y = (int) translation.get(1);
                         x = (int) translation.get(2);
-                        telemetry.addData("x: ", x);
+                        telemetry.addData("xPose: ", x);
                         telemetry.addData("y: ", y);
                         telemetry.update();
                         error = y + 10;
@@ -202,12 +207,12 @@ public class CF_Vuforia_Blue_Wheels extends CF_Library implements SensorEventLis
                         robot.MotorMecanumRightRear.setPower(rightPower);
                     }
                 }
-                if ((x < 100 && !isStopRequested()) || !seeable) {
+                if ((x < stopCount && !isStopRequested()) || !seeable || encoderCounts >= 5000) {
                     robot.MotorMecanumLeftFront.setPower(0.0f);
                     robot.MotorMecanumRightFront.setPower(0.0f);
                     robot.MotorMecanumLeftRear.setPower(0.0f);
                     robot.MotorMecanumRightRear.setPower(0.0f);
-                    if(x < 100 && !isStopRequested()) {
+                    if(x < stopCount && !isStopRequested()) {
                         picFlag = 1;
                     }
                 }
@@ -226,19 +231,23 @@ public class CF_Vuforia_Blue_Wheels extends CF_Library implements SensorEventLis
                     robot.SetButtonPusherPosition(0.00);
                     this.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                     TimeUnit.SECONDS.sleep(1);
-                    this.encoderMove(210, 210, 0.2f, 0.2f);
+                    this.encoderMove(300, 300, 0.2f, 0.2f);
                     beaconFlag = 1;
                     TimeUnit.SECONDS.sleep(1);
+                    this.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                    this.encoderMove(-300, -300, 0.2f, 0.2f);
                     requestOpModeStop();
-                } else if ((hue >= RedLowerLimit_highRange) && (hue <= RedUpperLimit_highRange) || (hue >= RedLowerLimit_LowRange) && (hue <= RedUpperLimit_LowRange)) {
+                } else if ((hue >= RedLowerLimit_highRange) && (hue <= RedUpperLimit_highRange)) {
                     telemetry.addData("red", hsvValues[0]);
                     telemetry.update();
                     robot.SetButtonPusherPosition(0.90);
                     this.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                     TimeUnit.SECONDS.sleep(1);
-                    this.encoderMove(210, 210, 0.2f, 0.2f);
+                    this.encoderMove(300, 300, 0.2f, 0.2f);
                     beaconFlag = 1;
                     TimeUnit.SECONDS.sleep(1);
+                    this.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                    this.encoderMove(-300, -300, 0.2f, 0.2f);
                     requestOpModeStop();
                 } else {
                     telemetry.addData("unknown", hsvValues[0]);
