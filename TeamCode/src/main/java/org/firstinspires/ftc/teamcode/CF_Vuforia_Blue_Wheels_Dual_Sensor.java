@@ -36,9 +36,9 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created by Ryley on 10/5/16.
  */
-@Autonomous(name="CF_Vuforia_Blue_Wheels", group ="Blue")
+@Autonomous(name="CF_Vuforia_Blue_Wheels_Dual_Sensor", group ="Blue")
 //@Disabled
-public class CF_Vuforia_Blue_Wheels extends CF_Library implements SensorEventListener{
+public class CF_Vuforia_Blue_Wheels_Dual_Sensor extends CF_Library implements SensorEventListener{
 
     float xAccel = 0;
     float yAccel = 0;
@@ -50,10 +50,10 @@ public class CF_Vuforia_Blue_Wheels extends CF_Library implements SensorEventLis
     @Override
     public void runOpMode ()throws InterruptedException {
         robot.init(hardwareMap);
-       robot.MotorMecanumLeftFront.setDirection(DcMotor.Direction.FORWARD);     // Set to REVERSE if using AndyMark motors
-       robot.MotorMecanumLeftRear.setDirection(DcMotor.Direction.FORWARD);      // Set to REVERSE if using AndyMark motors
-       robot.MotorMecanumRightFront.setDirection(DcMotor.Direction.REVERSE);    // Set to FORWARD if using AndyMark motors
-       robot.MotorMecanumRightRear.setDirection(DcMotor.Direction.REVERSE);
+        robot.MotorMecanumLeftFront.setDirection(DcMotor.Direction.FORWARD);     // Set to REVERSE if using AndyMark motors
+        robot.MotorMecanumLeftRear.setDirection(DcMotor.Direction.FORWARD);      // Set to REVERSE if using AndyMark motors
+        robot.MotorMecanumRightFront.setDirection(DcMotor.Direction.REVERSE);    // Set to FORWARD if using AndyMark motors
+        robot.MotorMecanumRightRear.setDirection(DcMotor.Direction.REVERSE);
         int x;
         int y;
         int z;
@@ -74,8 +74,8 @@ public class CF_Vuforia_Blue_Wheels extends CF_Library implements SensorEventLis
         final int RedLowerLimit_highRange = 325;
         final int BlueUpperLimit = 270;
         final int BlueLowerLimit = 0;
-       final int stopCount = 75;
-       int encoderCounts = 0;
+        final int stopCount = 75;
+        int encoderCounts = 0;
 
         int countRight = 1;
         int countLeft = 1;
@@ -83,7 +83,8 @@ public class CF_Vuforia_Blue_Wheels extends CF_Library implements SensorEventLis
         final int LEFT = 0;
         final int RIGHT = 1;
 
-        ColorSensor sensorRGB;
+        ColorSensor sensorRGBright;
+        ColorSensor sensorRGBleft;
         DeviceInterfaceModule cdim;
 
 
@@ -109,14 +110,15 @@ public class CF_Vuforia_Blue_Wheels extends CF_Library implements SensorEventLis
         beacons.get(2).setName("Legos");
         beacons.get(3).setName("Gears");
 
-        float hsvValues[] = {0F, 0F, 0F};
-        final float values[] = hsvValues;
+        float hsvValuesright[] = {0F, 0F, 0F};
+        float hsvValuesleft[] = {0F, 0F, 0F};
 
         cdim = hardwareMap.deviceInterfaceModule.get("CF_Dim");
 
         cdim.setDigitalChannelMode(LED_CHANNEL, DigitalChannelController.Mode.OUTPUT);
 
-        sensorRGB = hardwareMap.colorSensor.get("AdafruitRGB");
+        sensorRGBright = hardwareMap.colorSensor.get("AdafruitRGBright");
+        sensorRGBleft = hardwareMap.colorSensor.get("AdafruitRGBleft");
 
         initalize();
         //waitForStart();
@@ -152,8 +154,8 @@ public class CF_Vuforia_Blue_Wheels extends CF_Library implements SensorEventLis
             pose = ((VuforiaTrackableDefaultListener) beacons.get(PICTURE).getListener()).getRawPose();
 
 
-           // NOTE: If picture not seen is pose = NULL?
-           // Is "visible" on screen with light?
+            // NOTE: If picture not seen is pose = NULL?
+            // Is "visible" on screen with light?
             while(pose != null && picFlag == 0 && !isStopRequested()) {
                 if(isStopRequested()) {
                     requestOpModeStop();
@@ -192,7 +194,7 @@ public class CF_Vuforia_Blue_Wheels extends CF_Library implements SensorEventLis
                 while (x >= stopCount && !isStopRequested() && seeable && encoderCounts < 5000) {
                     pose = ((VuforiaTrackableDefaultListener) beacons.get(PICTURE).getListener()).getRawPose();
                     seeable = ((VuforiaTrackableDefaultListener) beacons.get(PICTURE).getListener()).isVisible();
-                   encoderCounts = robot.MotorMecanumLeftFront.getCurrentPosition();
+                    encoderCounts = robot.MotorMecanumLeftFront.getCurrentPosition();
                     if (pose != null) {
                         translation = pose.getTranslation();
                         y = (int) translation.get(1);
@@ -226,10 +228,11 @@ public class CF_Vuforia_Blue_Wheels extends CF_Library implements SensorEventLis
 
             //Change Here
             if(beaconFlag == 0) {
-                Color.RGBToHSV((sensorRGB.red() * 255) / 800, (sensorRGB.green() * 255) / 800, (sensorRGB.blue() * 255) / 800, hsvValues);
-                float hue = hsvValues[0];
-                if ((hue >= BlueLowerLimit) && (hue <= BlueUpperLimit)) {
-                    telemetry.addData("blue", hsvValues[0]);
+                Color.RGBToHSV((sensorRGBright.red() * 255) / 800, (sensorRGBright.green() * 255) / 800, (sensorRGBright.blue() * 255) / 800, hsvValuesright);
+                Color.RGBToHSV((sensorRGBleft.red() * 255) / 800, (sensorRGBleft.green() * 255) / 800, (sensorRGBleft.blue() * 255) / 800, hsvValuesleft);
+                float hueRight = hsvValuesright[0];
+                if (sensorRGBright.blue() > sensorRGBright.red() && sensorRGBleft.red() > sensorRGBleft.blue()) {
+                    telemetry.addData("blue", hsvValuesright[0]);
                     telemetry.update();
                     robot.SetButtonPusherPosition(0.00);
                     this.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -240,8 +243,8 @@ public class CF_Vuforia_Blue_Wheels extends CF_Library implements SensorEventLis
                     this.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                     this.encoderMove(-300, -300, 0.2f, 0.2f);
                     requestOpModeStop();
-                } else if ((hue >= RedLowerLimit_highRange) && (hue <= RedUpperLimit_highRange)) {
-                    telemetry.addData("red", hsvValues[0]);
+                } else if (sensorRGBright.red() > sensorRGBright.blue() && sensorRGBleft.blue() > sensorRGBleft.red()) {
+                    telemetry.addData("red", hsvValuesright[0]);
                     telemetry.update();
                     robot.SetButtonPusherPosition(0.90);
                     this.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -253,7 +256,7 @@ public class CF_Vuforia_Blue_Wheels extends CF_Library implements SensorEventLis
                     this.encoderMove(-300, -300, 0.2f, 0.2f);
                     requestOpModeStop();
                 } else {
-                    telemetry.addData("unknown", hsvValues[0]);
+                    telemetry.addData("unknown", hsvValuesright[0]);
                     telemetry.update();
                 }
             }

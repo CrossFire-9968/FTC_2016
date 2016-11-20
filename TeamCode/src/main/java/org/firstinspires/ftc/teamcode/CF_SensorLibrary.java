@@ -56,6 +56,32 @@ public class CF_SensorLibrary
       return (color);
    }
 
+   public float GetAdafruitHSV(Crossfire_Hardware robot) {
+      Color.RGBToHSV((robot.sensorRGB.red() * 255) / 800, (robot.sensorRGB.green() * 255) / 800, (robot.sensorRGB.blue() * 255) / 800, hsvValues);
+
+      return(hsvValues[0]);
+   }
+
+
+   public float GetAdafruitRED(Crossfire_Hardware robot) {
+      Color.RGBToHSV((robot.sensorRGB.red() * 255) / 800, (robot.sensorRGB.green() * 255) / 800, (robot.sensorRGB.blue() * 255) / 800, hsvValues);
+
+      return(robot.sensorRGB.red());
+   }
+
+
+   public float GetAdafruitGREEN(Crossfire_Hardware robot) {
+      Color.RGBToHSV((robot.sensorRGB.red() * 255) / 800, (robot.sensorRGB.green() * 255) / 800, (robot.sensorRGB.blue() * 255) / 800, hsvValues);
+
+      return(robot.sensorRGB.green());
+   }
+
+   public float GetAdafruitBLUE(Crossfire_Hardware robot) {
+      Color.RGBToHSV((robot.sensorRGB.red() * 255) / 800, (robot.sensorRGB.green() * 255) / 800, (robot.sensorRGB.blue() * 255) / 800, hsvValues);
+
+      return(robot.sensorRGB.blue());
+   }
+
 
 //   public void getLineData()
 //   {
