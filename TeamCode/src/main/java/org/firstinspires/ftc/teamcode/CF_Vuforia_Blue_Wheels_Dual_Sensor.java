@@ -74,7 +74,7 @@ public class CF_Vuforia_Blue_Wheels_Dual_Sensor extends CF_Library implements Se
         final int RedLowerLimit_highRange = 325;
         final int BlueUpperLimit = 270;
         final int BlueLowerLimit = 0;
-        final int stopCount = 75;
+        final int stopCount = 110;
         int encoderCounts = 0;
 
         int countRight = 1;
@@ -85,11 +85,12 @@ public class CF_Vuforia_Blue_Wheels_Dual_Sensor extends CF_Library implements Se
 
         ColorSensor sensorRGBright;
         ColorSensor sensorRGBleft;
-        DeviceInterfaceModule cdim;
+        DeviceInterfaceModule cdimright;
+        DeviceInterfaceModule cdimleft;
 
 
         final int LED_CHANNEL = 5;
-        final int PICTURE = 0;
+        final int PICTURE = 3;
 
         // Makes camera output appear on screen
         VuforiaLocalizer.Parameters params = new VuforiaLocalizer.Parameters(R.id.cameraMonitorViewId);
@@ -113,9 +114,10 @@ public class CF_Vuforia_Blue_Wheels_Dual_Sensor extends CF_Library implements Se
         float hsvValuesright[] = {0F, 0F, 0F};
         float hsvValuesleft[] = {0F, 0F, 0F};
 
-        cdim = hardwareMap.deviceInterfaceModule.get("CF_Dim");
+        cdimright = hardwareMap.deviceInterfaceModule.get("CF_DimRight");
 
-        cdim.setDigitalChannelMode(LED_CHANNEL, DigitalChannelController.Mode.OUTPUT);
+
+        cdimright.setDigitalChannelMode(LED_CHANNEL, DigitalChannelController.Mode.OUTPUT);
 
         sensorRGBright = hardwareMap.colorSensor.get("AdafruitRGBright");
         sensorRGBleft = hardwareMap.colorSensor.get("AdafruitRGBleft");
@@ -133,9 +135,17 @@ public class CF_Vuforia_Blue_Wheels_Dual_Sensor extends CF_Library implements Se
         telemetry.clearAll();
         telemetry.update();
 
+
+        //5060
+
         while (opModeIsActive()) {
             if (firstFlag == 0) {
-                this.encoderStrafeLeft(5060, 0.3f);
+                this.encoderStrafeLeft(3000, 0.3f);
+                this.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                this.encoderMove(1500, 1500, 0.3f, 0.3f);
+                this.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                this.encoderStrafeLeft(1900, 0.3f);
+                TimeUnit.SECONDS.sleep(0.5);
                 firstFlag = 1;
             }
             seeable = ((VuforiaTrackableDefaultListener) beacons.get(PICTURE).getListener()).isVisible();
@@ -243,7 +253,8 @@ public class CF_Vuforia_Blue_Wheels_Dual_Sensor extends CF_Library implements Se
                     this.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                     this.encoderMove(-300, -300, 0.2f, 0.2f);
                     requestOpModeStop();
-                } else if (sensorRGBright.red() > sensorRGBright.blue() && sensorRGBleft.blue() > sensorRGBleft.red()) {
+                } else if (sensorRGBright.red() > sensorRGBright.blue() && sensorRGBleft.blue() > sensorRGBleft.red())
+                {
                     telemetry.addData("red", hsvValuesright[0]);
                     telemetry.update();
                     robot.SetButtonPusherPosition(0.90);

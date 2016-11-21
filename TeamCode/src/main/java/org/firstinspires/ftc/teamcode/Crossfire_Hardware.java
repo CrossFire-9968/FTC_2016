@@ -30,7 +30,8 @@ public class Crossfire_Hardware
    public DcMotor MotorMecanumRightRear;
    public Servo ButtonPusher;
    public DcMotor BallLifterMotor;
-   public ColorSensor sensorRGB;
+   public ColorSensor sensorRGBright;
+   public ColorSensor sensorRGBleft;
 
    /* local OpMode members. */
    HardwareMap hwMap = null;
@@ -60,7 +61,8 @@ public class Crossfire_Hardware
       MotorMecanumRightRear = hwMap.dcMotor.get("right_rear_drive");
       ButtonPusher = hwMap.servo.get("button_pusher");
       BallLifterMotor = hwMap.dcMotor.get("ball_lifter");
-      sensorRGB = hwMap.colorSensor.get("AdafruitRGB");
+      sensorRGBright = hwMap.colorSensor.get("AdafruitRGBright");
+      sensorRGBleft = hwMap.colorSensor.get("AdafruitRGBleft");
 
       BallLifterMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
       BallLifterMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);

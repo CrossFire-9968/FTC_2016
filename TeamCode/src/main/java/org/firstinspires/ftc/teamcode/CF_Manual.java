@@ -70,7 +70,7 @@ public class CF_Manual extends OpMode
       // Adjust the beacon button servo
       ServiceServo();
 
-      beaconColor = colorSensor.GetAdafruitColor(robot);
+      beaconColor = colorSensor.GetAdafruitColorRight(robot);
 
       // Set steering to ball kicker driving mode
       if (gamepad1.right_bumper)

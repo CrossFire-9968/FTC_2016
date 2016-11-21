@@ -1,10 +1,13 @@
 package org.firstinspires.ftc.teamcode;
 
+import android.graphics.Color;
+
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DeviceInterfaceModule;
+import com.qualcomm.robotcore.hardware.DigitalChannelController;
 
 import org.firstinspires.ftc.teamcode.Crossfire_Hardware.sensorColor;
 
@@ -51,6 +54,19 @@ public class CF_ManualLightSensor extends OpMode
 
     private sensorColor beaconColor = sensorColor.unknown;
 
+    int hueRight = 0;
+    int hueLeft = 0;
+
+    float hsvValuesRight[] = {0F, 0F, 0F};
+    float hsvValuesLeft[] = {0F, 0F, 0F};
+
+
+    ColorSensor sensorRGBright;
+    ColorSensor sensorRGBleft;
+    DeviceInterfaceModule cdimright;
+    DeviceInterfaceModule cdimleft;
+
+
 
     /***
      *
@@ -58,7 +74,20 @@ public class CF_ManualLightSensor extends OpMode
     public void init()
     {
         robot.init(hardwareMap);
+
+        cdimright = hardwareMap.deviceInterfaceModule.get("CF_DimRight");
+        cdimleft = hardwareMap.deviceInterfaceModule.get("CF_DimLeft");
+
+        cdimright.setDigitalChannelMode(0, DigitalChannelController.Mode.OUTPUT);
+        cdimleft.setDigitalChannelMode(0, DigitalChannelController.Mode.OUTPUT);
+
+        sensorRGBright  = hardwareMap.colorSensor.get("AdafruitRGBright");
+        sensorRGBleft = hardwareMap.colorSensor.get("AdafruitRGBleft");
+
+
+
     }
+
 
 
     /***
@@ -71,9 +100,7 @@ public class CF_ManualLightSensor extends OpMode
         RunMecanumWheels();
 
         // Adjust the beacon button servo
-        ServiceServo();
-
-        beaconColor = colorSensor.GetAdafruitColor(robot);
+        //ServiceServo();
 
         // Set steering to ball kicker driving mode
         if (gamepad1.right_bumper)
@@ -86,10 +113,16 @@ public class CF_ManualLightSensor extends OpMode
         {
             robot.setBeaconMode();
         }
-        telemetry.addData("Hue: ", colorSensor.GetAdafruitHSV(robot));
-        telemetry.addData("Red: ", colorSensor.GetAdafruitRED(robot));
-        telemetry.addData("Green", colorSensor.GetAdafruitGREEN(robot));
-        telemetry.addData("Blue", colorSensor.GetAdafruitBLUE(robot));
+        Color.RGBToHSV((robot.sensorRGBright.red() * 255) / 800, (robot.sensorRGBright.green() * 255) / 800, (robot.sensorRGBright.blue() * 255) / 800, hsvValuesRight);
+        Color.RGBToHSV((robot.sensorRGBleft.red() * 255) / 800, (robot.sensorRGBleft.green() * 255) / 800, (robot.sensorRGBleft.blue() * 255) / 800, hsvValuesLeft);
+        telemetry.addData("HueRight: ", hsvValuesRight[0]);
+        telemetry.addData("RedRight: ", sensorRGBright.red());
+        telemetry.addData("GreenRight", sensorRGBright.green());
+        telemetry.addData("BlueRight", sensorRGBright.blue());
+        telemetry.addData("HueLeft: ", hsvValuesLeft[0]);
+        telemetry.addData("RedLeft: ", sensorRGBleft.red());
+        telemetry.addData("GreenLeft", sensorRGBleft.green());
+        telemetry.addData("BlueLeft", sensorRGBleft.blue());
         telemetry.update();
 
 
