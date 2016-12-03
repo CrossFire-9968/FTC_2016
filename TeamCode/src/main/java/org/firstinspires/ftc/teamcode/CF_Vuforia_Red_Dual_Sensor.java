@@ -181,7 +181,7 @@ public class CF_Vuforia_Red_Dual_Sensor extends CF_Library implements SensorEven
 
             this.encoderStrafeRight(4150, speed);
 
-            TimeUnit.SECONDS.sleep((long)0.5f);
+            TimeUnit.SECONDS.sleep((long)0.5);
 
             seeableSecond = ((VuforiaTrackableDefaultListener) beacons.get(SECONDPICTURE).getListener()).isVisible();
             while (!seeableSecond && !isStopRequested() && turnFlagSecond == 0) {
@@ -369,7 +369,6 @@ public class CF_Vuforia_Red_Dual_Sensor extends CF_Library implements SensorEven
             this.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             int count = 100;
             while(sensorRGBright.red() < sensorRGBright.blue() && count <= 600){
-                setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                 this.encoderMove(count, count, 0.3f, 0.3f);
                 count+=50;
             }
@@ -388,7 +387,6 @@ public class CF_Vuforia_Red_Dual_Sensor extends CF_Library implements SensorEven
             this.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             int count = 100;
             while(sensorRGBleft.blue() > sensorRGBleft.red() && count <= 600) {
-                setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                 this.encoderMove(count, count, 0.3f, 0.3f);
                 count += 50;
             }

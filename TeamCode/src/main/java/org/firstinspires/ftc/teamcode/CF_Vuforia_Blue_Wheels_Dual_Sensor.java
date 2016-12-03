@@ -104,6 +104,8 @@ public class CF_Vuforia_Blue_Wheels_Dual_Sensor extends CF_Library implements Se
 
         final int LED_CHANNEL = 5;
 
+        final float speed = 0.5f;
+
 
         // Makes camera output appear on screen
         VuforiaLocalizer.Parameters params = new VuforiaLocalizer.Parameters(R.id.cameraMonitorViewId);
@@ -151,18 +153,18 @@ public class CF_Vuforia_Blue_Wheels_Dual_Sensor extends CF_Library implements Se
 
         while (opModeIsActive()) {
             if (firstFlag == 0) {
-                this.encoderStrafeLeft(3000, 0.7f);
+                this.encoderStrafeLeft(3000, speed);
                 this.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                this.encoderMove(1500, 1500, 0.7f, 0.7f);
+                this.encoderMove(1500, 1500, speed, speed);
                 this.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                this.encoderStrafeLeft(1900, 0.7f);
-                TimeUnit.SECONDS.sleep((long)0.7);
+                this.encoderStrafeLeft(2000, speed);
+                TimeUnit.SECONDS.sleep((long)0.5);
                 firstFlag = 1;
             }
             seeableFirst = ((VuforiaTrackableDefaultListener) beacons.get(FIRSTPICTURE).getListener()).isVisible();
             while (!seeableFirst && !isStopRequested() && turnFlagFirst == 0) {
                 this.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                this.encoderStrafeLeft(100, 0.7f);
+                this.encoderStrafeLeft(100, speed);
                 seeableFirst = ((VuforiaTrackableDefaultListener) beacons.get(FIRSTPICTURE).getListener()).isVisible();
             }
 
@@ -177,12 +179,14 @@ public class CF_Vuforia_Blue_Wheels_Dual_Sensor extends CF_Library implements Se
 
             this.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-            this.encoderStrafeLeft(4500, 0.7f);
+            this.encoderStrafeLeft(4500, speed);
+
+            TimeUnit.SECONDS.sleep((long)0.5);
 
             seeableSecond = ((VuforiaTrackableDefaultListener) beacons.get(SECONDPICTURE).getListener()).isVisible();
             while (!seeableSecond && !isStopRequested() && turnFlagSecond == 0) {
                 this.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                this.encoderStrafeLeft(100, 0.7f);
+                this.encoderStrafeLeft(100, speed);
                 seeableSecond = ((VuforiaTrackableDefaultListener) beacons.get(SECONDPICTURE).getListener()).isVisible();
             }
 
@@ -192,6 +196,7 @@ public class CF_Vuforia_Blue_Wheels_Dual_Sensor extends CF_Library implements Se
             }
 
             picFlag = 0;
+
             driveToBeacon(SECONDPICTURE, beacons);
 
             pushBeaconButton();
@@ -362,6 +367,11 @@ public class CF_Vuforia_Blue_Wheels_Dual_Sensor extends CF_Library implements Se
                 beaconFlagFirst = 1;
                 TimeUnit.SECONDS.sleep(1);
                 this.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                int count = 100;
+                while(sensorRGBleft.red() > sensorRGBleft.blue() && count <= 600) {
+                    this.encoderMove(count, count, 0.3f, 0.3f);
+                    count+=50;
+                }
                 this.encoderMove(-1500, -1500, 0.2f, 0.2f);
                 //requestOpModeStop();
             } else if (sensorRGBright.red() > sensorRGBright.blue() && sensorRGBleft.blue() > sensorRGBleft.red()) {
@@ -374,6 +384,11 @@ public class CF_Vuforia_Blue_Wheels_Dual_Sensor extends CF_Library implements Se
                 beaconFlagFirst = 1;
                 TimeUnit.SECONDS.sleep(1);
                 this.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                int count = 100;
+                while(sensorRGBright.red() > sensorRGBright.blue() && count <= 600){
+                    this.encoderMove(count, count, 0.3f, 0.3f);
+                    count+=50;
+                }
                 this.encoderMove(-1500, -1500, 0.2f, 0.2f);
                 //requestOpModeStop();
             } else {
