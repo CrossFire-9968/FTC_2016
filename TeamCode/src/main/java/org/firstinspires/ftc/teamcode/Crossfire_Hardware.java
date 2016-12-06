@@ -29,6 +29,7 @@ public class Crossfire_Hardware
    public DcMotor MotorMecanumLeftRear;
    public DcMotor MotorMecanumRightRear;
    public Servo ButtonPusher;
+   //public DcMotor ZipTieSpinner;
    public DcMotor BallLifterMotor;
    public ColorSensor sensorRGB;
 
