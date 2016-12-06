@@ -200,6 +200,18 @@ public class CF_Manual extends OpMode
       }
    }
 
+//   public void runZipTieSpinner()
+//   {
+//      if (gamepad2.dpad_up)
+//      {
+//         robot.ZipTieSpinner.setPower(0.9);
+//      }
+//
+//      else if (gamepad2.dpad_down)
+//      {
+//         robot.ZipTieSpinner.setPower(-0.9);
+//      }
+//   }
 
    /***
     * Method operates the servo to push the beacon button.  To push
