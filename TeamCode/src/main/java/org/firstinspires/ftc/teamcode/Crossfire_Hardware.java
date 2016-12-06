@@ -29,7 +29,7 @@ public class Crossfire_Hardware
    public DcMotor MotorMecanumLeftRear;
    public DcMotor MotorMecanumRightRear;
    public Servo ButtonPusher;
-   //public DcMotor ZipTieSpinner;
+   public DcMotor ZipTieSpinner;
    public DcMotor BallLifterMotor;
    public ColorSensor sensorRGB;
 
@@ -62,7 +62,7 @@ public class Crossfire_Hardware
       ButtonPusher = hwMap.servo.get("button_pusher");
       BallLifterMotor = hwMap.dcMotor.get("ball_lifter");
       sensorRGB = hwMap.colorSensor.get("AdafruitRGB");
-      //ZipTieSpinner = hwMap.dcMotor.get("zip_tie_spinner");
+      ZipTieSpinner = hwMap.dcMotor.get("zip_tie_spinner");
 
       BallLifterMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
       BallLifterMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -74,7 +74,7 @@ public class Crossfire_Hardware
       MotorMecanumRightFront.setDirection(DcMotor.Direction.FORWARD);    // Set to FORWARD if using AndyMark motors
       MotorMecanumRightRear.setDirection(DcMotor.Direction.FORWARD);  // Set to FORWARD if using AndyMark motor
       BallLifterMotor.setDirection(DcMotor.Direction.FORWARD);
-      //ZipTieSpinner.setDirection(DcMotor.Direction.FORWARD);
+      ZipTieSpinner.setDirection(DcMotor.Direction.FORWARD);
       SetButtonPusherPosition(0.45);
 
        //Set all motors to zero power
