@@ -1,10 +1,24 @@
 package org.firstinspires.ftc.teamcode;
 
+import android.graphics.Color;
+
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.ColorSensor;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.vuforia.HINT;
+import com.vuforia.Vuforia;
 
+import org.firstinspires.ftc.robotcore.external.ClassFactory;
+import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
+import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
+import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
+import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
+import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
 import org.firstinspires.ftc.teamcode.Crossfire_Hardware.sensorColor;
+
+import java.util.concurrent.TimeUnit;
 
 
 /***
@@ -48,6 +62,27 @@ public class CF_Manual extends OpMode
 
    private sensorColor beaconColor = sensorColor.unknown;
 
+   int pictureNumber;
+   OpenGLMatrix pose = null;
+
+   final int stopCount = 110;
+   boolean seeable;
+   double kP = 0.0005;
+   double power = 0.2;
+   double effort;
+   int error;
+   double leftPower;
+   double rightPower;
+   VuforiaTrackables beacons;
+
+
+   ColorSensor sensorRGBright;
+   ColorSensor sensorRGBleft;
+
+   float hsvValuesright[] = {0F, 0F, 0F};
+   float hsvValuesleft[] = {0F, 0F, 0F};
+
+   VectorF translation;
 
    /***
     *
@@ -55,6 +90,32 @@ public class CF_Manual extends OpMode
    public void init()
    {
       robot.init(hardwareMap);
+      // This makes the Vuforia picture appear on the screen
+      VuforiaLocalizer.Parameters params = new VuforiaLocalizer.Parameters(R.id.cameraMonitorViewId);
+      // Sets camera direction
+      params.cameraDirection = VuforiaLocalizer.CameraDirection.BACK;
+      // License key
+      params.vuforiaLicenseKey = "AU2Vspr/////AAAAGSWZlF6AQEHFh9mbNlt5KlFGl/PX8qeeKea7jh5Xk8Ei573/nsoAjsJu9Cbi2MlRCuEIkZHQJoDGAxXmNgioA+0+DbRC6mG+1QbBu8ACMw0pBk6x3h+wvvqDeyZmjV0Fdji5Bk2bV3AaZ0AanljM2nuosjfFYOeUsoFqjE0+MQfJCOoG2ED2hxhJM88dhMaAH45kQqJ99Pn9c/F8whHUkRLeh71wW3O8qGdHEieX7WQO86VfVadHTrg0Ut8ALwiU/qVqB9pJPn+oVe9rYCixcJztb7XOp4T4Mo0IPUwVtkTUZtZTW1mAOPdbbWx3RX1OohA6q6BBU7ozDdQ1W33/L/mdETevYMf7rKPrb82Zbw8r";
+      // Sets the thing you see on the screen.  Could be AXES, TEAPOT, BUILDINGS, or NONE
+      params.cameraMonitorFeedback = VuforiaLocalizer.Parameters.CameraMonitorFeedback.AXES;
+
+      // Makes and instance of Vuforia
+      VuforiaLocalizer vuforia = ClassFactory.createVuforiaLocalizer(params);
+      // Lets VuForia see more than one object at one time
+      Vuforia.setHint(HINT.HINT_MAX_SIMULTANEOUS_IMAGE_TARGETS, 4);
+
+      beacons = vuforia.loadTrackablesFromAsset("FTC_2016-17");
+      beacons.get(0).setName("Wheels");
+      beacons.get(1).setName("Tools");
+      beacons.get(2).setName("Legos");
+      beacons.get(3).setName("Gears");
+
+      beacons.activate();
+
+      telemetry.addData("Vuforia initialized", "");
+
+      sensorRGBright = hardwareMap.colorSensor.get("AdafruitRGBright");
+      sensorRGBleft = hardwareMap.colorSensor.get("AdafruitRGBleft");
    }
 
 
@@ -82,6 +143,16 @@ public class CF_Manual extends OpMode
       if (gamepad1.left_bumper)
       {
          robot.setBeaconMode();
+      }
+
+
+      if(gamepad1.x)
+      {
+         pushBlueButton(beacons);
+      }
+
+      if(gamepad1.b) {
+         //pushRedButton();
       }
 
       SetBallLifterControls();
@@ -219,4 +290,181 @@ public class CF_Manual extends OpMode
          robot.SetButtonPusherPosition(ButtonPusherPosition - beaconPusherRate);
       }
    }
+
+   private void pushBlueButton(VuforiaTrackables pics)
+   {
+      if(((VuforiaTrackableDefaultListener) pics.get(0).getListener()).isVisible()) {
+         pictureNumber = 0;
+         robot.SetButtonPusherPosition(0.45f);
+         driveToBeacon(pics);
+      }
+      if(((VuforiaTrackableDefaultListener) pics.get(1).getListener()).isVisible()) {
+         pictureNumber = 1;
+         robot.SetButtonPusherPosition(0.45f);
+         driveToBeacon(pics);
+      }
+      if(((VuforiaTrackableDefaultListener) pics.get(2).getListener()).isVisible()) {
+         pictureNumber = 2;
+         robot.SetButtonPusherPosition(0.45f);
+         driveToBeacon(pics);
+      }
+      if(((VuforiaTrackableDefaultListener) pics.get(3).getListener()).isVisible()) {
+         pictureNumber = 3;
+         robot.SetButtonPusherPosition(0.45f);
+         driveToBeacon(pics);
+      }
+
+   }
+   private void driveToBeacon(VuforiaTrackables picsArray)
+   {
+      int x = stopCount + 1;
+      int y;
+      if(checkForStop())
+      {
+         requestOpModeStop();
+      }
+      seeable = ((VuforiaTrackableDefaultListener) picsArray.get(pictureNumber).getListener()).isVisible();
+      while(x >= stopCount && !checkForStop() && seeable) {
+         pose = ((VuforiaTrackableDefaultListener) picsArray.get(pictureNumber).getListener()).getRawPose();
+         if(checkForStop()) {
+            requestOpModeStop();
+         }
+         telemetry.clearAll();
+         telemetry.addData("visible", "visible");
+         telemetry.addData("xValue: ", x);
+         telemetry.update();
+
+         if (pose != null) {
+            translation = pose.getTranslation();
+            y = (int) translation.get(1);
+            x = (int) translation.get(2);
+            error = y + 10;
+            effort = kP * error;
+            rightPower = -1 * (power + effort);
+            leftPower = -1 * (power - effort);
+            robot.MotorMecanumLeftFront.setPower(leftPower);
+            robot.MotorMecanumRightFront.setPower(rightPower);
+            robot.MotorMecanumLeftRear.setPower(leftPower);
+            robot.MotorMecanumRightRear.setPower(rightPower);
+         }
+         seeable = ((VuforiaTrackableDefaultListener) picsArray.get(pictureNumber).getListener()).isVisible();
+      }
+      robot.MotorMecanumLeftFront.setPower(0.0f);
+      robot.MotorMecanumRightFront.setPower(0.0f);
+      robot.MotorMecanumLeftRear.setPower(0.0f);
+      robot.MotorMecanumRightRear.setPower(0.0f);
+   }
+   private boolean checkForStop()
+   {
+      if(gamepad1.back) {
+         return true;
+      }
+      else {
+         return false;
+      }
+   }
+   private void pushBlue() throws InterruptedException
+   {
+      Color.RGBToHSV((sensorRGBright.red() * 255) / 800, (sensorRGBright.green() * 255) / 800, (sensorRGBright.blue() * 255) / 800, hsvValuesright);
+      Color.RGBToHSV((sensorRGBleft.red() * 255) / 800, (sensorRGBleft.green() * 255) / 800, (sensorRGBleft.blue() * 255) / 800, hsvValuesleft);
+      if(sensorRGBright.blue() > sensorRGBright.red() && sensorRGBleft.red() > sensorRGBleft.blue()) {
+         telemetry.addData("blue", hsvValuesright[0]);
+         telemetry.update();
+         robot.SetButtonPusherPosition(0.00);
+         this.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+         TimeUnit.SECONDS.sleep(1);
+         this.encoderMove(300, 300, 0.2f, 0.2f);
+         TimeUnit.SECONDS.sleep(1);
+         this.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+         int count = 100;
+         while(sensorRGBleft.red() > sensorRGBleft.blue() && count <= 600) {
+            this.encoderMove(count, count, 0.3f, 0.3f);
+            count+=50;
+         }
+      }
+      else if (sensorRGBright.red() > sensorRGBright.blue() && sensorRGBleft.blue() > sensorRGBleft.red()) {
+         telemetry.addData("red", hsvValuesright[0]);
+         telemetry.update();
+         robot.SetButtonPusherPosition(0.90);
+         this.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+         TimeUnit.SECONDS.sleep(1);
+         this.encoderMove(300, 300, 0.2f, 0.2f);
+         TimeUnit.SECONDS.sleep(1);
+         this.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+         int count = 100;
+         while(sensorRGBright.red() > sensorRGBright.blue() && count <= 600){
+            this.encoderMove(count, count, 0.3f, 0.3f);
+            count+=50;
+         }
+         this.encoderMove(-1500, -1500, 0.2f, 0.2f);
+         //requestOpModeStop();
+      }
+      else {
+         robot.SetButtonPusherPosition(0.90);
+         int count = 100;
+         while(sensorRGBleft.red() > sensorRGBleft.blue() && count <= 600) {
+            setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            this.encoderMove(count, count, 0.3f, 0.3f);
+            count += 50;
+         }
+      }
+   }
+   private void pushRed()
+   {
+
+   }
+   public void encoderMove(int countLeft, int countRight, double leftPower, double rightPower){
+
+      robot.MotorMecanumLeftFront.setPower(leftPower);
+      robot.MotorMecanumRightFront.setPower(rightPower);
+      robot.MotorMecanumLeftRear.setPower(leftPower);
+      robot.MotorMecanumRightRear.setPower(rightPower);
+
+      setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+      robot.MotorMecanumLeftFront.setTargetPosition(countLeft);
+      robot.MotorMecanumRightFront.setTargetPosition(countRight);
+      robot.MotorMecanumLeftRear.setTargetPosition(countLeft);
+      robot.MotorMecanumRightRear.setTargetPosition(countRight);
+
+      while(robot.MotorMecanumLeftFront.isBusy() && robot.MotorMecanumRightFront.isBusy() && robot.MotorMecanumLeftRear.isBusy() && robot.MotorMecanumRightRear.isBusy()) {
+         double leftPos = robot.MotorMecanumLeftFront.getCurrentPosition();
+         double rightPos = robot.MotorMecanumRightFront.getCurrentPosition();
+         telemetry.addData("Right",rightPos);
+         telemetry.addData("Left",leftPos);
+         telemetry.update();
+         try {
+            idle();
+         }
+         catch(InterruptedException e) {
+            telemetry.addData("Idle Failed", "Idle Failed");
+         }
+
+      }
+      setPower(0.0f);
+      setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+   }
+   public void setMode(DcMotor.RunMode mode) {
+      robot.MotorMecanumLeftFront.setMode(mode);
+      robot.MotorMecanumRightFront.setMode(mode);
+      robot.MotorMecanumLeftRear.setMode(mode);
+      robot.MotorMecanumRightRear.setMode(mode);
+   }
+   public void setPower(float power) {
+      robot.MotorMecanumLeftFront.setPower(power);
+      robot.MotorMecanumRightFront.setPower(power);
+      robot.MotorMecanumLeftRear.setPower(power);
+      robot.MotorMecanumRightRear.setPower(power);
+   }
+   public final void idle() throws InterruptedException {
+      // Abort the OpMode if we've been asked to stop
+      if (checkForStop())
+         throw new InterruptedException();
+
+      // Otherwise, yield back our thread scheduling quantum and give other threads at
+      // our priority level a chance to run
+      Thread.yield();
+   }
+
+
 }
