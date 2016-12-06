@@ -78,6 +78,9 @@ public class CF_Manual extends OpMode
          robot.setBallKickerMode();
       }
 
+      // Sets controls for zip tie spinner
+      //runZipTieSpinner();
+
       // Set steering to beacon driving mode
       if (gamepad1.left_bumper)
       {
