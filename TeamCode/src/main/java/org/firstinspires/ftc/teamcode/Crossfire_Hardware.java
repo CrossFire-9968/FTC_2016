@@ -62,6 +62,7 @@ public class Crossfire_Hardware
       ButtonPusher = hwMap.servo.get("button_pusher");
       BallLifterMotor = hwMap.dcMotor.get("ball_lifter");
       sensorRGB = hwMap.colorSensor.get("AdafruitRGB");
+      //ZipTieSpinner = hwMap.dcMotor.get("zip_tie_spinner");
 
       BallLifterMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
       BallLifterMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
