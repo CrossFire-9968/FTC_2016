@@ -74,6 +74,7 @@ public class Crossfire_Hardware
       MotorMecanumRightFront.setDirection(DcMotor.Direction.FORWARD);    // Set to FORWARD if using AndyMark motors
       MotorMecanumRightRear.setDirection(DcMotor.Direction.FORWARD);  // Set to FORWARD if using AndyMark motor
       BallLifterMotor.setDirection(DcMotor.Direction.FORWARD);
+      //ZipTieSpinner.setDirection(DcMotor.Direction.FORWARD);
       SetButtonPusherPosition(0.45);
 
        //Set all motors to zero power
