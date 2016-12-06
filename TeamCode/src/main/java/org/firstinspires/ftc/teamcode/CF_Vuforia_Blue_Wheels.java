@@ -209,8 +209,6 @@ public class CF_Vuforia_Blue_Wheels extends CF_Library implements SensorEventLis
                     }
                 }
                 pose = ((VuforiaTrackableDefaultListener) beacons.get(PICTURE).getListener()).getRawPose();
-
-
             }
 
             Color.RGBToHSV((sensorRGB.red() * 255) / 800, (sensorRGB.green() * 255) / 800, (sensorRGB.blue() * 255) / 800, hsvValues);
@@ -225,8 +223,6 @@ public class CF_Vuforia_Blue_Wheels extends CF_Library implements SensorEventLis
                 telemetry.update();
                 robot.SetButtonPusherPosition(0.70);
             }
-
-
         }
 
 

@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -70,6 +69,12 @@ public class CF_Manual extends OpMode
       // Adjust the beacon button servo
       ServiceServo();
 
+      // Sets controls for zip tie spinner
+      //runZipTieSpinner();
+
+      // Sets controls for ball lifter
+      RunBallLifter();
+
       beaconColor = colorSensor.GetAdafruitColor(robot);
 
       // Set steering to ball kicker driving mode
@@ -83,8 +88,6 @@ public class CF_Manual extends OpMode
       {
          robot.setBeaconMode();
       }
-
-      SetBallLifterControls();
    }
 
 
@@ -178,7 +181,7 @@ public class CF_Manual extends OpMode
       }
    }
 
-   public void SetBallLifterControls()
+   public void RunBallLifter()
    {
       if (gamepad2.right_bumper)
       {
@@ -197,6 +200,19 @@ public class CF_Manual extends OpMode
       }
    }
 
+
+//   public void runZipTieSpinner()
+//   {
+//      if (gamepad2.dpad_up)
+//      {
+//         robot.ZipTieSpinner.setPower(0.9);
+//      }
+//
+//      else if (gamepad2.dpad_down)
+//      {
+//         robot.ZipTieSpinner.setPower(-0.9);
+//      }
+//   }
 
    /***
     * Method operates the servo to push the beacon button.  To push

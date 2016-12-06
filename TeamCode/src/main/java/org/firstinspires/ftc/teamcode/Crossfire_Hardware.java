@@ -28,9 +28,10 @@ public class Crossfire_Hardware
    public DcMotor MotorMecanumRightFront;
    public DcMotor MotorMecanumLeftRear;
    public DcMotor MotorMecanumRightRear;
-   public Servo ButtonPusher;
    public DcMotor BallLifterMotor;
+   //public DcMotor ZipTieSpinner;
    public ColorSensor sensorRGB;
+   public Servo ButtonPusher;
 
    /* local OpMode members. */
    HardwareMap hwMap = null;
@@ -61,9 +62,10 @@ public class Crossfire_Hardware
       ButtonPusher = hwMap.servo.get("button_pusher");
       BallLifterMotor = hwMap.dcMotor.get("ball_lifter");
       sensorRGB = hwMap.colorSensor.get("AdafruitRGB");
+      //ZipTieSpinner = hwMap.dcMotor.get("zip_tie_spinner");
 
-      BallLifterMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-      BallLifterMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+      //BallLifterMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+      //BallLifterMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
       // Set motor polarity.  We are using
       // AndyMark motors so directions are opposite.
@@ -71,13 +73,13 @@ public class Crossfire_Hardware
       MotorMecanumLeftRear.setDirection(DcMotor.Direction.REVERSE);      // Set to REVERSE if using AndyMark motors
       MotorMecanumRightFront.setDirection(DcMotor.Direction.FORWARD);    // Set to FORWARD if using AndyMark motors
       MotorMecanumRightRear.setDirection(DcMotor.Direction.FORWARD);  // Set to FORWARD if using AndyMark motor
-      BallLifterMotor.setDirection(DcMotor.Direction.FORWARD);
+      //BallLifterMotor.setDirection(DcMotor.Direction.FORWARD);
+      //ZipTieSpinner.setDirection(DcMotor.Direction.FORWARD);
       SetButtonPusherPosition(0.45);
 
        //Set all motors to zero power
       setMecanumPowers(0.0f, 0.0f, 0.0f, 0.0f);
       GetButtonPusherPosition();
-
       // Initialize driver controls to beacon mode or ball kicker mode.
       // Comment out the mode you don't want to start in.
       setBeaconMode();
@@ -149,7 +151,7 @@ public class Crossfire_Hardware
    }
 
 
-   /***
+   /*
     * Convenience method for setting encoder counts to all four mecanum drive motors
     *
     * @param LFcount Left front encoder counts
