@@ -65,7 +65,7 @@ public class CF_Manual extends OpMode
    int pictureNumber;
    OpenGLMatrix pose = null;
 
-   final int stopCount = 110;
+   final int stopCount = 200;
    boolean seeable;
    double kP = 0.0005;
    double power = 0.2;
@@ -153,6 +153,9 @@ public class CF_Manual extends OpMode
 
       if(gamepad1.b) {
          //pushRedButton();
+      }
+      if(gamepad2.y) {
+         robot.SetButtonPusherPosition(0.45f);
       }
 
       SetBallLifterControls();
@@ -295,22 +298,22 @@ public class CF_Manual extends OpMode
    {
       if(((VuforiaTrackableDefaultListener) pics.get(0).getListener()).isVisible()) {
          pictureNumber = 0;
-         robot.SetButtonPusherPosition(0.45f);
+         //robot.SetButtonPusherPosition(0.45f);
          driveToBeacon(pics);
       }
       if(((VuforiaTrackableDefaultListener) pics.get(1).getListener()).isVisible()) {
          pictureNumber = 1;
-         robot.SetButtonPusherPosition(0.45f);
+         //robot.SetButtonPusherPosition(0.45f);
          driveToBeacon(pics);
       }
       if(((VuforiaTrackableDefaultListener) pics.get(2).getListener()).isVisible()) {
          pictureNumber = 2;
-         robot.SetButtonPusherPosition(0.45f);
+         //robot.SetButtonPusherPosition(0.45f);
          driveToBeacon(pics);
       }
       if(((VuforiaTrackableDefaultListener) pics.get(3).getListener()).isVisible()) {
          pictureNumber = 3;
-         robot.SetButtonPusherPosition(0.45f);
+         //robot.SetButtonPusherPosition(0.45f);
          driveToBeacon(pics);
       }
 
@@ -324,8 +327,9 @@ public class CF_Manual extends OpMode
          requestOpModeStop();
       }
       seeable = ((VuforiaTrackableDefaultListener) picsArray.get(pictureNumber).getListener()).isVisible();
-      while(x >= stopCount && !checkForStop() && seeable) {
+      while(gamepad1.x && !checkForStop() && seeable) {
          pose = ((VuforiaTrackableDefaultListener) picsArray.get(pictureNumber).getListener()).getRawPose();
+         ServiceServo();
          if(checkForStop()) {
             requestOpModeStop();
          }
