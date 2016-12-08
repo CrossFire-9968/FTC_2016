@@ -36,9 +36,9 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created by Ryley on 10/5/16.
  */
-@Autonomous(name="CF_Vuforia_Blue_Wheels_Dual_Sensor", group ="Blue")
+@Autonomous(name="CF_Vuforia_Blue_Dual_Sensor", group ="Blue")
 //@Disabled
-public class CF_Vuforia_Blue_Wheels_Dual_Sensor extends CF_Library implements SensorEventListener {
+public class CF_Vuforia_Blue_Dual_Sensor extends CF_Library implements SensorEventListener {
 
     float xAccel = 0;
     float yAccel = 0;
@@ -360,7 +360,7 @@ public class CF_Vuforia_Blue_Wheels_Dual_Sensor extends CF_Library implements Se
             if (sensorRGBright.blue() > sensorRGBright.red() && sensorRGBleft.red() > sensorRGBleft.blue()) {
                 telemetry.addData("blue", hsvValuesright[0]);
                 telemetry.update();
-                robot.SetButtonPusherPosition(0.00);
+                robot.SetButtonPusherPosition(0.28);
                 this.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                 TimeUnit.SECONDS.sleep(1);
                 this.encoderMove(300, 300, 0.2f, 0.2f);
@@ -377,7 +377,7 @@ public class CF_Vuforia_Blue_Wheels_Dual_Sensor extends CF_Library implements Se
             } else if (sensorRGBright.red() > sensorRGBright.blue() && sensorRGBleft.blue() > sensorRGBleft.red()) {
                 telemetry.addData("red", hsvValuesright[0]);
                 telemetry.update();
-                robot.SetButtonPusherPosition(0.90);
+                robot.SetButtonPusherPosition(0.70);
                 this.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                 TimeUnit.SECONDS.sleep(1);
                 this.encoderMove(300, 300, 0.2f, 0.2f);

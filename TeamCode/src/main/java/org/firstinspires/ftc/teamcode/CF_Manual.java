@@ -282,16 +282,18 @@ public class CF_Manual extends OpMode
       double ButtonPusherPosition = robot.GetButtonPusherPosition();
 
       // Rotate CCW
-      if (gamepad2.x)
+      if (gamepad2.x && robot.GetButtonPusherPosition() <= 0.70)
       {
          robot.SetButtonPusherPosition(ButtonPusherPosition + beaconPusherRate);
       }
 
       // Rotate CW
-      else if (gamepad2.b)
+      else if (gamepad2.b && robot.GetButtonPusherPosition() >= 0.29)
       {
          robot.SetButtonPusherPosition(ButtonPusherPosition - beaconPusherRate);
       }
+      telemetry.addData("Pos: ", robot.GetButtonPusherPosition());
+      telemetry.update();
    }
 
    private void pushBlueButton(VuforiaTrackables pics)
@@ -366,56 +368,6 @@ public class CF_Manual extends OpMode
       else {
          return false;
       }
-   }
-   private void pushBlue() throws InterruptedException
-   {
-      Color.RGBToHSV((sensorRGBright.red() * 255) / 800, (sensorRGBright.green() * 255) / 800, (sensorRGBright.blue() * 255) / 800, hsvValuesright);
-      Color.RGBToHSV((sensorRGBleft.red() * 255) / 800, (sensorRGBleft.green() * 255) / 800, (sensorRGBleft.blue() * 255) / 800, hsvValuesleft);
-      if(sensorRGBright.blue() > sensorRGBright.red() && sensorRGBleft.red() > sensorRGBleft.blue()) {
-         telemetry.addData("blue", hsvValuesright[0]);
-         telemetry.update();
-         robot.SetButtonPusherPosition(0.00);
-         this.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-         TimeUnit.SECONDS.sleep(1);
-         this.encoderMove(300, 300, 0.2f, 0.2f);
-         TimeUnit.SECONDS.sleep(1);
-         this.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-         int count = 100;
-         while(sensorRGBleft.red() > sensorRGBleft.blue() && count <= 600) {
-            this.encoderMove(count, count, 0.3f, 0.3f);
-            count+=50;
-         }
-      }
-      else if (sensorRGBright.red() > sensorRGBright.blue() && sensorRGBleft.blue() > sensorRGBleft.red()) {
-         telemetry.addData("red", hsvValuesright[0]);
-         telemetry.update();
-         robot.SetButtonPusherPosition(0.90);
-         this.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-         TimeUnit.SECONDS.sleep(1);
-         this.encoderMove(300, 300, 0.2f, 0.2f);
-         TimeUnit.SECONDS.sleep(1);
-         this.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-         int count = 100;
-         while(sensorRGBright.red() > sensorRGBright.blue() && count <= 600){
-            this.encoderMove(count, count, 0.3f, 0.3f);
-            count+=50;
-         }
-         this.encoderMove(-1500, -1500, 0.2f, 0.2f);
-         //requestOpModeStop();
-      }
-      else {
-         robot.SetButtonPusherPosition(0.90);
-         int count = 100;
-         while(sensorRGBleft.red() > sensorRGBleft.blue() && count <= 600) {
-            setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            this.encoderMove(count, count, 0.3f, 0.3f);
-            count += 50;
-         }
-      }
-   }
-   private void pushRed()
-   {
-
    }
    public void encoderMove(int countLeft, int countRight, double leftPower, double rightPower){
 
