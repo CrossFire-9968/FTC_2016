@@ -28,8 +28,9 @@ public class Crossfire_Hardware
    public DcMotor MotorMecanumRightFront;
    public DcMotor MotorMecanumLeftRear;
    public DcMotor MotorMecanumRightRear;
-   public DcMotor BallLifterMotor;
-   //public DcMotor ZipTieSpinner;
+   //public DcMotor BallLifter;
+   //public DcMotor Loader;
+   //public DcMotor Shooter;
    public Servo ButtonPusher;
    public ColorSensor sensorRGBright;
    public ColorSensor sensorRGBleft;
@@ -61,22 +62,21 @@ public class Crossfire_Hardware
       MotorMecanumLeftRear = hwMap.dcMotor.get("left_rear_drive");
       MotorMecanumRightRear = hwMap.dcMotor.get("right_rear_drive");
       ButtonPusher = hwMap.servo.get("button_pusher");
-      BallLifterMotor = hwMap.dcMotor.get("ball_lifter");
       sensorRGBright = hwMap.colorSensor.get("AdafruitRGBright");
       sensorRGBleft = hwMap.colorSensor.get("AdafruitRGBleft");
-      //ZipTieSpinner = hwMap.dcMotor.get("zip_tie_spinner");
-
-      BallLifterMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-      BallLifterMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+      //BallLifter = hwMap.dcMotor.get("ball_lifter");
+      //Loader = hwMap.dcMotor.get("loader");
+      //Shooter = hwMap.dcMotor.get("shooter");
 
       // Set motor polarity.  We are using
       // AndyMark motors so directions are opposite.
       MotorMecanumLeftFront.setDirection(DcMotor.Direction.REVERSE);     // Set to REVERSE if using AndyMark motors
       MotorMecanumLeftRear.setDirection(DcMotor.Direction.REVERSE);      // Set to REVERSE if using AndyMark motors
       MotorMecanumRightFront.setDirection(DcMotor.Direction.FORWARD);    // Set to FORWARD if using AndyMark motors
-      MotorMecanumRightRear.setDirection(DcMotor.Direction.FORWARD);  // Set to FORWARD if using AndyMark motor
-      BallLifterMotor.setDirection(DcMotor.Direction.FORWARD);
-      //ZipTieSpinner.setDirection(DcMotor.Direction.FORWARD);
+      MotorMecanumRightRear.setDirection(DcMotor.Direction.FORWARD);     // Set to FORWARD if using AndyMark motor
+      //Loader.setDirection(DcMotor.Direction.FORWARD);
+      //Shooter.setDirection(DcMotor.Direction.FORWARD);
+      //BallLifter.setDirection(DcMotor.Direction.FORWARD);
       SetButtonPusherPosition(0.45);
 
        //Set all motors to zero power

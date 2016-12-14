@@ -145,7 +145,6 @@ public class CF_Manual extends OpMode
          robot.setBeaconMode();
       }
 
-
       if(gamepad1.x)
       {
          pushBlueButton(beacons);
@@ -158,7 +157,14 @@ public class CF_Manual extends OpMode
          robot.SetButtonPusherPosition(0.45f);
       }
 
-      SetBallLifterControls();
+      //runs ball lifter. No way.
+      //runBallLifter();
+
+      //runs the ball loader for Monty
+      //runLoader();
+
+      //runs ball shooter
+      //runShooter();
    }
 
 
@@ -253,28 +259,39 @@ public class CF_Manual extends OpMode
       }
    }
 
-   public void SetBallLifterControls()
-   {
-      if (gamepad2.right_bumper)
-      {
-         robot.BallLifterMotor.setPower(0.30);
+//public void runShooter()
+//{
+//   if (gamepad2.right_bumper)
+//   {
+//      robot.Shooter.setPower(1.0);
+//   }
+//
+//   else if (gamepad2.left_bumper)
+//   {
+//      robot.Shooter.setPower(0);
+//   }
+//}
 
-      }
+//   public void runLoader()
+//   {
+//      if (gamepad2.dpad_up)
+//      {
+//         robot.Loader.setPower(0.6);
+//      }
+//
+//      else if (gamepad2.dpad_down)
+//      {
+//         robot.Loader.setPower(-0.6);
+//      }
+//   }
 
-      else if (gamepad2.left_bumper)
-      {
-         robot.BallLifterMotor.setPower(-0.30);
-      }
-
-      else
-      {
-         robot.BallLifterMotor.setPower(0.0);
-      }
-   }
-
-   public void setZipTieSpinnerControls()
-   {
-   }
+//   public void runBallLifter()
+//   {
+//      if ((gamepad2.left_stick_y > 0.05) || (gamepad2.left_stick_y < -0.05))
+//      {
+//         robot.ZipTieSpinner.setPower(gamepad2.left_stick_y);
+//      }
+//   }
 
    /***
     * Method operates the servo to push the beacon button.  To push
