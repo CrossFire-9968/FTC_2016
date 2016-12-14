@@ -51,15 +51,29 @@ public class CF_Vuforia_Blue_Dual_Sensor extends CF_Library implements SensorEve
     int x;
     int y;
     int z;
+    float[] data;
     int error;
 
+    double kPy = 0.0009;
+
+    double kPangle = 0.0095;
+    double kPangleSmall = 0.0009;
+    double kIangle = 0.000085;
+    double kIangleBig = 0.00023;
+    float effortStrafe;
+    int angle;
+    int errorY;
+    double errorAngle;
+    double integral = 0.0;
+    double turnFront;
+    double turnRear;
 
     double kP = 0.0005;
     double power = 0.2;
     double effort;
     double leftPower;
     double rightPower;
-    final int FIRSTPICTURE = 0;
+    final int FIRSTPICTURE = 2; //0
     final int SECONDPICTURE = 2;
     int encoderCounts = 0;
     int picFlag = 0;
@@ -162,11 +176,11 @@ public class CF_Vuforia_Blue_Dual_Sensor extends CF_Library implements SensorEve
                 firstFlag = 1;
             }
             seeableFirst = ((VuforiaTrackableDefaultListener) beacons.get(FIRSTPICTURE).getListener()).isVisible();
-            while (!seeableFirst && !isStopRequested() && turnFlagFirst == 0) {
-                this.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                this.encoderStrafeLeft(100, speed);
-                seeableFirst = ((VuforiaTrackableDefaultListener) beacons.get(FIRSTPICTURE).getListener()).isVisible();
-            }
+//            while (!seeableFirst && !isStopRequested() && turnFlagFirst == 0) {
+//                this.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//                this.encoderStrafeLeft(100, speed);
+//                seeableFirst = ((VuforiaTrackableDefaultListener) beacons.get(FIRSTPICTURE).getListener()).isVisible();
+//            }
 
             if (seeableFirst) {
                 setPower(0.0f);
@@ -174,6 +188,8 @@ public class CF_Vuforia_Blue_Dual_Sensor extends CF_Library implements SensorEve
             }
 
             driveToBeacon(FIRSTPICTURE, beacons);
+
+            squareToBeacon(FIRSTPICTURE, beacons);
 
             pushBeaconButton();
 
@@ -396,6 +412,46 @@ public class CF_Vuforia_Blue_Dual_Sensor extends CF_Library implements SensorEve
                 telemetry.update();
             }
         //}
+    }
+    public void squareToBeacon(int picture, VuforiaTrackables beaconsArray) {
+        while (!(effortStrafe + turnFront < 0.05 && effortStrafe + turnRear < 0.05 && effortStrafe + turnFront > -0.05 && effortStrafe + turnRear > -0.05 && errorAngle < 5 && errorAngle > -5 && errorY < 7 && errorY > -7)) {
+            VectorF translation;
+            pose = ((VuforiaTrackableDefaultListener) beaconsArray.get(picture).getListener()).getRawPose();
+            if (pose != null) {
+                translation = pose.getTranslation();
+                data = pose.getData();
+                angle = (int) Math.toDegrees(Math.acos(data[2]));
+                y = (int) translation.get(1);
+                x = (int) translation.get(2);
+                errorY = y;
+                turnRear = kPy * errorY;
+                turnFront = kPy * errorY * -1;
+
+                errorAngle = 90 - angle;
+
+                if (errorAngle < 10 && errorAngle > -10) {
+                    integral = 0;
+                } else {
+                    integral = integral + errorAngle;
+                }
+                if (integral * kIangle > 1.0) {
+                    integral = 1000;
+                }
+                if (x < 700) {
+                    effortStrafe = (float) ((errorAngle * kPangleSmall) + (integral * kIangleBig));
+                } else {
+                    effortStrafe = (float) ((errorAngle * kPangle) + (integral * kIangle));
+                }
+
+                strafe(effortStrafe + turnFront, effortStrafe + turnRear);
+                telemetry.addData("error", errorY);
+                telemetry.addData("turnRear", turnRear);
+                telemetry.update();
+
+
+
+            }
+        }
     }
 }
 

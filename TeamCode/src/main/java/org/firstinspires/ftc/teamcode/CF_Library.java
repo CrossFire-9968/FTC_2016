@@ -116,5 +116,10 @@ public abstract class CF_Library extends LinearOpMode {
       setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
    }
-
+   public void strafe(double frontPower, double rearPower) {
+      robot.MotorMecanumRightFront.setPower(-1 * frontPower);
+      robot.MotorMecanumRightRear.setPower(rearPower);
+      robot.MotorMecanumLeftFront.setPower(frontPower);
+      robot.MotorMecanumLeftRear.setPower(-1 * rearPower);
+   }
 }
