@@ -202,23 +202,24 @@ public class CF_Manual extends OpMode
 
          // Calculate power for each mecanum wheel based on joystick inputs.  Each power is
          // based on three drive components: forward/reverse, strafe, and tank turn.
+         telemetry.addData("Mode: ", "Normal");
          if (robot.driveMode == Crossfire_Hardware.driveModeEnum.beaconMode)
          {
             LFPower = (forwardPriority * leftStickY) - (strafePriority * leftStickX) - (steerPriority * rightStickX);
             RFPower = (forwardPriority * leftStickY) + (strafePriority * leftStickX) + (steerPriority * rightStickX);
             LRPower = (forwardPriority * leftStickY) + (strafePriority * leftStickX) - (steerPriority * rightStickX);
             RRPower = (forwardPriority * leftStickY) - (strafePriority * leftStickX) + (steerPriority * rightStickX);
-            telemetry.addData("Mode: ", "Beacon");
          }
 
-
+         telemetry.addData("Mode: ", "Strafe");
          if (robot.driveMode == Crossfire_Hardware.driveModeEnum.ballKickerMode)
          {
-            LFPower = (forwardPriority * -leftStickY) + (strafePriority * leftStickX) - (steerPriority * rightStickX);
-            RFPower = (forwardPriority * -leftStickY) - (strafePriority * leftStickX) + (steerPriority * rightStickX);
-            LRPower = (forwardPriority * -leftStickY) - (strafePriority * leftStickX) - (steerPriority * rightStickX);
-            RRPower = (forwardPriority * -leftStickY) + (strafePriority * leftStickX) + (steerPriority * rightStickX);
-            telemetry.addData("Mode: ", "Ball Kicker");
+            LFPower = (forwardPriority * -1 * leftStickX) - (strafePriority * leftStickY) + (steerPriority * -rightStickX);
+            RFPower = (forwardPriority * -1 * leftStickX) + (strafePriority * leftStickY) - (steerPriority * -rightStickX);
+            LRPower = (forwardPriority * -1 * leftStickX) + (strafePriority * leftStickY) + (steerPriority * -rightStickX);
+            RRPower = (forwardPriority * -1 * leftStickX) - (strafePriority * leftStickY) - (steerPriority * -rightStickX);
+            telemetry.addData("leftStickX", leftStickX);
+            telemetry.update();
          }
 
          telemetry.update();
@@ -271,6 +272,9 @@ public class CF_Manual extends OpMode
       }
    }
 
+   public void setZipTieSpinnerControls()
+   {
+   }
 
    /***
     * Method operates the servo to push the beacon button.  To push
