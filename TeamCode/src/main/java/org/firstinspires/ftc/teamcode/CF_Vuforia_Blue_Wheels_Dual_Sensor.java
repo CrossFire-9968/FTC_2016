@@ -16,6 +16,7 @@ import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DeviceInterfaceModule;
 import com.qualcomm.robotcore.hardware.DigitalChannelController;
+import com.qualcomm.robotcore.util.ElapsedTime;
 import com.vuforia.HINT;
 import com.vuforia.TrackerManager;
 import com.vuforia.Vuforia;
@@ -39,6 +40,10 @@ import java.util.concurrent.TimeUnit;
 @Autonomous(name="CF_Vuforia_Blue_Wheels_Dual_Sensor", group ="Blue")
 //@Disabled
 public class CF_Vuforia_Blue_Wheels_Dual_Sensor extends CF_Library implements SensorEventListener {
+
+    private ElapsedTime runtime = new ElapsedTime();
+
+    static double TIMEOUT = 27;
 
     float xAccel = 0;
     float yAccel = 0;
@@ -152,19 +157,19 @@ public class CF_Vuforia_Blue_Wheels_Dual_Sensor extends CF_Library implements Se
         //5060
 
         while (opModeIsActive()) {
-            if (firstFlag == 0) {
-                this.encoderStrafeLeft(3000, speed);
+            if (firstFlag == 0 && runtime.seconds() < TIMEOUT) {
+                this.encoderStrafeLeft(3000, speed, runtime);
                 this.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                this.encoderMove(1500, 1500, speed, speed);
+                this.encoderMove(1500, 1500, speed, speed, runtime);
                 this.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                this.encoderStrafeLeft(2000, speed);
+                this.encoderStrafeLeft(2000, speed, runtime);
                 TimeUnit.SECONDS.sleep((long)0.5);
                 firstFlag = 1;
             }
             seeableFirst = ((VuforiaTrackableDefaultListener) beacons.get(FIRSTPICTURE).getListener()).isVisible();
-            while (!seeableFirst && !isStopRequested() && turnFlagFirst == 0) {
+            while (!seeableFirst && !isStopRequested() && turnFlagFirst == 0 && runtime.seconds() < TIMEOUT) {
                 this.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                this.encoderStrafeLeft(100, speed);
+                this.encoderStrafeLeft(100, speed, runtime);
                 seeableFirst = ((VuforiaTrackableDefaultListener) beacons.get(FIRSTPICTURE).getListener()).isVisible();
             }
 
@@ -179,14 +184,14 @@ public class CF_Vuforia_Blue_Wheels_Dual_Sensor extends CF_Library implements Se
 
             this.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-            this.encoderStrafeLeft(4500, speed);
+            this.encoderStrafeLeft(4500, speed, runtime);
 
             TimeUnit.SECONDS.sleep((long)0.5);
 
             seeableSecond = ((VuforiaTrackableDefaultListener) beacons.get(SECONDPICTURE).getListener()).isVisible();
-            while (!seeableSecond && !isStopRequested() && turnFlagSecond == 0) {
+            while (!seeableSecond && !isStopRequested() && turnFlagSecond == 0 && runtime.seconds() < TIMEOUT) {
                 this.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                this.encoderStrafeLeft(100, speed);
+                this.encoderStrafeLeft(100, speed, runtime);
                 seeableSecond = ((VuforiaTrackableDefaultListener) beacons.get(SECONDPICTURE).getListener()).isVisible();
             }
 
@@ -288,13 +293,13 @@ public class CF_Vuforia_Blue_Wheels_Dual_Sensor extends CF_Library implements Se
             seeableFirst = ((VuforiaTrackableDefaultListener) beaconsArray.get(pictureNumber).getListener()).isVisible();
         }
 
-        while (x >= stopCount && !isStopRequested() && seeableFirst && encoderCounts < 5000) {
+        while (x >= stopCount && !isStopRequested() && seeableFirst && encoderCounts < 5000 && runtime.seconds() < TIMEOUT) {
             pose = ((VuforiaTrackableDefaultListener) beaconsArray.get(pictureNumber).getListener()).getRawPose();
 
 
             // NOTE: If picture not seen is pose = NULL?
             // Is "visible" on screen with light?
-            while (pose != null && picFlag == 0 && !isStopRequested()) {
+            while (pose != null && picFlag == 0 && !isStopRequested() && runtime.seconds() < TIMEOUT) {
                 if (isStopRequested()) {
                     requestOpModeStop();
                 }
@@ -317,7 +322,7 @@ public class CF_Vuforia_Blue_Wheels_Dual_Sensor extends CF_Library implements Se
 
                 seeableFirst = ((VuforiaTrackableDefaultListener) beaconsArray.get(pictureNumber).getListener()).isVisible();
 
-                while (x >= stopCount && !isStopRequested() && seeableFirst && encoderCounts < 5000) {
+                while (x >= stopCount && !isStopRequested() && seeableFirst && encoderCounts < 5000 && runtime.seconds() < TIMEOUT) {
                     pose = ((VuforiaTrackableDefaultListener) beaconsArray.get(pictureNumber).getListener()).getRawPose();
                     seeableFirst = ((VuforiaTrackableDefaultListener) beaconsArray.get(pictureNumber).getListener()).isVisible();
                     encoderCounts = robot.MotorMecanumLeftFront.getCurrentPosition();
@@ -357,39 +362,39 @@ public class CF_Vuforia_Blue_Wheels_Dual_Sensor extends CF_Library implements Se
         //if (beaconFlagFirst == 0) {
             Color.RGBToHSV((sensorRGBright.red() * 255) / 800, (sensorRGBright.green() * 255) / 800, (sensorRGBright.blue() * 255) / 800, hsvValuesright);
             Color.RGBToHSV((sensorRGBleft.red() * 255) / 800, (sensorRGBleft.green() * 255) / 800, (sensorRGBleft.blue() * 255) / 800, hsvValuesleft);
-            if (sensorRGBright.blue() > sensorRGBright.red() && sensorRGBleft.red() > sensorRGBleft.blue()) {
+            if (sensorRGBright.blue() > sensorRGBright.red() && sensorRGBleft.red() > sensorRGBleft.blue() && runtime.seconds() < TIMEOUT) {
                 telemetry.addData("blue", hsvValuesright[0]);
                 telemetry.update();
                 robot.SetButtonPusherPosition(0.00);
                 this.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                 TimeUnit.SECONDS.sleep(1);
-                this.encoderMove(300, 300, 0.2f, 0.2f);
+                this.encoderMove(300, 300, 0.2f, 0.2f, runtime);
                 beaconFlagFirst = 1;
                 TimeUnit.SECONDS.sleep(1);
                 this.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                 int count = 100;
-                while(sensorRGBleft.red() > sensorRGBleft.blue() && count <= 600) {
-                    this.encoderMove(count, count, 0.3f, 0.3f);
+                while(sensorRGBleft.red() > sensorRGBleft.blue() && count <= 600 && runtime.seconds() < TIMEOUT) {
+                    this.encoderMove(count, count, 0.3f, 0.3f, runtime);
                     count+=50;
                 }
-                this.encoderMove(-1500, -1500, 0.2f, 0.2f);
+                this.encoderMove(-1500, -1500, 0.2f, 0.2f, runtime);
                 //requestOpModeStop();
-            } else if (sensorRGBright.red() > sensorRGBright.blue() && sensorRGBleft.blue() > sensorRGBleft.red()) {
+            } else if (sensorRGBright.red() > sensorRGBright.blue() && sensorRGBleft.blue() > sensorRGBleft.red() && runtime.seconds() < TIMEOUT) {
                 telemetry.addData("red", hsvValuesright[0]);
                 telemetry.update();
                 robot.SetButtonPusherPosition(0.90);
                 this.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                 TimeUnit.SECONDS.sleep(1);
-                this.encoderMove(300, 300, 0.2f, 0.2f);
+                this.encoderMove(300, 300, 0.2f, 0.2f, runtime);
                 beaconFlagFirst = 1;
                 TimeUnit.SECONDS.sleep(1);
                 this.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                 int count = 100;
-                while(sensorRGBright.red() > sensorRGBright.blue() && count <= 600){
-                    this.encoderMove(count, count, 0.3f, 0.3f);
+                while((sensorRGBright.red() > sensorRGBright.blue() && count <= 600) && runtime.seconds() < TIMEOUT){
+                    this.encoderMove(count, count, 0.3f, 0.3f, runtime);
                     count+=50;
                 }
-                this.encoderMove(-1500, -1500, 0.2f, 0.2f);
+                this.encoderMove(-1500, -1500, 0.2f, 0.2f, runtime);
                 //requestOpModeStop();
             } else {
                 telemetry.addData("unknown", hsvValuesright[0]);

@@ -1,12 +1,15 @@
 package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.util.ElapsedTime;
+
 /**
  * Created by Ryley on 9/20/16.
  */
 
 public abstract class CF_Library extends LinearOpMode {
    Crossfire_Hardware robot   = new Crossfire_Hardware();
+   static double TIMEOUT = 28;
    public void setPower(float power) {
       robot.MotorMecanumLeftFront.setPower(power);
       robot.MotorMecanumRightFront.setPower(power);
@@ -31,7 +34,7 @@ public abstract class CF_Library extends LinearOpMode {
       robot.MotorMecanumRightRear.setMode(mode);
    }
 
-   public void encoderMove(int countLeft, int countRight, double leftPower, double rightPower){
+   public void encoderMove(int countLeft, int countRight, double leftPower, double rightPower, ElapsedTime time){
 
       robot.MotorMecanumLeftFront.setPower(leftPower);
       robot.MotorMecanumRightFront.setPower(rightPower);
@@ -45,7 +48,7 @@ public abstract class CF_Library extends LinearOpMode {
       robot.MotorMecanumLeftRear.setTargetPosition(countLeft);
       robot.MotorMecanumRightRear.setTargetPosition(countRight);
 
-      while(robot.MotorMecanumLeftFront.isBusy() && robot.MotorMecanumRightFront.isBusy() && robot.MotorMecanumLeftRear.isBusy() && robot.MotorMecanumRightRear.isBusy()) {
+      while(robot.MotorMecanumLeftFront.isBusy() && robot.MotorMecanumRightFront.isBusy() && robot.MotorMecanumLeftRear.isBusy() && robot.MotorMecanumRightRear.isBusy() && time.seconds() < TIMEOUT) {
          double leftPos = robot.MotorMecanumLeftFront.getCurrentPosition();
          double rightPos = robot.MotorMecanumRightFront.getCurrentPosition();
          telemetry.addData("Right",rightPos);
@@ -62,7 +65,7 @@ public abstract class CF_Library extends LinearOpMode {
       setPower(0.0f);
       setMode(DcMotor.RunMode.RUN_USING_ENCODER);
    }
-   public void encoderStrafeRight(int count, float power) throws InterruptedException{
+   public void encoderStrafeRight(int count, float power, ElapsedTime time) throws InterruptedException{
       setLeftPower(power);
       setRightPower(power);
       setPower(power);
@@ -71,7 +74,7 @@ public abstract class CF_Library extends LinearOpMode {
       robot.MotorMecanumLeftRear.setTargetPosition(count * -1);
       robot.MotorMecanumRightRear.setTargetPosition(count);
       setMode(DcMotor.RunMode.RUN_TO_POSITION);
-      while(robot.MotorMecanumLeftFront.isBusy() && robot.MotorMecanumRightFront.isBusy() && robot.MotorMecanumLeftRear.isBusy() && robot.MotorMecanumRightRear.isBusy()) {
+      while(robot.MotorMecanumLeftFront.isBusy() && robot.MotorMecanumRightFront.isBusy() && robot.MotorMecanumLeftRear.isBusy() && robot.MotorMecanumRightRear.isBusy() && time.seconds() < TIMEOUT) {
          double leftPos = robot.MotorMecanumLeftRear.getCurrentPosition();
          double rightPos = robot.MotorMecanumRightRear.getCurrentPosition();
          telemetry.addData("Right",rightPos);
@@ -89,7 +92,7 @@ public abstract class CF_Library extends LinearOpMode {
       setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
    }
-   public void encoderStrafeLeft(int count, float power) throws InterruptedException{
+   public void encoderStrafeLeft(int count, float power, ElapsedTime time) throws InterruptedException{
       setLeftPower(power);
       setRightPower(power);
       setPower(power);
@@ -98,7 +101,7 @@ public abstract class CF_Library extends LinearOpMode {
       robot.MotorMecanumLeftRear.setTargetPosition(count);
       robot.MotorMecanumRightRear.setTargetPosition(count * -1);
       setMode(DcMotor.RunMode.RUN_TO_POSITION);
-      while(robot.MotorMecanumLeftFront.isBusy() && robot.MotorMecanumRightFront.isBusy() && robot.MotorMecanumLeftRear.isBusy() && robot.MotorMecanumRightRear.isBusy()) {
+      while(robot.MotorMecanumLeftFront.isBusy() && robot.MotorMecanumRightFront.isBusy() && robot.MotorMecanumLeftRear.isBusy() && robot.MotorMecanumRightRear.isBusy() && time.seconds() < TIMEOUT) {
          double leftPos = robot.MotorMecanumLeftRear.getCurrentPosition();
          double rightPos = robot.MotorMecanumRightRear.getCurrentPosition();
          telemetry.addData("Right",rightPos);
