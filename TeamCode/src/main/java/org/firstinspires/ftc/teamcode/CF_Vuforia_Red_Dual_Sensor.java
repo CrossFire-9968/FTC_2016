@@ -16,6 +16,7 @@ import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DeviceInterfaceModule;
 import com.qualcomm.robotcore.hardware.DigitalChannelController;
+import com.qualcomm.robotcore.util.ElapsedTime;
 import com.vuforia.HINT;
 import com.vuforia.TrackerManager;
 import com.vuforia.Vuforia;
@@ -39,6 +40,10 @@ import java.util.concurrent.TimeUnit;
 @Autonomous(name="CF_Vuforia_Red_Dual_Sensor", group ="Blue")
 //@Disabled
 public class CF_Vuforia_Red_Dual_Sensor extends CF_Library implements SensorEventListener {
+
+    private ElapsedTime runtime = new ElapsedTime();
+
+    final double TIMEOUT = 27;
 
     float xAccel = 0;
     float yAccel = 0;
@@ -152,20 +157,26 @@ public class CF_Vuforia_Red_Dual_Sensor extends CF_Library implements SensorEven
         //5060
 
         while (opModeIsActive()) {
-            if (firstFlag == 0) {
+            if (firstFlag == 0 && runtime.seconds() < TIMEOUT) {
                 this.encoderStrafeRight(3000, speed);
                 this.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                 this.encoderMove(1500, 1500, speed, speed);
                 this.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                this.encoderStrafeRight(1850, speed);
+                this.encoderStrafeRight(1750, speed);
                 TimeUnit.SECONDS.sleep((long)0.5f);
                 firstFlag = 1;
             }
             seeableFirst = ((VuforiaTrackableDefaultListener) beacons.get(FIRSTPICTURE).getListener()).isVisible();
-            while (!seeableFirst && !isStopRequested() && turnFlagFirst == 0) {
+            while (!seeableFirst && !isStopRequested() && turnFlagFirst == 0 && runtime.seconds() < TIMEOUT) {
                 this.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                 this.encoderStrafeRight(100, speed);
                 seeableFirst = ((VuforiaTrackableDefaultListener) beacons.get(FIRSTPICTURE).getListener()).isVisible();
+                if(runtime.seconds() < TIMEOUT) {
+                    requestOpModeStop();
+                }
+                telemetry.clearAll();
+                telemetry.addData("Timer: ", runtime.seconds());
+                telemetry.update();
             }
 
             if (seeableFirst) {
@@ -184,7 +195,7 @@ public class CF_Vuforia_Red_Dual_Sensor extends CF_Library implements SensorEven
             TimeUnit.SECONDS.sleep((long)0.5);
 
             seeableSecond = ((VuforiaTrackableDefaultListener) beacons.get(SECONDPICTURE).getListener()).isVisible();
-            while (!seeableSecond && !isStopRequested() && turnFlagSecond == 0) {
+            while (!seeableSecond && !isStopRequested() && turnFlagSecond == 0 && runtime.seconds() < TIMEOUT) {
                 this.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                 this.encoderStrafeRight(100, speed);
                 seeableSecond = ((VuforiaTrackableDefaultListener) beacons.get(SECONDPICTURE).getListener()).isVisible();
@@ -288,13 +299,13 @@ public class CF_Vuforia_Red_Dual_Sensor extends CF_Library implements SensorEven
             seeableFirst = ((VuforiaTrackableDefaultListener) beaconsArray.get(pictureNumber).getListener()).isVisible();
         }
 
-        while (x >= stopCount && !isStopRequested() && seeableFirst && encoderCounts < 5000) {
+        while (x >= stopCount && !isStopRequested() && seeableFirst && encoderCounts < 5000 && runtime.seconds() < TIMEOUT) {
             pose = ((VuforiaTrackableDefaultListener) beaconsArray.get(pictureNumber).getListener()).getRawPose();
 
 
             // NOTE: If picture not seen is pose = NULL?
             // Is "visible" on screen with light?
-            while (pose != null && picFlag == 0 && !isStopRequested()) {
+            while (pose != null && picFlag == 0 && !isStopRequested() && runtime.seconds() < TIMEOUT) {
                 if (isStopRequested()) {
                     requestOpModeStop();
                 }
@@ -317,7 +328,7 @@ public class CF_Vuforia_Red_Dual_Sensor extends CF_Library implements SensorEven
 
                 seeableFirst = ((VuforiaTrackableDefaultListener) beaconsArray.get(pictureNumber).getListener()).isVisible();
 
-                while (x >= stopCount && !isStopRequested() && seeableFirst && encoderCounts < 5000) {
+                while (x >= stopCount && !isStopRequested() && seeableFirst && encoderCounts < 5000 && runtime.seconds() < TIMEOUT) {
                     pose = ((VuforiaTrackableDefaultListener) beaconsArray.get(pictureNumber).getListener()).getRawPose();
                     seeableFirst = ((VuforiaTrackableDefaultListener) beaconsArray.get(pictureNumber).getListener()).isVisible();
                     encoderCounts = robot.MotorMecanumLeftFront.getCurrentPosition();
