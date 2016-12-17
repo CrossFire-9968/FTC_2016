@@ -186,10 +186,9 @@ public class CF_Vuforia_Red_Dual_Sensor extends CF_Library implements SensorEven
                 setPower(0.0f);
                 turnFlagFirst = 1;
             }
+            squareToBeacon(FIRSTPICTURE, beacons);
 
             driveToBeacon(FIRSTPICTURE, beacons);
-
-            squareToBeacon(FIRSTPICTURE, beacons);
 
             pushBeaconButton();
 

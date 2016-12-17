@@ -73,7 +73,7 @@ public class CF_Vuforia_Blue_Dual_Sensor extends CF_Library implements SensorEve
     double effort;
     double leftPower;
     double rightPower;
-    final int FIRSTPICTURE = 2; //0
+    final int FIRSTPICTURE = 0; //0
     final int SECONDPICTURE = 2;
     int encoderCounts = 0;
     int picFlag = 0;
@@ -187,9 +187,9 @@ public class CF_Vuforia_Blue_Dual_Sensor extends CF_Library implements SensorEve
                 turnFlagFirst = 1;
             }
 
-            driveToBeacon(FIRSTPICTURE, beacons);
-
             squareToBeacon(FIRSTPICTURE, beacons);
+
+            driveToBeacon(FIRSTPICTURE, beacons);
 
             pushBeaconButton();
 
@@ -200,11 +200,11 @@ public class CF_Vuforia_Blue_Dual_Sensor extends CF_Library implements SensorEve
             TimeUnit.SECONDS.sleep((long)0.5);
 
             seeableSecond = ((VuforiaTrackableDefaultListener) beacons.get(SECONDPICTURE).getListener()).isVisible();
-            while (!seeableSecond && !isStopRequested() && turnFlagSecond == 0) {
-                this.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                this.encoderStrafeLeft(100, speed);
-                seeableSecond = ((VuforiaTrackableDefaultListener) beacons.get(SECONDPICTURE).getListener()).isVisible();
-            }
+//            while (!seeableSecond && !isStopRequested() && turnFlagSecond == 0) {
+//                this.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//                this.encoderStrafeLeft(100, speed);
+//                seeableSecond = ((VuforiaTrackableDefaultListener) beacons.get(SECONDPICTURE).getListener()).isVisible();
+//            }
 
             if (seeableSecond) {
                 setPower(0.0f);
@@ -212,6 +212,8 @@ public class CF_Vuforia_Blue_Dual_Sensor extends CF_Library implements SensorEve
             }
 
             picFlag = 0;
+
+            squareToBeacon(SECONDPICTURE, beacons);
 
             driveToBeacon(SECONDPICTURE, beacons);
 
