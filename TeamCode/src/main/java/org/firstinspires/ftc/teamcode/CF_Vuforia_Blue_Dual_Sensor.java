@@ -182,10 +182,10 @@ public class CF_Vuforia_Blue_Dual_Sensor extends CF_Library implements SensorEve
 //                seeableFirst = ((VuforiaTrackableDefaultListener) beacons.get(FIRSTPICTURE).getListener()).isVisible();
 //            }
 
-            if (seeableFirst) {
-                setPower(0.0f);
-                turnFlagFirst = 1;
-            }
+//            if (seeableFirst) {
+//                setPower(0.0f);
+//                turnFlagFirst = 1;
+//            }
 
             squareToBeacon(FIRSTPICTURE, beacons);
 
@@ -416,7 +416,7 @@ public class CF_Vuforia_Blue_Dual_Sensor extends CF_Library implements SensorEve
         //}
     }
     public void squareToBeacon(int picture, VuforiaTrackables beaconsArray) {
-        while (!(effortStrafe + turnFront < 0.05 && effortStrafe + turnRear < 0.05 && effortStrafe + turnFront > -0.05 && effortStrafe + turnRear > -0.05 && errorAngle < 5 && errorAngle > -5 && errorY < 7 && errorY > -7)) {
+        do {
             VectorF translation;
             pose = ((VuforiaTrackableDefaultListener) beaconsArray.get(picture).getListener()).getRawPose();
             if (pose != null) {
@@ -449,11 +449,8 @@ public class CF_Vuforia_Blue_Dual_Sensor extends CF_Library implements SensorEve
                 telemetry.addData("error", errorY);
                 telemetry.addData("turnRear", turnRear);
                 telemetry.update();
-
-
-
             }
-        }
+        } while (!(effortStrafe + turnFront < 0.05 && effortStrafe + turnRear < 0.05 && effortStrafe + turnFront > -0.05 && effortStrafe + turnRear > -0.05 && errorAngle < 5 && errorAngle > -5 && errorY < 7 && errorY > -7));
     }
 }
 
