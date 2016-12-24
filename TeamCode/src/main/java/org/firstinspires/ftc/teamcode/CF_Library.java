@@ -1,6 +1,11 @@
 package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+
+import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
+import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
+import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
+
 /**
  * Created by Ryley on 9/20/16.
  */
@@ -116,5 +121,10 @@ public abstract class CF_Library extends LinearOpMode {
       setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
    }
+//
+//   public void driveToBeacon (int pictureNumber, VuforiaTrackables beaconsArray) {
+//      robot.SetButtonPusherPosition(0.45f);
+//      OpenGLMatrix pose = ((VuforiaTrackableDefaultListener) beaconsArray.get(pictureNumber).getListener()).getRawPose();
+//   }
 
 }

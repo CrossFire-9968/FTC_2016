@@ -355,8 +355,6 @@ public class CF_Vuforia_Blue_Wheels_Dual_Sensor extends CF_Library implements Se
 
     public void pushBeaconButton() throws InterruptedException{
         //if (beaconFlagFirst == 0) {
-            Color.RGBToHSV((sensorRGBright.red() * 255) / 800, (sensorRGBright.green() * 255) / 800, (sensorRGBright.blue() * 255) / 800, hsvValuesright);
-            Color.RGBToHSV((sensorRGBleft.red() * 255) / 800, (sensorRGBleft.green() * 255) / 800, (sensorRGBleft.blue() * 255) / 800, hsvValuesleft);
             if (sensorRGBright.blue() > sensorRGBright.red() && sensorRGBleft.red() > sensorRGBleft.blue()) {
                 telemetry.addData("blue", hsvValuesright[0]);
                 telemetry.update();
