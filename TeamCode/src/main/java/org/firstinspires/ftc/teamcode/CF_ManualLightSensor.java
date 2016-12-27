@@ -126,12 +126,12 @@ public class CF_ManualLightSensor extends OpMode
         telemetry.update();
 
 
-        SetBallLifterControls();
+        //SetBallLifterControls();
     }
 
 
     /***
-     * This method calculates the individual motor powers required to drive teh mecanum
+     * This method calculates the individual motor powers required to drive the mecanum
      * wheels based off the driver 1 controller.  This drive strategy uses the following
      * joystick assignments
      * <p/>
@@ -220,24 +220,24 @@ public class CF_ManualLightSensor extends OpMode
         }
     }
 
-    public void SetBallLifterControls()
-    {
-        if (gamepad2.right_bumper)
-        {
-            robot.BallLifterMotor.setPower(0.30);
-
-        }
-
-        else if (gamepad2.left_bumper)
-        {
-            robot.BallLifterMotor.setPower(-0.30);
-        }
-
-        else
-        {
-            robot.BallLifterMotor.setPower(0.0);
-        }
-    }
+//    public void SetBallLifterControls()
+//    {
+//        if (gamepad2.right_bumper)
+//        {
+//            robot.BallLifterMotor.setPower(0.30);
+//
+//        }
+//
+//        else if (gamepad2.left_bumper)
+//        {
+//            robot.BallLifterMotor.setPower(-0.30);
+//        }
+//
+//        else
+//        {
+//            robot.BallLifterMotor.setPower(0.0);
+//        }
+//    }
 
 
     /***

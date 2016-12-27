@@ -73,6 +73,8 @@ public class CF_Manual extends OpMode
    int error;
    double leftPower;
    double rightPower;
+   boolean spinnerFlag = false;
+   boolean shooterFlag = false;
    VuforiaTrackables beacons;
 
 
@@ -129,7 +131,7 @@ public class CF_Manual extends OpMode
       RunMecanumWheels();
 
       // Adjust the beacon button servo
-      ServiceServo();
+      ServiceServos();
 
       beaconColor = colorSensor.GetAdafruitColorRight(robot);
 
@@ -145,26 +147,29 @@ public class CF_Manual extends OpMode
          robot.setBeaconMode();
       }
 
-      if(gamepad1.x)
-      {
-         pushBlueButton(beacons);
-      }
+//      if (gamepad1.x)
+//      {
+//         pushBlueButton(beacons);
+//      }
+//
+//      if (gamepad1.b)
+//      {
+//         //pushRedButton();
+//      }
 
-      if(gamepad1.b) {
-         //pushRedButton();
-      }
-      if(gamepad2.y) {
+      if (gamepad2.y)
+      {
          robot.SetButtonPusherPosition(0.45f);
       }
 
-      //runs ball lifter. No way.
-      //runBallLifter();
-
-      //runs the ball loader for Monty
-      //runLoader();
+      //runs the spinner. No way.
+      runSpinner();
 
       //runs ball shooter
-      //runShooter();
+      runShooter();
+
+      //runs ball lifter motor; could be backwards
+      //runBallLifter
    }
 
 
@@ -198,8 +203,8 @@ public class CF_Manual extends OpMode
       // a minimum threshold.  Adjust this threshold if the motor has motion when the joystick
       // is not being used and in the center position.
       if ((Math.abs(gamepad1.left_stick_y) >= joystickThreshold) ||
-          (Math.abs(gamepad1.left_stick_x) >= joystickThreshold) ||
-          (Math.abs(gamepad1.right_stick_x) >= joystickThreshold))
+         (Math.abs(gamepad1.left_stick_x) >= joystickThreshold) ||
+         (Math.abs(gamepad1.right_stick_x) >= joystickThreshold))
       {
          leftStickY = robot.ScaleJoystickCommand(gamepad1.left_stick_y);
          leftStickX = robot.ScaleJoystickCommand(gamepad1.left_stick_x);
@@ -259,37 +264,56 @@ public class CF_Manual extends OpMode
       }
    }
 
-//public void runShooter()
-//{
-//   if (gamepad2.right_bumper)
-//   {
-//      robot.Shooter.setPower(1.0);
-//   }
-//
-//   else if (gamepad2.left_bumper)
-//   {
-//      robot.Shooter.setPower(0);
-//   }
-//}
+   public void runShooter()
+   {
+      if (gamepad2.right_bumper)
+      {
+         if (shooterFlag = false)
+         {
+            telemetry.addData("Flag" , "true");
+            robot.Shooter.setPower(1.0);
+            shooterFlag = true;
+            telemetry.update();
+         }
 
-//   public void runLoader()
-//   {
-//      if (gamepad2.dpad_up)
-//      {
-//         robot.Loader.setPower(0.6);
-//      }
-//
-//      else if (gamepad2.dpad_down)
-//      {
-//         robot.Loader.setPower(-0.6);
-//      }
-//   }
+         if (shooterFlag = true)
+         {
+            telemetry.addData("Flag" , "false");
+            robot.Shooter.setPower(0.0);
+            shooterFlag = false;
+            telemetry.update();
+         }
+      }
+   }
+
+   public void runSpinner()
+   {
+      double LoaderPosition = robot.GetLoaderPosition();
+      if (gamepad2.left_bumper)
+      {
+         if (spinnerFlag = false)
+         {
+            telemetry.addData("Flag" , "true");
+            robot.Spinner.setPower(1.0);
+            spinnerFlag = true;
+            telemetry.update();
+         }
+
+         if (spinnerFlag = true)
+         {
+            telemetry.addData("Flag" , "false");
+            robot.Spinner.setPower(0.0);
+            spinnerFlag = false;
+            telemetry.update();
+         }
+      }
+   }
 
 //   public void runBallLifter()
 //   {
-//      if ((gamepad2.left_stick_y > 0.05) || (gamepad2.left_stick_y < -0.05))
+//      if ((gamepad2.left_stick_y > 0.05) && (gamepad2.left_stick_y < -0.05));
 //      {
-//         robot.ZipTieSpinner.setPower(gamepad2.left_stick_y);
+//         robot.BallLifter.setPower(gamepad2.left_stick_y);
 //      }
 //   }
 
@@ -298,9 +322,10 @@ public class CF_Manual extends OpMode
     * left-hand button, press and hold x to rotate serve CCW. To push
     * right-hand button, press and hold b button to rotate servo CW.
     */
-   private void ServiceServo()
+   private void ServiceServos()
    {
       double ButtonPusherPosition = robot.GetButtonPusherPosition();
+      double LoaderPosition = robot.GetLoaderPosition();
 
       // Rotate CCW
       if (gamepad2.x && robot.GetButtonPusherPosition() <= 0.70)
@@ -315,6 +340,24 @@ public class CF_Manual extends OpMode
       }
       telemetry.addData("Pos: ", robot.GetButtonPusherPosition());
       telemetry.update();
+
+      //Unknown
+      if (gamepad2.dpad_left)
+      {
+         robot.Loader.setPosition(0.0);
+      }
+
+      //Also unknown
+      if (gamepad2.dpad_up)
+      {
+         robot.Loader.setPosition(0.50);
+      }
+
+      //Also unknown. What a surprise.
+      if (gamepad2.dpad_right)
+      {
+         robot.Loader.setPosition(0.85);
+      }
    }
 
    private void pushBlueButton(VuforiaTrackables pics)
@@ -352,7 +395,7 @@ public class CF_Manual extends OpMode
       seeable = ((VuforiaTrackableDefaultListener) picsArray.get(pictureNumber).getListener()).isVisible();
       while(gamepad1.x && !checkForStop() && seeable) {
          pose = ((VuforiaTrackableDefaultListener) picsArray.get(pictureNumber).getListener()).getRawPose();
-         ServiceServo();
+         ServiceServos();
          if(checkForStop()) {
             requestOpModeStop();
          }

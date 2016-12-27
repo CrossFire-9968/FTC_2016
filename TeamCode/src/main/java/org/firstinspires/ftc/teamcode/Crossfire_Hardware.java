@@ -28,12 +28,13 @@ public class Crossfire_Hardware
    public DcMotor MotorMecanumRightFront;
    public DcMotor MotorMecanumLeftRear;
    public DcMotor MotorMecanumRightRear;
-   //public DcMotor BallLifter;
-   //public DcMotor Loader;
-   //public DcMotor Shooter;
+   public DcMotor Spinner;
+   public Servo Loader;
+   public DcMotor Shooter;
    public Servo ButtonPusher;
    public ColorSensor sensorRGBright;
    public ColorSensor sensorRGBleft;
+   //public DcMotor BallLifter;
 
    /* local OpMode members. */
    HardwareMap hwMap = null;
@@ -64,9 +65,10 @@ public class Crossfire_Hardware
       ButtonPusher = hwMap.servo.get("button_pusher");
       sensorRGBright = hwMap.colorSensor.get("AdafruitRGBright");
       sensorRGBleft = hwMap.colorSensor.get("AdafruitRGBleft");
-      //BallLifter = hwMap.dcMotor.get("ball_lifter");
-      //Loader = hwMap.dcMotor.get("loader");
-      //Shooter = hwMap.dcMotor.get("shooter");
+      Spinner= hwMap.dcMotor.get("spinner");
+      Loader = hwMap.servo.get("loader");
+      Shooter = hwMap.dcMotor.get("shooter");
+      //BallLifter = hwMap.dcMotor.get("ball_lifter")
 
       // Set motor polarity.  We are using
       // AndyMark motors so directions are opposite.
@@ -74,10 +76,11 @@ public class Crossfire_Hardware
       MotorMecanumLeftRear.setDirection(DcMotor.Direction.REVERSE);      // Set to REVERSE if using AndyMark motors
       MotorMecanumRightFront.setDirection(DcMotor.Direction.FORWARD);    // Set to FORWARD if using AndyMark motors
       MotorMecanumRightRear.setDirection(DcMotor.Direction.FORWARD);     // Set to FORWARD if using AndyMark motor
-      //Loader.setDirection(DcMotor.Direction.FORWARD);
-      //Shooter.setDirection(DcMotor.Direction.FORWARD);
+      Shooter.setDirection(DcMotor.Direction.FORWARD);
+      Spinner.setDirection(DcMotor.Direction.FORWARD);
       //BallLifter.setDirection(DcMotor.Direction.FORWARD);
       SetButtonPusherPosition(0.45);
+      SetLoaderPosition(0.60);
 
        //Set all motors to zero power
       setMecanumPowers(0.0f, 0.0f, 0.0f, 0.0f);
@@ -118,6 +121,37 @@ public class Crossfire_Hardware
       if (ButtonPusher != null)
       {
          position = ButtonPusher.getPosition();
+      }
+      return position;
+   }
+
+   /***
+    * This method sets the position of the ball loader servo.  The driver
+    * holds down the controller button (digital) which increases or
+    * decreases the position value.  This method checks that the driver didn't fall
+    * asleep holding the button making the servo rotate to a position it obviously
+    * should go.  The limits are magic numbers by Lauren...<sigh>!
+    *
+    * @param servoPositionDesired Desired position for beacon button pusher servo
+    */
+   public void SetLoaderPosition(double servoPositionDesired)
+   {
+      double servoPositionActual = Range.clip(servoPositionDesired, 0.00, 1.00);
+      Loader.setPosition(servoPositionActual);
+   }
+
+   /***
+    * If you want to know where the beacon button servo has gone, this is the method for you.
+    *
+    * @return Relative position of servo, range is 0 to 1
+    */
+   public double GetLoaderPosition()
+   {
+      double position = 0.0;
+
+      if (Loader != null)
+      {
+         position = Loader.getPosition();
       }
       return position;
    }
