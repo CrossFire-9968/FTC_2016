@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.vuforia.HINT;
 import com.vuforia.Vuforia;
 
@@ -163,11 +164,35 @@ public class CF_Manual extends OpMode
       }
 
       //runs the spinner. No way.
-      runSpinner();
+      try {
+         runSpinner();
+      } catch(InterruptedException e) {
+         telemetry.addData("Exception: ", "Interrupted Exception");
+         telemetry.update();
+      }
+
 
       //runs ball shooter
-      runShooter();
+      try {
+         runShooter();
+      } catch(InterruptedException e) {
+         telemetry.addData("Exception: ", "Interrupted Exception");
+         telemetry.update();
+      }
 
+//      robot.Loader.setPosition(0.5f);
+//      try {
+//         TimeUnit.SECONDS.sleep(2);
+//      } catch (InterruptedException e) {
+//         e.printStackTrace();
+//      }
+//      robot.Loader.setPosition(0.1f);
+//      try {
+//         TimeUnit.SECONDS.sleep(2);
+//      } catch (InterruptedException e) {
+//         e.printStackTrace();
+//      }
+//      robot.Loader.setPosition(0.9f);
       //runs ball lifter motor; could be backwards
       //runBallLifter
    }
@@ -264,49 +289,31 @@ public class CF_Manual extends OpMode
       }
    }
 
-   public void runShooter()
-   {
-      if (gamepad2.right_bumper)
-      {
-         if (shooterFlag = false)
-         {
-            telemetry.addData("Flag" , "true");
-            robot.Shooter.setPower(1.0);
-            shooterFlag = true;
-            telemetry.update();
+   public void runShooter() throws InterruptedException{
+      while(gamepad2.right_bumper) {
+         if(!shooterFlag) {
+            robot.Shooter.setPower(-1.0f);
          }
-
-         if (shooterFlag = true)
-         {
-            telemetry.addData("Flag" , "false");
-            robot.Shooter.setPower(0.0);
-            shooterFlag = false;
-            telemetry.update();
+         if(shooterFlag) {
+            robot.Shooter.setPower(0.0f);
          }
+         TimeUnit.MILLISECONDS.sleep(500);
       }
+      shooterFlag = !shooterFlag;
    }
 
-   public void runSpinner()
-   {
-      double LoaderPosition = robot.GetLoaderPosition();
-      if (gamepad2.left_bumper)
-      {
-         if (spinnerFlag = false)
-         {
-            telemetry.addData("Flag" , "true");
-            robot.Spinner.setPower(1.0);
-            spinnerFlag = true;
-            telemetry.update();
+   public void runSpinner() throws InterruptedException {
+      //double LoaderPosition = robot.GetLoaderPosition();
+      while(gamepad2.left_bumper) {
+         if(!spinnerFlag) {
+            robot.Spinner.setPower(1.0f);
          }
-
-         if (spinnerFlag = true)
-         {
-            telemetry.addData("Flag" , "false");
-            robot.Spinner.setPower(0.0);
-            spinnerFlag = false;
-            telemetry.update();
+         if(spinnerFlag) {
+            robot.Spinner.setPower(0.0f);
          }
+         TimeUnit.MILLISECONDS.sleep(500);
       }
+      spinnerFlag = !spinnerFlag;
    }
 
 //   public void runBallLifter()
@@ -325,8 +332,6 @@ public class CF_Manual extends OpMode
    private void ServiceServos()
    {
       double ButtonPusherPosition = robot.GetButtonPusherPosition();
-      double LoaderPosition = robot.GetLoaderPosition();
-
       // Rotate CCW
       if (gamepad2.x && robot.GetButtonPusherPosition() <= 0.70)
       {
@@ -344,19 +349,22 @@ public class CF_Manual extends OpMode
       //Unknown
       if (gamepad2.dpad_left)
       {
-         robot.Loader.setPosition(0.0);
+         //robot.Loader.setPosition(0.0);
+         robot.Loader.setPosition(0.5f);
       }
 
       //Also unknown
       if (gamepad2.dpad_up)
       {
-         robot.Loader.setPosition(0.50);
+         //robot.Loader.setPosition(0.50);
+         robot.Loader.setPosition(0.4f);
       }
 
       //Also unknown. What a surprise.
       if (gamepad2.dpad_right)
       {
-         robot.Loader.setPosition(0.85);
+        //robot.Loader.setPosition(0.85);
+         robot.Loader.setPosition(0.6f);
       }
    }
 

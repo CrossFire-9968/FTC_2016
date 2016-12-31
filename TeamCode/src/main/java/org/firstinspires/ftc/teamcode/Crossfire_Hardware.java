@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -80,7 +81,7 @@ public class Crossfire_Hardware
       Spinner.setDirection(DcMotor.Direction.FORWARD);
       //BallLifter.setDirection(DcMotor.Direction.FORWARD);
       SetButtonPusherPosition(0.45);
-      SetLoaderPosition(0.60);
+      SetLoaderPosition(0.5f);
 
        //Set all motors to zero power
       setMecanumPowers(0.0f, 0.0f, 0.0f, 0.0f);
@@ -145,16 +146,16 @@ public class Crossfire_Hardware
     *
     * @return Relative position of servo, range is 0 to 1
     */
-   public double GetLoaderPosition()
-   {
-      double position = 0.0;
-
-      if (Loader != null)
-      {
-         position = Loader.getPosition();
-      }
-      return position;
-   }
+//   public double GetLoaderPosition()
+//   {
+//      double position = 0.0;
+//
+//      if (Loader != null)
+//      {
+//         position = Loader.
+//      }
+//      return position;
+//   }
 
    /***
     * Convenience method to assign motor power for mecanum drive.  Each mecanum
