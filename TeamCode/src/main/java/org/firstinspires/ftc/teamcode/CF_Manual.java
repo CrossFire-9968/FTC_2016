@@ -62,6 +62,7 @@ public class CF_Manual extends OpMode
    private sensorColor beaconColor = sensorColor.unknown;
 
    int pictureNumber;
+   float Pos = 0;
    OpenGLMatrix pose = null;
 
    final int stopCount = 200;
@@ -295,6 +296,8 @@ public class CF_Manual extends OpMode
          if(shooterFlag) {
             robot.Shooter.setPower(0.0f);
          }
+         // A simple debounce.  Magic number of 500 by me(Ryley).  This can be played with if necessary
+         // to make button pressing more better
          TimeUnit.MILLISECONDS.sleep(500);
       }
       shooterFlag = !shooterFlag;
@@ -309,6 +312,8 @@ public class CF_Manual extends OpMode
          if(spinnerFlag) {
             robot.Spinner.setPower(0.0f);
          }
+         // A simple debounce.  Magic number of 500 by me(Ryley).  This can be played with if necessary
+         // to make button pressing more better
          TimeUnit.MILLISECONDS.sleep(500);
       }
       spinnerFlag = !spinnerFlag;
@@ -344,26 +349,41 @@ public class CF_Manual extends OpMode
       telemetry.addData("Pos: ", robot.GetButtonPusherPosition());
       telemetry.update();
 
-      //Unknown
-      if (gamepad2.dpad_left)
-      {
-         //robot.Loader.setPosition(0.0);
-         robot.Loader.setPosition(0.5f);
-      }
+      // So the servo we are using on the robot is NOT a true continuous rotation
+      // servo.  It is a <i>winch<i> servo, and so it rotates about 6.5 rotations
+      // (with our hardware.  It CAN go farther, however.)  It also has feedback,
+      // which makes it basically the same as a normal servo, however it's range is *much*
+      // more sensitive.  So, after a little experimentation, I found that position 0 - position
+      // 0.12 is about 270 deg. of rotation, which is <i>about<i> what we want for our
+      // ball stuffer.  So, what this bit will do is start at a base case(whatever our
+      // default servo position will be), and then increment that base case slowly, thus moving the
+      // servo slowly.  It also will limit the servo to the ~270 degrees of rotation allowable.
 
-      //Also unknown
       if (gamepad2.dpad_up)
       {
          //robot.Loader.setPosition(0.50);
-         robot.Loader.setPosition(0.4f);
-      }
 
-      //Also unknown. What a surprise.
-      if (gamepad2.dpad_right)
+         // The amount to add is a magic number :)
+         if(Pos < 0.12) {
+            Pos += 0.001;
+         }
+         else {
+            Pos = 0.12f;
+         }
+      }
+      if (gamepad2.dpad_down)
       {
         //robot.Loader.setPosition(0.85);
-         robot.Loader.setPosition(0.6f);
+
+         // The amount to subtract is a magic number :)
+         if(Pos > 0) {
+            Pos -= 0.001;
+         }
+         else {
+            Pos = 0;
+         }
       }
+      robot.Loader.setPosition(Pos);
    }
 
    private void pushBlueButton(VuforiaTrackables pics)

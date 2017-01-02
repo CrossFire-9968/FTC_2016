@@ -72,7 +72,6 @@ public class Crossfire_Hardware
       //BallLifter = hwMap.dcMotor.get("ball_lifter")
 
       // Set motor polarity.  We are using
-      // AndyMark motors so directions are opposite.
       MotorMecanumLeftFront.setDirection(DcMotor.Direction.REVERSE);     // Set to REVERSE if using AndyMark motors
       MotorMecanumLeftRear.setDirection(DcMotor.Direction.REVERSE);      // Set to REVERSE if using AndyMark motors
       MotorMecanumRightFront.setDirection(DcMotor.Direction.FORWARD);    // Set to FORWARD if using AndyMark motors
