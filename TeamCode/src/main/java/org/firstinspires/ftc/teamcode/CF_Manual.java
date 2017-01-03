@@ -44,10 +44,10 @@ public class CF_Manual extends OpMode
    CF_SensorLibrary colorSensor = new CF_SensorLibrary();
 
    // Minimum joystick position before we assume value is good.
-   // Near center, value could contain noise or offset that we want to ignore.
-   private static final float joystickThreshold = 0.05f;
 
    // Steering priority gains allow for control effort to
+   // Near center, value could contain noise or offset that we want to ignore.
+   private static final float joystickThreshold = 0.05f;
    // emphasis one aspect of steering effort over another.
    // Gain values should be set to a value between 0 and 1;
    // Values greater than 1.0f will increase the likelihood of
