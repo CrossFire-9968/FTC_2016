@@ -68,7 +68,10 @@ public class CF_CRServo_Test extends OpMode
 
 
     private void ServiceServos()
-    {        //Unknown
+    {
+        //Unknown
+
+        /*
         if(gamepad2.x) {
             posLeft += 0.03;
         }
@@ -103,6 +106,8 @@ public class CF_CRServo_Test extends OpMode
             //robot.Loader.setPower(0.2f);
             robot.Loader.setPosition(0.12f);
         }
+        */
+        robot.Loader.setPosition(0.0f);
         telemetry.addData("Position", robot.Loader.getPosition());
     }
 

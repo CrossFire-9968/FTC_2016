@@ -62,7 +62,10 @@ public class CF_Manual extends OpMode
    private sensorColor beaconColor = sensorColor.unknown;
 
    int pictureNumber;
-   float Pos = 0;
+
+   float basePos = 0.0f;
+   float Pos = basePos;
+
    OpenGLMatrix pose = null;
 
    final int stopCount = 200;
@@ -156,11 +159,6 @@ public class CF_Manual extends OpMode
 //      {
 //         //pushRedButton();
 //      }
-
-      if (gamepad2.y)
-      {
-         robot.SetButtonPusherPosition(0.45f);
-      }
 
       //runs the spinner. No way.
       try {
@@ -289,34 +287,34 @@ public class CF_Manual extends OpMode
    }
 
    public void runShooter() throws InterruptedException{
-      while(gamepad2.right_bumper) {
-         if(!shooterFlag) {
-            robot.Shooter.setPower(-1.0f);
+      if(gamepad2.right_bumper) {
+         while(gamepad2.right_bumper) {
+            idle();
          }
          if(shooterFlag) {
+            robot.Shooter.setPower(-1.0f);
+         }
+         if(!shooterFlag) {
             robot.Shooter.setPower(0.0f);
          }
-         // A simple debounce.  Magic number of 500 by me(Ryley).  This can be played with if necessary
-         // to make button pressing more better
-         TimeUnit.MILLISECONDS.sleep(500);
+         shooterFlag = !shooterFlag;
       }
-      shooterFlag = !shooterFlag;
    }
 
    public void runSpinner() throws InterruptedException {
       //double LoaderPosition = robot.GetLoaderPosition();
-      while(gamepad2.left_bumper) {
-         if(!spinnerFlag) {
+      if(gamepad2.left_bumper) {
+         while (gamepad2.left_bumper) {
+            idle();
+         }
+         if (spinnerFlag) {
             robot.Spinner.setPower(1.0f);
          }
-         if(spinnerFlag) {
+         if (!spinnerFlag) {
             robot.Spinner.setPower(0.0f);
          }
-         // A simple debounce.  Magic number of 500 by me(Ryley).  This can be played with if necessary
-         // to make button pressing more better
-         TimeUnit.MILLISECONDS.sleep(500);
+         spinnerFlag = !spinnerFlag;
       }
-      spinnerFlag = !spinnerFlag;
    }
 
 //   public void runBallLifter()
@@ -353,7 +351,7 @@ public class CF_Manual extends OpMode
       // servo.  It is a <i>winch<i> servo, and so it rotates about 6.5 rotations
       // (with our hardware.  It CAN go farther, however.)  It also has feedback,
       // which makes it basically the same as a normal servo, however it's range is *much*
-      // more sensitive.  So, after a little experimentation, I found that position 0 - position
+      // more sensitive.  So, after a little experimentation, I found that position 0 through position
       // 0.12 is about 270 deg. of rotation, which is <i>about<i> what we want for our
       // ball stuffer.  So, what this bit will do is start at a base case(whatever our
       // default servo position will be), and then increment that base case slowly, thus moving the
@@ -363,25 +361,35 @@ public class CF_Manual extends OpMode
       {
          //robot.Loader.setPosition(0.50);
 
-         // The amount to add is a magic number :)
-         if(Pos < 0.12) {
-            Pos += 0.001;
+         // The amount to add is a magic number, and can be adjusted as seen fit :)
+         if(Pos < basePos + 0.1) {
+            Pos += 0.001f;
+            telemetry.addData("Pos: ", Pos);
+            telemetry.update();
          }
          else {
-            Pos = 0.12f;
+            Pos = basePos + 0.1f;
+            telemetry.addData("Pos: ", Pos);
+            telemetry.update();
          }
       }
       if (gamepad2.dpad_down)
       {
         //robot.Loader.setPosition(0.85);
 
-         // The amount to subtract is a magic number :)
-         if(Pos > 0) {
-            Pos -= 0.001;
+         // The amount to subtract is a magic number, and can be adjusted as seen fit :)
+         if(Pos > basePos) {
+            Pos -= 0.001f;
          }
          else {
-            Pos = 0;
+            Pos = basePos;
          }
+      }
+      if(gamepad2.y) {
+         Pos = basePos + 0.1f;
+      }
+      if(gamepad2.a) {
+         Pos = basePos;
       }
       robot.Loader.setPosition(Pos);
    }
