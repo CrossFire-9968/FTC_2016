@@ -41,7 +41,7 @@ public class Crossfire_Hardware
    HardwareMap hwMap = null;
    private ElapsedTime period = new ElapsedTime();
 
-   public enum driveModeEnum {beaconMode, ballKickerMode};
+   public enum driveModeEnum {beaconMode, ballLifterMode, scooperMode};
 
    public enum sensorColor { blue, red, unknown };
 
@@ -80,7 +80,7 @@ public class Crossfire_Hardware
       Spinner.setDirection(DcMotor.Direction.FORWARD);
       //BallLifter.setDirection(DcMotor.Direction.FORWARD);
       SetButtonPusherPosition(0.45);
-      SetLoaderPosition(0.5f);
+      SetLoaderPosition(0.0f);
 
        //Set all motors to zero power
       setMecanumPowers(0.0f, 0.0f, 0.0f, 0.0f);
@@ -289,11 +289,18 @@ public class Crossfire_Hardware
    /***
     *
     */
-   public void setBallKickerMode()
+   public void setBallLifterMode()
    {
-      driveMode = driveModeEnum.ballKickerMode;
+      driveMode = driveModeEnum.ballLifterMode;
    }
 
+   /***
+    *
+    */
+   public void setscooperMode()
+   {
+      driveMode = driveModeEnum.scooperMode;
+   }
 
    /***
     *
@@ -312,13 +319,18 @@ public class Crossfire_Hardware
    public double ScaleJoystickCommand(double input)
    {
       double scaledInput;
-      final int numPointsInMap = 16;
+      final int numPointsInMap = 25;
 
       // Ensure the values make sense.  Clip the values to max/min values
       double clippedPower = Range.clip(input, -1, 1);
 
-      // Array used to map joystick input to motor output
-      double[] scalingArray = {0, 0.01, 0.02, 0.04, 0.05, 0.08, 0.11,
+//      // Array used to map joystick input to motor output
+//      double[] scalingArray = {0, 0.01, 0.02, 0.04, 0.05, 0.08, 0.11,
+//         0.13, 0.17, 0.23, 0.32, 0.4, 0.48, 0.61, 0.73, 0.89, 1};
+
+            // Array used to map joystick input to motor output
+      double[] scalingArray =
+         {0, 0.004, 0.0045, 0.005, 0.01, 0.015, 0.02, 0.025, 0.03, 0.035, 0.04, 0.047, 0.05, 0.065, 0.08, 0.11,
          0.13, 0.17, 0.23, 0.32, 0.4, 0.48, 0.61, 0.73, 0.89, 1};
 
       // Get the corresponding index for the specified argument/parameter.

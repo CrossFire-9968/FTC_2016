@@ -47,7 +47,7 @@ public class CF_Manual extends OpMode
 
    // Steering priority gains allow for control effort to
    // Near center, value could contain noise or offset that we want to ignore.
-   private static final float joystickThreshold = 0.05f;
+   private static final float joystickThreshold = 0.003f;
    // emphasis one aspect of steering effort over another.
    // Gain values should be set to a value between 0 and 1;
    // Values greater than 1.0f will increase the likelihood of
@@ -62,7 +62,10 @@ public class CF_Manual extends OpMode
    private sensorColor beaconColor = sensorColor.unknown;
 
    int pictureNumber;
-   float Pos = 0;
+
+   float basePos = 0.0f;
+   float Pos = basePos;
+
    OpenGLMatrix pose = null;
 
    final int stopCount = 200;
@@ -135,16 +138,22 @@ public class CF_Manual extends OpMode
 
       beaconColor = colorSensor.GetAdafruitColorRight(robot);
 
-      // Set steering to ball kicker driving mode
-      if (gamepad1.right_bumper)
+      // Set steering to ball lifter driving mode
+      if (gamepad1.a)
       {
-         robot.setBallKickerMode();
+         robot.setscooperMode();
       }
 
       // Set steering to beacon driving mode
-      if (gamepad1.left_bumper)
+      if (gamepad1.y)
       {
          robot.setBeaconMode();
+      }
+
+      // Set steering to scooper driving mode
+      if (gamepad1.x)
+      {
+         robot.setBallLifterMode();
       }
 
 //      if (gamepad1.x)
@@ -157,17 +166,11 @@ public class CF_Manual extends OpMode
 //         //pushRedButton();
 //      }
 
-      if (gamepad2.y)
-      {
-         robot.SetButtonPusherPosition(0.45f);
-      }
-
       //runs the spinner. No way.
       try {
          runSpinner();
       } catch(InterruptedException e) {
          telemetry.addData("Exception: ", "Interrupted Exception");
-         telemetry.update();
       }
 
 
@@ -176,24 +179,8 @@ public class CF_Manual extends OpMode
          runShooter();
       } catch(InterruptedException e) {
          telemetry.addData("Exception: ", "Interrupted Exception");
-         telemetry.update();
       }
-
-//      robot.Loader.setPosition(0.5f);
-//      try {
-//         TimeUnit.SECONDS.sleep(2);
-//      } catch (InterruptedException e) {
-//         e.printStackTrace();
-//      }
-//      robot.Loader.setPosition(0.1f);
-//      try {
-//         TimeUnit.SECONDS.sleep(2);
-//      } catch (InterruptedException e) {
-//         e.printStackTrace();
-//      }
-//      robot.Loader.setPosition(0.9f);
-      //runs ball lifter motor; could be backwards
-      //runBallLifter
+      telemetry.update();
    }
 
 
@@ -237,27 +224,33 @@ public class CF_Manual extends OpMode
 
          // Calculate power for each mecanum wheel based on joystick inputs.  Each power is
          // based on three drive components: forward/reverse, strafe, and tank turn.
-         telemetry.addData("Mode: ", "Normal");
+         telemetry.addData("Mode: ", "Beacon");
          if (robot.driveMode == Crossfire_Hardware.driveModeEnum.beaconMode)
          {
-            LFPower = (forwardPriority * leftStickY) - (strafePriority * leftStickX) - (steerPriority * rightStickX);
-            RFPower = (forwardPriority * leftStickY) + (strafePriority * leftStickX) + (steerPriority * rightStickX);
-            LRPower = (forwardPriority * leftStickY) + (strafePriority * leftStickX) - (steerPriority * rightStickX);
-            RRPower = (forwardPriority * leftStickY) - (strafePriority * leftStickX) + (steerPriority * rightStickX);
+            LFPower = (forwardPriority * leftStickY) + (strafePriority * leftStickX) - (steerPriority * rightStickX);
+            RFPower = (forwardPriority * leftStickY) - (strafePriority * leftStickX) + (steerPriority * rightStickX);
+            LRPower = (forwardPriority * leftStickY) - (strafePriority * leftStickX) - (steerPriority * rightStickX);
+            RRPower = (forwardPriority * leftStickY) + (strafePriority * leftStickX) + (steerPriority * rightStickX);
          }
 
          telemetry.addData("Mode: ", "Strafe");
-         if (robot.driveMode == Crossfire_Hardware.driveModeEnum.ballKickerMode)
+         if (robot.driveMode == Crossfire_Hardware.driveModeEnum.ballLifterMode)
          {
-            LFPower = (forwardPriority * -1 * leftStickX) - (strafePriority * leftStickY) + (steerPriority * -rightStickX);
-            RFPower = (forwardPriority * -1 * leftStickX) + (strafePriority * leftStickY) - (steerPriority * -rightStickX);
-            LRPower = (forwardPriority * -1 * leftStickX) + (strafePriority * leftStickY) + (steerPriority * -rightStickX);
-            RRPower = (forwardPriority * -1 * leftStickX) - (strafePriority * leftStickY) - (steerPriority * -rightStickX);
+            LFPower = (forwardPriority * -leftStickX) - (strafePriority * -leftStickY) + (steerPriority * -rightStickX);
+            RFPower = (forwardPriority * -leftStickX) + (strafePriority * -leftStickY) - (steerPriority * -rightStickX);
+            LRPower = (forwardPriority * -leftStickX) + (strafePriority * -leftStickY) + (steerPriority * -rightStickX);
+            RRPower = (forwardPriority * -leftStickX) - (strafePriority * -leftStickY) - (steerPriority * -rightStickX);
             telemetry.addData("leftStickX", leftStickX);
-            telemetry.update();
          }
 
-         telemetry.update();
+         telemetry.addData("Mode: ", "Scoop");
+         if (robot.driveMode == Crossfire_Hardware.driveModeEnum.scooperMode)
+         {
+            LFPower = (forwardPriority * -leftStickY) - (strafePriority * leftStickX) + (steerPriority * -rightStickX);
+            RFPower = (forwardPriority * -leftStickY) + (strafePriority * leftStickX) - (steerPriority * -rightStickX);
+            LRPower = (forwardPriority * -leftStickY) + (strafePriority * leftStickX) + (steerPriority * -rightStickX);
+            RRPower = (forwardPriority * -leftStickY) - (strafePriority * leftStickX) - (steerPriority * -rightStickX);
+         }
 
          // Find maximum power commanded to all the mecanum wheels.  Using the above power
          // equations, it is possible to calculate a power command greater than 1.0f (100%).
@@ -289,34 +282,41 @@ public class CF_Manual extends OpMode
    }
 
    public void runShooter() throws InterruptedException{
-      while(gamepad2.right_bumper) {
-         if(!shooterFlag) {
+      if(gamepad2.right_bumper) {
+         while(gamepad2.right_bumper)
+         {
+            idle();
+         }
+         if(shooterFlag)
+         {
             robot.Shooter.setPower(-1.0f);
          }
-         if(shooterFlag) {
+         if(!shooterFlag)
+         {
             robot.Shooter.setPower(0.0f);
          }
-         // A simple debounce.  Magic number of 500 by me(Ryley).  This can be played with if necessary
-         // to make button pressing more better
-         TimeUnit.MILLISECONDS.sleep(500);
+         shooterFlag = !shooterFlag;
       }
-      shooterFlag = !shooterFlag;
    }
 
    public void runSpinner() throws InterruptedException {
       //double LoaderPosition = robot.GetLoaderPosition();
-      while(gamepad2.left_bumper) {
-         if(!spinnerFlag) {
+      if(gamepad2.left_bumper)
+      {
+         while (gamepad2.left_bumper)
+         {
+            idle();
+         }
+         if (spinnerFlag)
+         {
             robot.Spinner.setPower(1.0f);
          }
-         if(spinnerFlag) {
+         if (!spinnerFlag)
+         {
             robot.Spinner.setPower(0.0f);
          }
-         // A simple debounce.  Magic number of 500 by me(Ryley).  This can be played with if necessary
-         // to make button pressing more better
-         TimeUnit.MILLISECONDS.sleep(500);
+         spinnerFlag = !spinnerFlag;
       }
-      spinnerFlag = !spinnerFlag;
    }
 
 //   public void runBallLifter()
@@ -347,13 +347,12 @@ public class CF_Manual extends OpMode
          robot.SetButtonPusherPosition(ButtonPusherPosition - beaconPusherRate);
       }
       telemetry.addData("Pos: ", robot.GetButtonPusherPosition());
-      telemetry.update();
 
       // So the servo we are using on the robot is NOT a true continuous rotation
       // servo.  It is a <i>winch<i> servo, and so it rotates about 6.5 rotations
       // (with our hardware.  It CAN go farther, however.)  It also has feedback,
       // which makes it basically the same as a normal servo, however it's range is *much*
-      // more sensitive.  So, after a little experimentation, I found that position 0 - position
+      // more sensitive.  So, after a little experimentation, I found that position 0 through position
       // 0.12 is about 270 deg. of rotation, which is <i>about<i> what we want for our
       // ball stuffer.  So, what this bit will do is start at a base case(whatever our
       // default servo position will be), and then increment that base case slowly, thus moving the
@@ -363,25 +362,36 @@ public class CF_Manual extends OpMode
       {
          //robot.Loader.setPosition(0.50);
 
-         // The amount to add is a magic number :)
-         if(Pos < 0.12) {
-            Pos += 0.001;
+         // The amount to add is a magic number, and can be adjusted as seen fit :)
+         if(Pos < basePos + 0.1)
+         {
+            Pos += 0.001f;
+            telemetry.addData("Pos: ", Pos);
          }
-         else {
-            Pos = 0.12f;
+         else
+         {
+            Pos = basePos + 0.1f;
+            telemetry.addData("Pos: ", Pos);
          }
       }
       if (gamepad2.dpad_down)
       {
         //robot.Loader.setPosition(0.85);
 
-         // The amount to subtract is a magic number :)
-         if(Pos > 0) {
-            Pos -= 0.001;
+         // The amount to subtract is a magic number, and can be adjusted as seen fit :)
+         if(Pos > basePos)
+         {
+            Pos -= 0.001f;
          }
          else {
-            Pos = 0;
+            Pos = basePos;
          }
+      }
+      if(gamepad2.y) {
+         Pos = basePos + 0.1f;
+      }
+      if(gamepad2.a) {
+         Pos = basePos;
       }
       robot.Loader.setPosition(Pos);
    }
@@ -428,7 +438,6 @@ public class CF_Manual extends OpMode
          telemetry.clearAll();
          telemetry.addData("visible", "visible");
          telemetry.addData("xValue: ", x);
-         telemetry.update();
 
          if (pose != null) {
             translation = pose.getTranslation();
@@ -452,14 +461,17 @@ public class CF_Manual extends OpMode
    }
    private boolean checkForStop()
    {
-      if(gamepad1.back) {
+      if(gamepad1.back)
+      {
          return true;
       }
-      else {
+      else
+      {
          return false;
       }
    }
-   public void encoderMove(int countLeft, int countRight, double leftPower, double rightPower){
+   public void encoderMove(int countLeft, int countRight, double leftPower, double rightPower)
+   {
 
       robot.MotorMecanumLeftFront.setPower(leftPower);
       robot.MotorMecanumRightFront.setPower(rightPower);
@@ -473,16 +485,18 @@ public class CF_Manual extends OpMode
       robot.MotorMecanumLeftRear.setTargetPosition(countLeft);
       robot.MotorMecanumRightRear.setTargetPosition(countRight);
 
-      while(robot.MotorMecanumLeftFront.isBusy() && robot.MotorMecanumRightFront.isBusy() && robot.MotorMecanumLeftRear.isBusy() && robot.MotorMecanumRightRear.isBusy()) {
+      while(robot.MotorMecanumLeftFront.isBusy() && robot.MotorMecanumRightFront.isBusy() && robot.MotorMecanumLeftRear.isBusy() && robot.MotorMecanumRightRear.isBusy())
+      {
          double leftPos = robot.MotorMecanumLeftFront.getCurrentPosition();
          double rightPos = robot.MotorMecanumRightFront.getCurrentPosition();
          telemetry.addData("Right",rightPos);
          telemetry.addData("Left",leftPos);
-         telemetry.update();
-         try {
+         try
+         {
             idle();
          }
-         catch(InterruptedException e) {
+         catch(InterruptedException e)
+         {
             telemetry.addData("Idle Failed", "Idle Failed");
          }
 
@@ -490,19 +504,22 @@ public class CF_Manual extends OpMode
       setPower(0.0f);
       setMode(DcMotor.RunMode.RUN_USING_ENCODER);
    }
-   public void setMode(DcMotor.RunMode mode) {
+   public void setMode(DcMotor.RunMode mode)
+   {
       robot.MotorMecanumLeftFront.setMode(mode);
       robot.MotorMecanumRightFront.setMode(mode);
       robot.MotorMecanumLeftRear.setMode(mode);
       robot.MotorMecanumRightRear.setMode(mode);
    }
-   public void setPower(float power) {
+   public void setPower(float power)
+   {
       robot.MotorMecanumLeftFront.setPower(power);
       robot.MotorMecanumRightFront.setPower(power);
       robot.MotorMecanumLeftRear.setPower(power);
       robot.MotorMecanumRightRear.setPower(power);
    }
-   public final void idle() throws InterruptedException {
+   public final void idle() throws InterruptedException
+   {
       // Abort the OpMode if we've been asked to stop
       if (checkForStop())
          throw new InterruptedException();
@@ -511,6 +528,4 @@ public class CF_Manual extends OpMode
       // our priority level a chance to run
       Thread.yield();
    }
-
-
 }

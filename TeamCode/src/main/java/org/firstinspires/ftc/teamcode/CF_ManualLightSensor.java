@@ -105,7 +105,7 @@ public class CF_ManualLightSensor extends OpMode
         // Set steering to ball kicker driving mode
         if (gamepad1.right_bumper)
         {
-            robot.setBallKickerMode();
+            robot.setBallLifterMode();
         }
 
         // Set steering to beacon driving mode
@@ -180,7 +180,7 @@ public class CF_ManualLightSensor extends OpMode
             }
 
 
-            if (robot.driveMode == Crossfire_Hardware.driveModeEnum.ballKickerMode)
+            if (robot.driveMode == Crossfire_Hardware.driveModeEnum.ballLifterMode)
             {
                 LFPower = (forwardPriority * -leftStickY) + (strafePriority * leftStickX) - (steerPriority * rightStickX);
                 RFPower = (forwardPriority * -leftStickY) - (strafePriority * leftStickX) + (steerPriority * rightStickX);

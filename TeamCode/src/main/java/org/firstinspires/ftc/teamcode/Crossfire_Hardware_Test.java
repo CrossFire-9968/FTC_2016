@@ -43,7 +43,7 @@ public class Crossfire_Hardware_Test
         hwMap = ahwMap;
 
         Loader = hwMap.servo.get("loader");
-        SetLoaderPosition(0.5f);
+        SetLoaderPosition(0.0f);
     }
 
 
