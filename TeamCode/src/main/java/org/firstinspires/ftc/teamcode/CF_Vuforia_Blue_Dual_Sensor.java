@@ -443,7 +443,7 @@ public class CF_Vuforia_Blue_Dual_Sensor extends CF_Library implements SensorEve
                     effortStrafe = (float) ((errorAngle * kPangle) + (integral * kIangle));
                 }
 
-                strafe(effortStrafe + turnFront, effortStrafe + turnRear);
+                //this.strafe(effortStrafe + turnFront, effortStrafe + turnRear);
                 telemetry.addData("error", errorY);
                 telemetry.addData("turnRear", turnRear);
                 telemetry.update();

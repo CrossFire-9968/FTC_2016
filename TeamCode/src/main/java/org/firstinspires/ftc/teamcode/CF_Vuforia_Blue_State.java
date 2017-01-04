@@ -29,16 +29,12 @@ public class CF_Vuforia_Blue_State extends CF_Library{
     VectorF translation = null;
 
     final int stopCount = 110;
-    boolean seeableFirst;
-    boolean seeableSecond;
     boolean breakLoop = false;
     int x = stopCount + 100;
     int y;
 
-    final int FIRSTPICTURE = 0;
-    final int SECONDPICTURE = 2;
-    int encoderCounts = 0;
-    int picFlag = 0;
+    final int FIRSTPICTURE = 2; // swap back
+    final int SECONDPICTURE = 0;
     int beaconFlagFirst = 0;
 
     ColorSensor sensorRGBright;
@@ -92,9 +88,10 @@ public class CF_Vuforia_Blue_State extends CF_Library{
         // Run initializing routine
         initalize();
 
-        while(opModeIsActive() && breakLoop == false) {
+        while(opModeIsActive() && !breakLoop) {
             switch(State) {
                 case FIRSTSTRAFE:
+                    System.out.println("FIRST STRAFE");
                     // This is to get the robot more or less lined up with the picture
                     this.encoderStrafeLeft(3000, speed);
                     this.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -106,38 +103,46 @@ public class CF_Vuforia_Blue_State extends CF_Library{
                     TimeUnit.SECONDS.sleep((long)0.5);
 
                     // Increment the state to the next state
-                    State = driveState.DRIVETOFIRSTBEACON;
+                    if(robot.MotorMecanumLeftFront.getPower() == 0.0) {
+                        State = driveState.DRIVETOFIRSTBEACON;
+                    }
                     break;
                 case DRIVETOFIRSTBEACON:
                     // Get pose and translation
+                    System.out.println("DRIVE TO FIRST BEACON");
                     pose = ((VuforiaTrackableDefaultListener) beacons.get(FIRSTPICTURE).getListener()).getRawPose();
 
                     if(pose != null && x > stopCount) {
                         translation = pose.getTranslation();
-                        x = (int) translation.get(2);
                         y = (int) translation.get(1);
+                        x = (int) translation.get(2);
 
                         // Drive to beacon using PID controller
-                        pidDrive(x, y);
+                        pidDrive(y);
                     }
 
                     // Stop if close enough to picture
                     if(x <= stopCount) {
-                        State = driveState.PUSHFIRSTBEACON;
-                        break;
+                        //State = driveState.PUSHFIRSTBEACON;
+                        setPower(0.0f);
+                        breakLoop = true;
                     }
+                    break;
                 case PUSHFIRSTBEACON:
+                    System.out.println("PUSH FIRST BEACON");
                     // Push the beacon button
                     pushBeaconButton();
                     State = driveState.SECONDSTRAFE;
                     break;
                 case SECONDSTRAFE:
+                    System.out.println("SECOND STRAFE");
                     // Move close to the second picture
                     encoderMove(-1500, -1500, 0.2f, 0.2f);
                     encoderStrafeLeft(4500, speed);
                     State = driveState.DRIVETOSECONDBEACON;
                     break;
                 case DRIVETOSECONDBEACON:
+                    System.out.println("DRIVE TO SECOND BEACON");
                     // Get pose and translation
                     pose = ((VuforiaTrackableDefaultListener) beacons.get(SECONDPICTURE).getListener()).getRawPose();
 
@@ -147,7 +152,7 @@ public class CF_Vuforia_Blue_State extends CF_Library{
                         y = (int) translation.get(1);
 
                         // Drive to beacon using PID controller
-                        pidDrive(x, y);
+                        pidDrive(y);
                     }
 
                     // Stop if close enough to picture
@@ -156,14 +161,17 @@ public class CF_Vuforia_Blue_State extends CF_Library{
                         break;
                     }
                 case PUSHSECONDBEACON:
+                    System.out.println("PUSH SECOND BEACON");
                     // Push the beacon button
                     pushBeaconButton();
                     break;
                 default:
+                    System.out.println("DEFAULT");
                     // Turn on the boolean that breaks out of the loop
                     breakLoop = true;
                     break;
             }
+            telemetry.update();
         }
         // Stop op mode when the loop has been broken out of
         requestOpModeStop();
@@ -196,7 +204,7 @@ public class CF_Vuforia_Blue_State extends CF_Library{
         waitForStart();
     }
 
-    private void pidDrive(int xDist, int yDist) {
+    private void pidDrive(int yDist) {
         int error;
 
         double kP = 0.0005;
@@ -209,11 +217,13 @@ public class CF_Vuforia_Blue_State extends CF_Library{
         // Multiply the error by our gain to get a control effort
         effort = kP * error;
         // Set the right and left powers by subtracting or adding the control effort from a base power
-        rightPower = power + effort;
-        leftPower = power - effort;
+        leftPower = power + effort;
+        rightPower = power - effort;
         // Set powers
-        setLeftPower((float) leftPower);
-        setRightPower((float) rightPower);
+        robot.MotorMecanumLeftFront.setPower(leftPower);
+        robot.MotorMecanumRightFront.setPower(rightPower);
+        robot.MotorMecanumLeftRear.setPower(leftPower);
+        robot.MotorMecanumRightRear.setPower(rightPower);
     }
     public void pushBeaconButton() throws InterruptedException{
         //if (beaconFlagFirst == 0) {

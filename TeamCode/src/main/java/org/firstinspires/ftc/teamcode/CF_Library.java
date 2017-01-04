@@ -24,9 +24,9 @@ public abstract class CF_Library extends LinearOpMode {
       robot.MotorMecanumLeftRear.setPower(power);
    }
 
-   public void setRightPower(float rpower) {
-      robot.MotorMecanumRightFront.setPower(rpower);
-      robot.MotorMecanumRightRear.setPower(rpower);
+   public void setRightPower(float power) {
+      robot.MotorMecanumRightFront.setPower(power);
+      robot.MotorMecanumRightRear.setPower(power);
    }
 
    public void setMode(DcMotor.RunMode mode) {
@@ -55,7 +55,7 @@ public abstract class CF_Library extends LinearOpMode {
          double rightPos = robot.MotorMecanumRightFront.getCurrentPosition();
          telemetry.addData("Right",rightPos);
          telemetry.addData("Left",leftPos);
-         telemetry.update();
+         //telemetry.update();
          try {
             idle();
          }
@@ -67,7 +67,7 @@ public abstract class CF_Library extends LinearOpMode {
       setPower(0.0f);
       setMode(DcMotor.RunMode.RUN_USING_ENCODER);
    }
-   public void encoderStrafeRight(int count, float power) throws InterruptedException{
+   public void encoderStrafeLeft(int count, float power) throws InterruptedException{
       setLeftPower(power);
       setRightPower(power);
       setPower(power);
@@ -81,7 +81,7 @@ public abstract class CF_Library extends LinearOpMode {
          double rightPos = robot.MotorMecanumRightRear.getCurrentPosition();
          telemetry.addData("Right",rightPos);
          telemetry.addData("Left",leftPos);
-         telemetry.update();
+         //telemetry.update();
          try {
             idle();
          }
@@ -94,7 +94,7 @@ public abstract class CF_Library extends LinearOpMode {
       setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
    }
-   public void encoderStrafeLeft(int count, float power) throws InterruptedException{
+   public void encoderStrafeRight(int count, float power) throws InterruptedException{
       setLeftPower(power);
       setRightPower(power);
       setPower(power);

@@ -444,7 +444,7 @@ public class CF_Vuforia_Red_Dual_Sensor extends CF_Library implements SensorEven
                     effortStrafe = (float) ((errorAngle * kPangle) + (integral * kIangle));
                 }
 
-                strafe(effortStrafe + turnFront, effortStrafe + turnRear);
+                //strafe(effortStrafe + turnFront, effortStrafe + turnRear);
                 telemetry.addData("error", errorY);
                 telemetry.addData("turnRear", turnRear);
                 telemetry.update();

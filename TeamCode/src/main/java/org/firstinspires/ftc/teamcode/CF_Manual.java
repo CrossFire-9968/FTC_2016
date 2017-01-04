@@ -157,8 +157,6 @@ public class CF_Manual extends OpMode
       if(gamepad2.y) {
          robot.SetButtonPusherPosition(0.45f);
       }
-
-      SetBallLifterControls();
    }
 
 
@@ -252,24 +250,7 @@ public class CF_Manual extends OpMode
       }
    }
 
-   public void SetBallLifterControls()
-   {
-      if (gamepad2.right_bumper)
-      {
-         robot.BallLifterMotor.setPower(0.30);
 
-      }
-
-      else if (gamepad2.left_bumper)
-      {
-         robot.BallLifterMotor.setPower(-0.30);
-      }
-
-      else
-      {
-         robot.BallLifterMotor.setPower(0.0);
-      }
-   }
 
 
    /***

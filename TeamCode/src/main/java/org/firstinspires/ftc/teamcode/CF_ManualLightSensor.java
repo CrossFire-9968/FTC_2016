@@ -124,9 +124,6 @@ public class CF_ManualLightSensor extends OpMode
         telemetry.addData("GreenLeft", sensorRGBleft.green());
         telemetry.addData("BlueLeft", sensorRGBleft.blue());
         telemetry.update();
-
-
-        SetBallLifterControls();
     }
 
 
@@ -217,25 +214,6 @@ public class CF_ManualLightSensor extends OpMode
         {
             // Explicitly set powers to zero.  May not be necessary but is good practice.
             robot.setMecanumPowers(0.0, 0.0, 0.0, 0.0);
-        }
-    }
-
-    public void SetBallLifterControls()
-    {
-        if (gamepad2.right_bumper)
-        {
-            robot.BallLifterMotor.setPower(0.30);
-
-        }
-
-        else if (gamepad2.left_bumper)
-        {
-            robot.BallLifterMotor.setPower(-0.30);
-        }
-
-        else
-        {
-            robot.BallLifterMotor.setPower(0.0);
         }
     }
 

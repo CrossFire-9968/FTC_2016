@@ -111,7 +111,7 @@ public class CF_Vuforia_Perp extends CF_Library {
                 if(effort + turnFront < 0.05 && effort + turnRear < 0.05 && effort + turnFront > -0.05 && effort + turnRear > -0.05 && errorAngle < 5 && errorAngle > -5 && errorY < 7 && errorY > -7) {
                     requestOpModeStop();
                 }
-                strafe(effort + turnFront, effort + turnRear);
+                //strafe(effort + turnFront, effort + turnRear);
                 telemetry.addData("error", errorY);
                 telemetry.addData("turnRear", turnRear);
                 telemetry.update();
