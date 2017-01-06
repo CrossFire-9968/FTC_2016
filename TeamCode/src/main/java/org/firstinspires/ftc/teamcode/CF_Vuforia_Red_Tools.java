@@ -35,7 +35,7 @@ import org.firstinspires.ftc.teamcode.Crossfire_Hardware;
  * Created by Ryley on 10/5/16.
  */
 @Autonomous(name="CF_Vuforia_Red_Tools", group ="Red")
-//@Disabled
+@Disabled
 public class CF_Vuforia_Red_Tools extends CF_Library implements SensorEventListener{
 
     float xAccel = 0;

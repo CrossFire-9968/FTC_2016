@@ -55,7 +55,7 @@ public abstract class CF_Library extends LinearOpMode {
          double rightPos = robot.MotorMecanumRightFront.getCurrentPosition();
          telemetry.addData("Right",rightPos);
          telemetry.addData("Left",leftPos);
-         //telemetry.update();
+         telemetry.update();
          try {
             idle();
          }
