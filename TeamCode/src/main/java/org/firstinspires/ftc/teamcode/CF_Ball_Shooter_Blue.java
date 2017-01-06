@@ -3,6 +3,8 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
+import java.util.concurrent.TimeUnit;
+
 /**
  * Created by Ryley on 1/6/17.
  */
@@ -42,9 +44,26 @@ public class CF_Ball_Shooter_Blue extends CF_Library{
 
                     break;
                 case BALLONE:
+                    robot.Shooter.setPower(-1.0f);
+                    TimeUnit.SECONDS.sleep(1);
+                    robot.SetLoaderPosition(0.03);
+
+                    TimeUnit.SECONDS.sleep(1);
+                    State = botState.BALLTWO;
+                    break;
+                case BALLTWO:
+                    robot.SetLoaderPosition(0.0f);
+                    TimeUnit.SECONDS.sleep(2);
+                    robot.Shooter.setPower(0.0f);
+                    breakLoop = true;
+                    break;
+                default:
+                    breakLoop = true;
+                    break;
                     
             }
         }
+        requestOpModeStop();
     }
     private void initalize() throws InterruptedException {
         // Sends telemetry message to signify robot waiting

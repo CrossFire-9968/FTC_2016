@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -28,15 +29,19 @@ public class Crossfire_Hardware
    public DcMotor MotorMecanumRightFront;
    public DcMotor MotorMecanumLeftRear;
    public DcMotor MotorMecanumRightRear;
+   public DcMotor Spinner;
+   public Servo Loader;
+   public DcMotor Shooter;
    public Servo ButtonPusher;
    public ColorSensor sensorRGBright;
    public ColorSensor sensorRGBleft;
+   //public DcMotor BallLifter;
 
    /* local OpMode members. */
    HardwareMap hwMap = null;
    private ElapsedTime period = new ElapsedTime();
 
-   public enum driveModeEnum {beaconMode, ballKickerMode};
+   public enum driveModeEnum {beaconMode, ballLifterMode, scooperMode};
 
    public enum sensorColor { blue, red, unknown };
 
@@ -61,14 +66,21 @@ public class Crossfire_Hardware
       ButtonPusher = hwMap.servo.get("button_pusher");
       sensorRGBright = hwMap.colorSensor.get("AdafruitRGBright");
       sensorRGBleft = hwMap.colorSensor.get("AdafruitRGBleft");
+      Spinner= hwMap.dcMotor.get("spinner");
+      Loader = hwMap.servo.get("loader");
+      Shooter = hwMap.dcMotor.get("shooter");
+      //BallLifter = hwMap.dcMotor.get("ball_lifter")
 
       // Set motor polarity.  We are using
-      // AndyMark motors so directions are opposite.
       MotorMecanumLeftFront.setDirection(DcMotor.Direction.REVERSE);     // Set to REVERSE if using AndyMark motors
       MotorMecanumLeftRear.setDirection(DcMotor.Direction.REVERSE);      // Set to REVERSE if using AndyMark motors
       MotorMecanumRightFront.setDirection(DcMotor.Direction.FORWARD);    // Set to FORWARD if using AndyMark motors
       MotorMecanumRightRear.setDirection(DcMotor.Direction.FORWARD);  // Set to FORWARD if using AndyMark motor
+      Shooter.setDirection(DcMotor.Direction.FORWARD);
+      Spinner.setDirection(DcMotor.Direction.FORWARD);
+      //BallLifter.setDirection(DcMotor.Direction.FORWARD);
       SetButtonPusherPosition(0.45);
+      SetLoaderPosition(0.1f);
 
        //Set all motors to zero power
       setMecanumPowers(0.0f, 0.0f, 0.0f, 0.0f);
@@ -112,6 +124,37 @@ public class Crossfire_Hardware
       }
       return position;
    }
+
+   /***
+    * This method sets the position of the ball loader servo.  The driver
+    * holds down the controller button (digital) which increases or
+    * decreases the position value.  This method checks that the driver didn't fall
+    * asleep holding the button making the servo rotate to a position it obviously
+    * should go.  The limits are magic numbers by Lauren...<sigh>!
+    *
+    * @param servoPositionDesired Desired position for beacon button pusher servo
+    */
+   public void SetLoaderPosition(double servoPositionDesired)
+   {
+      double servoPositionActual = Range.clip(servoPositionDesired, 0.00, 1.00);
+      Loader.setPosition(servoPositionActual);
+   }
+
+   /***
+    * If you want to know where the beacon button servo has gone, this is the method for you.
+    *
+    * @return Relative position of servo, range is 0 to 1
+    */
+//   public double GetLoaderPosition()
+//   {
+//      double position = 0.0;
+//
+//      if (Loader != null)
+//      {
+//         position = Loader.
+//      }
+//      return position;
+//   }
 
    /***
     * Convenience method to assign motor power for mecanum drive.  Each mecanum
@@ -246,11 +289,18 @@ public class Crossfire_Hardware
    /***
     *
     */
-   public void setBallKickerMode()
+   public void setBallLifterMode()
    {
-      driveMode = driveModeEnum.ballKickerMode;
+      driveMode = driveModeEnum.ballLifterMode;
    }
 
+   /***
+    *
+    */
+   public void setscooperMode()
+   {
+      driveMode = driveModeEnum.scooperMode;
+   }
 
    /***
     *
@@ -269,13 +319,18 @@ public class Crossfire_Hardware
    public double ScaleJoystickCommand(double input)
    {
       double scaledInput;
-      final int numPointsInMap = 16;
+      final int numPointsInMap = 25;
 
       // Ensure the values make sense.  Clip the values to max/min values
       double clippedPower = Range.clip(input, -1, 1);
 
-      // Array used to map joystick input to motor output
-      double[] scalingArray = {0, 0.01, 0.02, 0.04, 0.05, 0.08, 0.11,
+//      // Array used to map joystick input to motor output
+//      double[] scalingArray = {0, 0.01, 0.02, 0.04, 0.05, 0.08, 0.11,
+//         0.13, 0.17, 0.23, 0.32, 0.4, 0.48, 0.61, 0.73, 0.89, 1};
+
+            // Array used to map joystick input to motor output
+      double[] scalingArray =
+         {0, 0.004, 0.0045, 0.005, 0.01, 0.015, 0.02, 0.025, 0.03, 0.035, 0.04, 0.047, 0.05, 0.065, 0.08, 0.11,
          0.13, 0.17, 0.23, 0.32, 0.4, 0.48, 0.61, 0.73, 0.89, 1};
 
       // Get the corresponding index for the specified argument/parameter.

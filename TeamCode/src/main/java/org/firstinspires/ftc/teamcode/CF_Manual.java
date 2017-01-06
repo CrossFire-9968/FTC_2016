@@ -1,12 +1,14 @@
 package org.firstinspires.ftc.teamcode;
 
 import android.graphics.Color;
+import java.util.concurrent.TimeUnit;
 
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.vuforia.HINT;
 import com.vuforia.Vuforia;
 
@@ -17,9 +19,6 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
 import org.firstinspires.ftc.teamcode.Crossfire_Hardware.sensorColor;
-
-import java.util.concurrent.TimeUnit;
-
 
 /***
  * This file provides basic Telop driving for a robot with mecanum drive
@@ -45,10 +44,10 @@ public class CF_Manual extends OpMode
    CF_SensorLibrary colorSensor = new CF_SensorLibrary();
 
    // Minimum joystick position before we assume value is good.
-   // Near center, value could contain noise or offset that we want to ignore.
-   private static final float joystickThreshold = 0.05f;
 
    // Steering priority gains allow for control effort to
+   // Near center, value could contain noise or offset that we want to ignore.
+   private static final float joystickThreshold = 0.003f;
    // emphasis one aspect of steering effort over another.
    // Gain values should be set to a value between 0 and 1;
    // Values greater than 1.0f will increase the likelihood of
@@ -63,6 +62,10 @@ public class CF_Manual extends OpMode
    private sensorColor beaconColor = sensorColor.unknown;
 
    int pictureNumber;
+
+   float basePos = 0.0f;
+   float Pos = basePos;
+
    OpenGLMatrix pose = null;
 
    final int stopCount = 200;
@@ -73,6 +76,8 @@ public class CF_Manual extends OpMode
    int error;
    double leftPower;
    double rightPower;
+   boolean spinnerFlag = false;
+   boolean shooterFlag = false;
    VuforiaTrackables beacons;
 
 
@@ -129,34 +134,51 @@ public class CF_Manual extends OpMode
       RunMecanumWheels();
 
       // Adjust the beacon button servo
-      ServiceServo();
+      ServiceServos();
 
       beaconColor = colorSensor.GetAdafruitColorRight(robot);
 
-      // Set steering to ball kicker driving mode
-      if (gamepad1.right_bumper)
+      // Set steering to ball lifter driving mode
+      if (gamepad1.a)
       {
-         robot.setBallKickerMode();
+         robot.setscooperMode();
       }
 
       // Set steering to beacon driving mode
-      if (gamepad1.left_bumper)
+      if (gamepad1.y)
       {
          robot.setBeaconMode();
       }
 
-
-      if(gamepad1.x)
+      // Set steering to scooper driving mode
+      if (gamepad1.x)
       {
-         pushBlueButton(beacons);
+         robot.setBallLifterMode();
       }
 
-      if(gamepad1.b) {
-         //pushRedButton();
+//      if (gamepad1.x)
+//      {
+//         pushBlueButton(beacons);
+//      }
+//
+//      if (gamepad1.b)
+//      {
+//         //pushRedButton();
+//      }
+
+      //runs the spinner. No way.
+      try {
+         runSpinner();
+      } catch(InterruptedException e) {
+         telemetry.addData("Exception: ", "Interrupted Exception");
       }
-      if(gamepad2.y) {
-         robot.SetButtonPusherPosition(0.45f);
+      //runs ball shooter
+      try {
+         runShooter();
+      } catch(InterruptedException e) {
+         telemetry.addData("Exception: ", "Interrupted Exception");
       }
+      telemetry.update();
    }
 
 
@@ -190,8 +212,8 @@ public class CF_Manual extends OpMode
       // a minimum threshold.  Adjust this threshold if the motor has motion when the joystick
       // is not being used and in the center position.
       if ((Math.abs(gamepad1.left_stick_y) >= joystickThreshold) ||
-          (Math.abs(gamepad1.left_stick_x) >= joystickThreshold) ||
-          (Math.abs(gamepad1.right_stick_x) >= joystickThreshold))
+         (Math.abs(gamepad1.left_stick_x) >= joystickThreshold) ||
+         (Math.abs(gamepad1.right_stick_x) >= joystickThreshold))
       {
          leftStickY = robot.ScaleJoystickCommand(gamepad1.left_stick_y);
          leftStickX = robot.ScaleJoystickCommand(gamepad1.left_stick_x);
@@ -200,26 +222,33 @@ public class CF_Manual extends OpMode
 
          // Calculate power for each mecanum wheel based on joystick inputs.  Each power is
          // based on three drive components: forward/reverse, strafe, and tank turn.
+         telemetry.addData("Mode: ", "Beacon");
          if (robot.driveMode == Crossfire_Hardware.driveModeEnum.beaconMode)
          {
-            LFPower = (forwardPriority * leftStickY) - (strafePriority * leftStickX) - (steerPriority * rightStickX);
-            RFPower = (forwardPriority * leftStickY) + (strafePriority * leftStickX) + (steerPriority * rightStickX);
-            LRPower = (forwardPriority * leftStickY) + (strafePriority * leftStickX) - (steerPriority * rightStickX);
-            RRPower = (forwardPriority * leftStickY) - (strafePriority * leftStickX) + (steerPriority * rightStickX);
-            telemetry.addData("Mode: ", "Beacon");
+            LFPower = (forwardPriority * leftStickY) + (strafePriority * leftStickX) - (steerPriority * rightStickX);
+            RFPower = (forwardPriority * leftStickY) - (strafePriority * leftStickX) + (steerPriority * rightStickX);
+            LRPower = (forwardPriority * leftStickY) - (strafePriority * leftStickX) - (steerPriority * rightStickX);
+            RRPower = (forwardPriority * leftStickY) + (strafePriority * leftStickX) + (steerPriority * rightStickX);
          }
 
-
-         if (robot.driveMode == Crossfire_Hardware.driveModeEnum.ballKickerMode)
+         telemetry.addData("Mode: ", "Strafe");
+         if (robot.driveMode == Crossfire_Hardware.driveModeEnum.ballLifterMode)
          {
-            LFPower = (forwardPriority * -leftStickY) + (strafePriority * leftStickX) - (steerPriority * rightStickX);
-            RFPower = (forwardPriority * -leftStickY) - (strafePriority * leftStickX) + (steerPriority * rightStickX);
-            LRPower = (forwardPriority * -leftStickY) - (strafePriority * leftStickX) - (steerPriority * rightStickX);
-            RRPower = (forwardPriority * -leftStickY) + (strafePriority * leftStickX) + (steerPriority * rightStickX);
-            telemetry.addData("Mode: ", "Ball Kicker");
+            LFPower = (forwardPriority * -leftStickX) - (strafePriority * -leftStickY) + (steerPriority * -rightStickX);
+            RFPower = (forwardPriority * -leftStickX) + (strafePriority * -leftStickY) - (steerPriority * -rightStickX);
+            LRPower = (forwardPriority * -leftStickX) + (strafePriority * -leftStickY) + (steerPriority * -rightStickX);
+            RRPower = (forwardPriority * -leftStickX) - (strafePriority * -leftStickY) - (steerPriority * -rightStickX);
+            telemetry.addData("leftStickX", leftStickX);
          }
 
-         telemetry.update();
+         telemetry.addData("Mode: ", "Scoop");
+         if (robot.driveMode == Crossfire_Hardware.driveModeEnum.scooperMode)
+         {
+            LFPower = (forwardPriority * -leftStickY) - (strafePriority * leftStickX) + (steerPriority * -rightStickX);
+            RFPower = (forwardPriority * -leftStickY) + (strafePriority * leftStickX) - (steerPriority * -rightStickX);
+            LRPower = (forwardPriority * -leftStickY) + (strafePriority * leftStickX) + (steerPriority * -rightStickX);
+            RRPower = (forwardPriority * -leftStickY) - (strafePriority * leftStickX) - (steerPriority * -rightStickX);
+         }
 
          // Find maximum power commanded to all the mecanum wheels.  Using the above power
          // equations, it is possible to calculate a power command greater than 1.0f (100%).
@@ -250,18 +279,60 @@ public class CF_Manual extends OpMode
       }
    }
 
+   public void runShooter() throws InterruptedException{
+      if(gamepad2.right_bumper) {
+         while(gamepad2.right_bumper)
+         {
+            idle();
+         }
+         if(shooterFlag)
+         {
+            robot.Shooter.setPower(-1.0f);
+         }
+         if(!shooterFlag)
+         {
+            robot.Shooter.setPower(0.0f);
+         }
+         shooterFlag = !shooterFlag;
+      }
+   }
 
+   public void runSpinner() throws InterruptedException {
+      //double LoaderPosition = robot.GetLoaderPosition();
+      if(gamepad2.left_bumper)
+      {
+         while (gamepad2.left_bumper)
+         {
+            idle();
+         }
+         if (spinnerFlag)
+         {
+            robot.Spinner.setPower(1.0f);
+         }
+         if (!spinnerFlag)
+         {
+            robot.Spinner.setPower(0.0f);
+         }
+         spinnerFlag = !spinnerFlag;
+      }
+   }
 
+//   public void runBallLifter()
+//   {
+//      if ((gamepad2.left_stick_y > 0.05) && (gamepad2.left_stick_y < -0.05));
+//      {
+//         robot.BallLifter.setPower(gamepad2.left_stick_y);
+//      }
+//   }
 
    /***
     * Method operates the servo to push the beacon button.  To push
     * left-hand button, press and hold x to rotate serve CCW. To push
     * right-hand button, press and hold b button to rotate servo CW.
     */
-   private void ServiceServo()
+   private void ServiceServos()
    {
       double ButtonPusherPosition = robot.GetButtonPusherPosition();
-
       // Rotate CCW
       if (gamepad2.x && robot.GetButtonPusherPosition() <= 0.70)
       {
@@ -274,7 +345,53 @@ public class CF_Manual extends OpMode
          robot.SetButtonPusherPosition(ButtonPusherPosition - beaconPusherRate);
       }
       telemetry.addData("Pos: ", robot.GetButtonPusherPosition());
-      telemetry.update();
+
+      // So the servo we are using on the robot is NOT a true continuous rotation
+      // servo.  It is a <i>winch<i> servo, and so it rotates about 6.5 rotations
+      // (with our hardware.  It CAN go farther, however.)  It also has feedback,
+      // which makes it basically the same as a normal servo, however it's range is *much*
+      // more sensitive.  So, after a little experimentation, I found that position 0 through position
+      // 0.12 is about 270 deg. of rotation, which is <i>about<i> what we want for our
+      // ball stuffer.  So, what this bit will do is start at a base case(whatever our
+      // default servo position will be), and then increment that base case slowly, thus moving the
+      // servo slowly.  It also will limit the servo to the ~270 degrees of rotation allowable.
+
+      if (gamepad2.dpad_up)
+      {
+         //robot.Loader.setPosition(0.50);
+
+         // The amount to add is a magic number, and can be adjusted as seen fit :)
+         if(Pos < basePos + 0.1)
+         {
+            Pos += 0.001f;
+            telemetry.addData("Pos: ", Pos);
+         }
+         else
+         {
+            Pos = basePos + 0.1f;
+            telemetry.addData("Pos: ", Pos);
+         }
+      }
+      if (gamepad2.dpad_down)
+      {
+        //robot.Loader.setPosition(0.85);
+
+         // The amount to subtract is a magic number, and can be adjusted as seen fit :)
+         if(Pos > basePos)
+         {
+            Pos -= 0.001f;
+         }
+         else {
+            Pos = basePos;
+         }
+      }
+      if(gamepad2.y) {
+         Pos = basePos + 0.1f;
+      }
+      if(gamepad2.a) {
+         Pos = basePos;
+      }
+      robot.Loader.setPosition(Pos);
    }
 
    private void pushBlueButton(VuforiaTrackables pics)
@@ -312,14 +429,13 @@ public class CF_Manual extends OpMode
       seeable = ((VuforiaTrackableDefaultListener) picsArray.get(pictureNumber).getListener()).isVisible();
       while(gamepad1.x && !checkForStop() && seeable) {
          pose = ((VuforiaTrackableDefaultListener) picsArray.get(pictureNumber).getListener()).getRawPose();
-         ServiceServo();
+         ServiceServos();
          if(checkForStop()) {
             requestOpModeStop();
          }
          telemetry.clearAll();
          telemetry.addData("visible", "visible");
          telemetry.addData("xValue: ", x);
-         telemetry.update();
 
          if (pose != null) {
             translation = pose.getTranslation();
@@ -343,14 +459,17 @@ public class CF_Manual extends OpMode
    }
    private boolean checkForStop()
    {
-      if(gamepad1.back) {
+      if(gamepad1.back)
+      {
          return true;
       }
-      else {
+      else
+      {
          return false;
       }
    }
-   public void encoderMove(int countLeft, int countRight, double leftPower, double rightPower){
+   public void encoderMove(int countLeft, int countRight, double leftPower, double rightPower)
+   {
 
       robot.MotorMecanumLeftFront.setPower(leftPower);
       robot.MotorMecanumRightFront.setPower(rightPower);
@@ -364,16 +483,18 @@ public class CF_Manual extends OpMode
       robot.MotorMecanumLeftRear.setTargetPosition(countLeft);
       robot.MotorMecanumRightRear.setTargetPosition(countRight);
 
-      while(robot.MotorMecanumLeftFront.isBusy() && robot.MotorMecanumRightFront.isBusy() && robot.MotorMecanumLeftRear.isBusy() && robot.MotorMecanumRightRear.isBusy()) {
+      while(robot.MotorMecanumLeftFront.isBusy() && robot.MotorMecanumRightFront.isBusy() && robot.MotorMecanumLeftRear.isBusy() && robot.MotorMecanumRightRear.isBusy())
+      {
          double leftPos = robot.MotorMecanumLeftFront.getCurrentPosition();
          double rightPos = robot.MotorMecanumRightFront.getCurrentPosition();
          telemetry.addData("Right",rightPos);
          telemetry.addData("Left",leftPos);
-         telemetry.update();
-         try {
+         try
+         {
             idle();
          }
-         catch(InterruptedException e) {
+         catch(InterruptedException e)
+         {
             telemetry.addData("Idle Failed", "Idle Failed");
          }
 
@@ -381,19 +502,22 @@ public class CF_Manual extends OpMode
       setPower(0.0f);
       setMode(DcMotor.RunMode.RUN_USING_ENCODER);
    }
-   public void setMode(DcMotor.RunMode mode) {
+   public void setMode(DcMotor.RunMode mode)
+   {
       robot.MotorMecanumLeftFront.setMode(mode);
       robot.MotorMecanumRightFront.setMode(mode);
       robot.MotorMecanumLeftRear.setMode(mode);
       robot.MotorMecanumRightRear.setMode(mode);
    }
-   public void setPower(float power) {
+   public void setPower(float power)
+   {
       robot.MotorMecanumLeftFront.setPower(power);
       robot.MotorMecanumRightFront.setPower(power);
       robot.MotorMecanumLeftRear.setPower(power);
       robot.MotorMecanumRightRear.setPower(power);
    }
-   public final void idle() throws InterruptedException {
+   public final void idle() throws InterruptedException
+   {
       // Abort the OpMode if we've been asked to stop
       if (checkForStop())
          throw new InterruptedException();
@@ -402,6 +526,4 @@ public class CF_Manual extends OpMode
       // our priority level a chance to run
       Thread.yield();
    }
-
-
 }
