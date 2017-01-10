@@ -80,7 +80,7 @@ public class Crossfire_Hardware
       Spinner.setDirection(DcMotor.Direction.FORWARD);
       //BallLifter.setDirection(DcMotor.Direction.FORWARD);
       SetButtonPusherPosition(0.45);
-      SetLoaderPosition(0.1f);
+      SetLoaderPosition(0.05f);
 
        //Set all motors to zero power
       setMecanumPowers(0.0f, 0.0f, 0.0f, 0.0f);

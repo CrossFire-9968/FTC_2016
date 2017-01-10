@@ -52,7 +52,7 @@ public class CF_Vuforia_Perp extends CF_Library {
         int y;
         int x;
 
-        double kPy = 0.0009;
+        double kPy = 0.00097;
 
         double kPangle = 0.0095;
         double kPangleSmall = 0.0009;
@@ -111,7 +111,7 @@ public class CF_Vuforia_Perp extends CF_Library {
                 if(effort + turnFront < 0.05 && effort + turnRear < 0.05 && effort + turnFront > -0.05 && effort + turnRear > -0.05 && errorAngle < 5 && errorAngle > -5 && errorY < 7 && errorY > -7) {
                     requestOpModeStop();
                 }
-                //strafe(effort + turnFront, effort + turnRear);
+                strafe(effort + turnFront, effort + turnRear);
                 telemetry.addData("error", errorY);
                 telemetry.addData("turnRear", turnRear);
                 telemetry.update();

@@ -33,6 +33,29 @@ public class CF_Vuforia_Blue_State extends CF_Library{
     int x = stopCount + 100;
     int y;
 
+    double kPy = 0.00097;
+
+    double kPangle = 0.0095;
+    double kPangleSmall = 0.0009;
+    double kIangle = 0.000085;
+    double kIangleBig = 0.00023;
+
+    double integral = 0.0;
+
+    float effortAngle;
+
+    float[] data;
+
+    int angle;
+    int errorY;
+    double errorAngle;
+
+    int ySquare;
+
+    double turnFront;
+    double turnRear;
+
+
     int FIRSTPICTURE = 2; // swap back
     int SECONDPICTURE = 0;
 
@@ -44,7 +67,7 @@ public class CF_Vuforia_Blue_State extends CF_Library{
     private SensorManager sensorManager;
 
     private enum driveState {
-        FIRSTSTRAFE, DRIVETOFIRSTBEACON, PUSHFIRSTBEACON, SECONDSTRAFE, DRIVETOSECONDBEACON, PUSHSECONDBEACON
+        FIRSTSTRAFE, SQUARETOFIRSTBEACON, BALLONE, BALLTWO, DRIVETOFIRSTBEACON, PUSHFIRSTBEACON, SECONDSTRAFE, DRIVETOSECONDBEACON, PUSHSECONDBEACON
     }
 
     @Override
@@ -111,8 +134,71 @@ public class CF_Vuforia_Blue_State extends CF_Library{
                     //TimeUnit.SECONDS.sleep((long)0.5);
 
                     // Increment the state to the next state
-                    State = driveState.DRIVETOFIRSTBEACON;
+                    State = driveState.BALLONE;
 
+                    break;
+                case SQUARETOFIRSTBEACON:
+                    pose = ((VuforiaTrackableDefaultListener) beacons.get(FIRSTPICTURE).getListener()).getRawPose();
+
+                    if(pose != null) {
+                        translation = pose.getTranslation();
+                        data = pose.getData();
+                        angle = (int) Math.toDegrees(Math.acos(data[2]));
+
+                        ySquare = (int) translation.get(1);
+
+                        errorY = ySquare;
+
+                        turnRear = kPy * errorY;
+                        turnFront = kPy * errorY * -1;
+
+                        errorAngle = 90 - angle;
+
+                        if(errorAngle < 10 && errorAngle > -10) {
+                            integral = 0;
+                        } else {
+                            integral = integral + errorAngle;
+                        }
+                        if(integral * kIangle > 1.0) {
+                            integral = 1000;
+                        }
+
+                        if(x < 700) {
+                            effortAngle = (float) ((errorAngle * kPangleSmall) + (integral * kIangleBig));
+                        }
+                        else{
+                            effortAngle = (float) ((errorAngle * kPangle) + (integral * kIangle));
+                        }
+
+                        if((errorAngle < 10 || -10 < errorAngle) && (errorY < 10 || -10 < errorY)) {
+                            setPower(0.0f);
+                            State = driveState.BALLONE;
+                        }
+                        strafe(effortAngle + turnFront, effortAngle + turnRear);
+                        telemetry.addData("error", errorY);
+                        telemetry.addData("turnRear", turnRear);
+                        telemetry.update();
+                    }
+                    if(pose == null) {
+                        strafe(0, 0);
+                        breakLoop = true;
+                    }
+                    pose = null;
+                    break;
+                case BALLONE:
+                    robot.Shooter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                    robot.Shooter.setPower(-0.6f);
+                    TimeUnit.SECONDS.sleep(2);
+                    robot.SetLoaderPosition(0.015);
+
+                    TimeUnit.SECONDS.sleep(2);
+                    State = driveState.BALLTWO;
+                    break;
+                case BALLTWO:
+                    robot.SetLoaderPosition(0.0f);
+                    TimeUnit.SECONDS.sleep(1);
+                    robot.Shooter.setPower(0.0f);
+                    State = driveState.DRIVETOFIRSTBEACON;
                     break;
                 case DRIVETOFIRSTBEACON:
                     System.out.println("DRIVE TO FIRST BEACON");
@@ -153,14 +239,14 @@ public class CF_Vuforia_Blue_State extends CF_Library{
                     pushBeaconButton();
                     setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                     this.encoderMove(-1500, -1500, 0.2f, 0.2f);
-                    //breakLoop = true;
                     State = driveState.SECONDSTRAFE;
+                    //breakLoop = true;
                     break;
                 case SECONDSTRAFE:
                     System.out.println("SECOND STRAFE");
                     // Move close to the second picture
                     setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                    encoderStrafeLeft(4500, speed);
+                    encoderStrafeLeft(4600, speed);
                     State = driveState.DRIVETOSECONDBEACON;
                     x = stopCount + 10;
                     break;
@@ -278,7 +364,7 @@ public class CF_Vuforia_Blue_State extends CF_Library{
             TimeUnit.SECONDS.sleep(1);
             this.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             int count = 100;
-            while(sensorRGBleft.red() > sensorRGBleft.blue() && count <= 600) {
+            while(sensorRGBleft.red() > sensorRGBleft.blue() && count <= 160) {
                 this.encoderMove(count, count, 0.3f, 0.3f);
                 count+=50;
             }
