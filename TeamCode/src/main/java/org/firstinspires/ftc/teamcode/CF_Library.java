@@ -60,7 +60,7 @@ public abstract class CF_Library extends LinearOpMode {
          //telemetry.update();
          if(!robot.MotorMecanumRightRear.isBusy() || !robot.MotorMecanumRightFront.isBusy() || !robot.MotorMecanumLeftFront.isBusy() || !robot.MotorMecanumLeftRear.isBusy()) {
             keepGoing = false;
-            setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            //setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
          }
          try {
             idle();
@@ -85,12 +85,13 @@ public abstract class CF_Library extends LinearOpMode {
       while(keepGoing) {
          double leftPos = robot.MotorMecanumLeftRear.getCurrentPosition();
          double rightPos = robot.MotorMecanumRightRear.getCurrentPosition();
+
          telemetry.addData("Right",rightPos);
          telemetry.addData("Left",leftPos);
          //telemetry.update();
          if(!robot.MotorMecanumRightRear.isBusy() || !robot.MotorMecanumRightFront.isBusy() || !robot.MotorMecanumLeftFront.isBusy() || !robot.MotorMecanumLeftRear.isBusy()) {
             keepGoing = false;
-            setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            //setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
          }
          try {
             idle();
@@ -103,6 +104,37 @@ public abstract class CF_Library extends LinearOpMode {
       setPower(0.0f);
       setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
+   }
+   public void encoderStrafeLeftDualPower(int countOne, float powerOne, int countTwo, float powerTwo) {
+      boolean keepGoing = true;
+      setPower(powerOne);
+      robot.MotorMecanumLeftFront.setTargetPosition(countOne + countTwo);
+      robot.MotorMecanumRightFront.setTargetPosition((countOne + countTwo) * -1);
+      robot.MotorMecanumLeftRear.setTargetPosition((countOne + countTwo) * -1);
+      robot.MotorMecanumRightRear.setTargetPosition(countOne + countTwo);
+      setMode(DcMotor.RunMode.RUN_TO_POSITION);
+      while(keepGoing) {
+         double leftPos = robot.MotorMecanumLeftRear.getCurrentPosition();
+         double rightPos = robot.MotorMecanumRightRear.getCurrentPosition();
+
+         if(!robot.MotorMecanumRightRear.isBusy() || !robot.MotorMecanumRightFront.isBusy() || !robot.MotorMecanumLeftFront.isBusy() || !robot.MotorMecanumLeftRear.isBusy()) {
+            keepGoing = false;
+            //setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+         }
+         if(leftPos > countOne && rightPos > countOne) {
+            setPower(powerTwo);
+         }
+         try {
+            idle();
+         }
+         catch(InterruptedException e) {
+            telemetry.addData("Idle Failed", "Idle Failed");
+         }
+
+      }
+
+      setPower(0.0f);
+      setMode(DcMotor.RunMode.RUN_USING_ENCODER);
    }
    public void encoderStrafeRight(int count, float power) throws InterruptedException{
       boolean keepGoing = true;
@@ -122,7 +154,7 @@ public abstract class CF_Library extends LinearOpMode {
          telemetry.update();
          if(!robot.MotorMecanumRightRear.isBusy() || !robot.MotorMecanumRightFront.isBusy() || !robot.MotorMecanumLeftFront.isBusy() || !robot.MotorMecanumLeftRear.isBusy()) {
             keepGoing = false;
-            setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            //setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
          }
          try {
             idle();
