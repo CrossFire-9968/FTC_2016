@@ -37,7 +37,7 @@ import java.util.concurrent.TimeUnit;
  * Created by Ryley on 10/5/16.
  */
 @Autonomous(name="CF_Vuforia_Blue_Wheels", group ="Blue")
-//@Disabled
+@Disabled
 public class CF_Vuforia_Blue_Wheels extends CF_Library implements SensorEventListener{
 
     float xAccel = 0;

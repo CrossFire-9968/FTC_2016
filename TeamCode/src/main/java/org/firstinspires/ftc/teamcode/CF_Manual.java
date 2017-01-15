@@ -155,25 +155,15 @@ public class CF_Manual extends OpMode
       {
          robot.setBallLifterMode();
       }
-// controls for the EZ button
-//      if (gamepad1.x)
-//      {
-//         pushBlueButton(beacons);
-//      }
-//
-//      if (gamepad1.b)
-//      {
-//         //pushRedButton();
-//      }
 
       //runs the spinner. No way.
+      runLifter();
+
       try {
          runSpinner();
       } catch(InterruptedException e) {
          telemetry.addData("Exception: ", "Interrupted Exception");
       }
-
-
       //runs ball shooter
       try {
          runShooter();
@@ -280,6 +270,18 @@ public class CF_Manual extends OpMode
          robot.setMecanumPowers(0.0, 0.0, 0.0, 0.0);
       }
    }
+
+
+   public void runLifter(){
+      if(gamepad2.right_trigger > 0.05 && gamepad2.left_trigger < 0.05) {
+         robot.Lifter.setPower(-1 * gamepad2.right_trigger);
+      } else if(gamepad2.left_trigger > 0.05 && gamepad2.right_trigger < 0.05) {
+         robot.Lifter.setPower(gamepad2.left_trigger);
+      } else {
+         robot.Lifter.setPower(0.0f);
+      }
+   }
+   
 
    //Runs the two ruber coated wheels so they rotate opposite directions and launch
    //the particle balls into the center vortex
