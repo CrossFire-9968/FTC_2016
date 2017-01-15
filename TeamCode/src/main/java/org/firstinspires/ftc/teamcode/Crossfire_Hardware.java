@@ -30,8 +30,9 @@ public class Crossfire_Hardware
    public DcMotor MotorMecanumLeftRear;
    public DcMotor MotorMecanumRightRear;
    public DcMotor Spinner;
-   public Servo Loader;
+   public DcMotor Lifter;
    public DcMotor Shooter;
+   public Servo Loader;
    public Servo ButtonPusher;
    public ColorSensor sensorRGBright;
    public ColorSensor sensorRGBleft;
@@ -69,6 +70,7 @@ public class Crossfire_Hardware
       Spinner= hwMap.dcMotor.get("spinner");
       Loader = hwMap.servo.get("loader");
       Shooter = hwMap.dcMotor.get("shooter");
+      Lifter = hwMap.dcMotor.get("lifter");
       //BallLifter = hwMap.dcMotor.get("ball_lifter")
 
       // Set motor polarity.  We are using
@@ -78,6 +80,8 @@ public class Crossfire_Hardware
       MotorMecanumRightRear.setDirection(DcMotor.Direction.FORWARD);  // Set to FORWARD if using AndyMark motor
       Shooter.setDirection(DcMotor.Direction.FORWARD);
       Spinner.setDirection(DcMotor.Direction.FORWARD);
+      Lifter.setDirection(DcMotorSimple.Direction.FORWARD);
+
       //BallLifter.setDirection(DcMotor.Direction.FORWARD);
       SetButtonPusherPosition(0.45);
       SetLoaderPosition(0.05f);

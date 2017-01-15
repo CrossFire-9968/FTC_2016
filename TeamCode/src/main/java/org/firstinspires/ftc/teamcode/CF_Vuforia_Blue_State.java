@@ -132,9 +132,10 @@ public class CF_Vuforia_Blue_State extends CF_Library{
 
                     this.encoderStrafeLeft(3000, speed);
                     this.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                    robot.Shooter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                    robot.Shooter.setPower(1.0f);
                     this.encoderMove(1500, 1500, 0.6f, 0.6f);
                     this.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                    robot.Shooter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
                     robot.Shooter.setPower(-0.6f);
                     this.encoderStrafeLeft(2250, speed);
                     System.out.println("DONE STRAFING");

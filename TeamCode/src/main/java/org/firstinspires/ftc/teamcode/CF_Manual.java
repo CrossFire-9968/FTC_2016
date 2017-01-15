@@ -167,6 +167,8 @@ public class CF_Manual extends OpMode
 //      }
 
       //runs the spinner. No way.
+      runLifter();
+
       try {
          runSpinner();
       } catch(InterruptedException e) {
@@ -276,6 +278,16 @@ public class CF_Manual extends OpMode
       {
          // Explicitly set powers to zero.  May not be necessary but is good practice.
          robot.setMecanumPowers(0.0, 0.0, 0.0, 0.0);
+      }
+   }
+
+   public void runLifter(){
+      if(gamepad2.right_trigger > 0.05 && gamepad2.left_trigger < 0.05) {
+         robot.Lifter.setPower(-1 * gamepad2.right_trigger);
+      } else if(gamepad2.left_trigger > 0.05 && gamepad2.right_trigger < 0.05) {
+         robot.Lifter.setPower(gamepad2.left_trigger);
+      } else {
+         robot.Lifter.setPower(0.0f);
       }
    }
 
