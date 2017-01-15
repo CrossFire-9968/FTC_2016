@@ -54,6 +54,9 @@ public class CF_Manual extends OpMode
    private static final float forwardPriority = 1.0f;
    private static final float strafePriority = 1.0f;
    private static final float steerPriority = 1.0f;
+   private static final float forwardGain_Scoop = 1.0f;
+   private static final float strafeGain_Scoop = 1.0f;
+   private static final float steerGain_Scoop = 1.0f;
 
    // Beacon button pusher servo increment rate
    private static final double beaconPusherRate = 0.005;
@@ -236,10 +239,10 @@ public class CF_Manual extends OpMode
          telemetry.addData("Mode: ", "Scoop");
          if (robot.driveMode == Crossfire_Hardware.driveModeEnum.scooperMode)
          {
-            LFPower = (forwardPriority * -leftStickY) - (strafePriority * leftStickX) + (steerPriority * -rightStickX);
-            RFPower = (forwardPriority * -leftStickY) + (strafePriority * leftStickX) - (steerPriority * -rightStickX);
-            LRPower = (forwardPriority * -leftStickY) + (strafePriority * leftStickX) + (steerPriority * -rightStickX);
-            RRPower = (forwardPriority * -leftStickY) - (strafePriority * leftStickX) - (steerPriority * -rightStickX);
+            LFPower = (forwardGain_Scoop * -leftStickY) - (strafeGain_Scoop * leftStickX) + (steerGain_Scoop * -rightStickX);
+            RFPower = (forwardGain_Scoop * -leftStickY) + (strafeGain_Scoop * leftStickX) - (steerGain_Scoop * -rightStickX);
+            LRPower = (forwardGain_Scoop * -leftStickY) + (strafeGain_Scoop * leftStickX) + (steerGain_Scoop * -rightStickX);
+            RRPower = (forwardGain_Scoop * -leftStickY) - (strafeGain_Scoop * leftStickX) - (steerGain_Scoop * -rightStickX);
          }
 
          // Find maximum power commanded to all the mecanum wheels.  Using the above power
@@ -281,7 +284,7 @@ public class CF_Manual extends OpMode
          robot.Lifter.setPower(0.0f);
       }
    }
-   
+
 
    //Runs the two ruber coated wheels so they rotate opposite directions and launch
    //the particle balls into the center vortex
@@ -468,6 +471,8 @@ public class CF_Manual extends OpMode
       robot.MotorMecanumLeftRear.setPower(0.0f);
       robot.MotorMecanumRightRear.setPower(0.0f);
    }
+
+
    private boolean checkForStop()
    {
       if(gamepad1.back)
@@ -479,9 +484,10 @@ public class CF_Manual extends OpMode
          return false;
       }
    }
+
+
    public void encoderMove(int countLeft, int countRight, double leftPower, double rightPower)
    {
-
       robot.MotorMecanumLeftFront.setPower(leftPower);
       robot.MotorMecanumRightFront.setPower(rightPower);
       robot.MotorMecanumLeftRear.setPower(leftPower);
@@ -513,6 +519,8 @@ public class CF_Manual extends OpMode
       setPower(0.0f);
       setMode(DcMotor.RunMode.RUN_USING_ENCODER);
    }
+
+
    public void setMode(DcMotor.RunMode mode)
    {
       robot.MotorMecanumLeftFront.setMode(mode);
@@ -520,6 +528,8 @@ public class CF_Manual extends OpMode
       robot.MotorMecanumLeftRear.setMode(mode);
       robot.MotorMecanumRightRear.setMode(mode);
    }
+
+
    public void setPower(float power)
    {
       robot.MotorMecanumLeftFront.setPower(power);
@@ -527,6 +537,8 @@ public class CF_Manual extends OpMode
       robot.MotorMecanumLeftRear.setPower(power);
       robot.MotorMecanumRightRear.setPower(power);
    }
+
+
    public final void idle() throws InterruptedException
    {
       // Abort the OpMode if we've been asked to stop
