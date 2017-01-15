@@ -43,15 +43,14 @@ public class CF_Manual extends OpMode
    Crossfire_Hardware robot = new Crossfire_Hardware();
    CF_SensorLibrary colorSensor = new CF_SensorLibrary();
 
-   // Minimum joystick position before we assume value is good.
-
-   // Steering priority gains allow for control effort to
-   // Near center, value could contain noise or offset that we want to ignore.
+// Joystick threshhold sets a minimum value for the controller
+// to reach before the robot will begin to move.
    private static final float joystickThreshold = 0.003f;
-   // emphasis one aspect of steering effort over another.
-   // Gain values should be set to a value between 0 and 1;
-   // Values greater than 1.0f will increase the likelihood of
-   // clipping computed power level.
+
+   //When two joysticks are held at once, the robot cannot fully do both functions.
+   // Priority sets the team's driving priority - whether strafing, turning, or
+   // driving straight should have more importance, causing to robot to perform more
+   // of one action than of the others. from the controller, turning, or driving straight.
    private static final float forwardPriority = 1.0f;
    private static final float strafePriority = 1.0f;
    private static final float steerPriority = 1.0f;
@@ -60,9 +59,9 @@ public class CF_Manual extends OpMode
    private static final double beaconPusherRate = 0.005;
 
    private sensorColor beaconColor = sensorColor.unknown;
-
    int pictureNumber;
 
+   //these variables set positions for the Loader servo.
    float basePos = 0.0f;
    float Pos = basePos;
 
@@ -90,7 +89,8 @@ public class CF_Manual extends OpMode
    VectorF translation;
 
    /***
-    *
+    *This method inits all hardware on the robot as well as the camera on the drivers'
+    * phone.
     */
    public void init()
    {
@@ -133,7 +133,7 @@ public class CF_Manual extends OpMode
       // Calculate and apply motor power to drive wheels
       RunMecanumWheels();
 
-      // Adjust the beacon button servo
+      // Adjust the beacon button servo and the loader servo
       ServiceServos();
 
       beaconColor = colorSensor.GetAdafruitColorRight(robot);
@@ -155,7 +155,7 @@ public class CF_Manual extends OpMode
       {
          robot.setBallLifterMode();
       }
-
+// controls for the EZ button
 //      if (gamepad1.x)
 //      {
 //         pushBlueButton(beacons);
@@ -281,6 +281,8 @@ public class CF_Manual extends OpMode
       }
    }
 
+   //Runs the two ruber coated wheels so they rotate opposite directions and launch
+   //the particle balls into the center vortex
    public void runShooter() throws InterruptedException{
       if(gamepad2.right_bumper) {
          while(gamepad2.right_bumper)
@@ -299,12 +301,15 @@ public class CF_Manual extends OpMode
       }
    }
 
+   //Runs the particle ball gatherer on the front of the robot.
    public void runSpinner() throws InterruptedException {
+
       //double LoaderPosition = robot.GetLoaderPosition();
       if(gamepad2.left_bumper)
       {
          while (gamepad2.left_bumper)
          {
+            Pos = basePos + 0.1f;
             idle();
          }
          if (spinnerFlag)
@@ -332,6 +337,8 @@ public class CF_Manual extends OpMode
     * left-hand button, press and hold x to rotate serve CCW. To push
     * right-hand button, press and hold b button to rotate servo CW.
     */
+
+   //Sets controls and positions for both the Button Pusher servo and the Loader servo.
    private void ServiceServos()
    {
       double ButtonPusherPosition = robot.GetButtonPusherPosition();
@@ -348,7 +355,7 @@ public class CF_Manual extends OpMode
       }
       telemetry.addData("Pos: ", robot.GetButtonPusherPosition());
 
-      // So the servo we are using on the robot is NOT a true continuous rotation
+      // The servo we are using on the robot is NOT a true continuous rotation
       // servo.  It is a <i>winch<i> servo, and so it rotates about 6.5 rotations
       // (with our hardware.  It CAN go farther, however.)  It also has feedback,
       // which makes it basically the same as a normal servo, however it's range is *much*
