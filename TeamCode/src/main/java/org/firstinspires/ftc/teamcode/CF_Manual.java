@@ -57,6 +57,9 @@ public class CF_Manual extends OpMode
    private static final float forwardGain_Scoop = 1.0f;
    private static final float strafeGain_Scoop = 1.0f;
    private static final float steerGain_Scoop = 1.0f;
+   private static final float forwardGain_Lifter = 0.5f;
+   private static final float strafeGain_Lifter = 1.0f;
+   private static final float steerGain_Lifter = 0.5f;
 
    // Beacon button pusher servo increment rate
    private static final double beaconPusherRate = 0.005;
@@ -232,10 +235,10 @@ public class CF_Manual extends OpMode
          telemetry.addData("Mode: ", "Strafe");
          if (robot.driveMode == Crossfire_Hardware.driveModeEnum.ballLifterMode)
          {
-            LFPower = (forwardPriority * -leftStickX) - (strafePriority * -leftStickY) + (steerPriority * -rightStickX);
-            RFPower = (forwardPriority * -leftStickX) + (strafePriority * -leftStickY) - (steerPriority * -rightStickX);
-            LRPower = (forwardPriority * -leftStickX) + (strafePriority * -leftStickY) + (steerPriority * -rightStickX);
-            RRPower = (forwardPriority * -leftStickX) - (strafePriority * -leftStickY) - (steerPriority * -rightStickX);
+            LFPower = (forwardGain_Lifter * -leftStickX) - (strafeGain_Lifter * -leftStickY) + (steerGain_Lifter * -rightStickX);
+            RFPower = (forwardGain_Lifter * -leftStickX) + (strafeGain_Lifter * -leftStickY) - (steerGain_Lifter * -rightStickX);
+            LRPower = (forwardGain_Lifter * -leftStickX) + (strafeGain_Lifter * -leftStickY) + (steerGain_Lifter * -rightStickX);
+            RRPower = (forwardGain_Lifter * -leftStickX) - (strafeGain_Lifter * -leftStickY) - (steerGain_Lifter * -rightStickX);
             telemetry.addData("leftStickX", leftStickX);
          }
 

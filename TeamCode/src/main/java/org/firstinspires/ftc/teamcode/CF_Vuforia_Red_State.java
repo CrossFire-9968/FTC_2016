@@ -23,9 +23,9 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created by Ryley on 12/22/16.
  */
-@Autonomous(name="CF_Vuforia_Blue_State", group ="Blue")
+@Autonomous(name="CF_Vuforia_Red_State", group ="Red")
 //@Disabled
-public class CF_Vuforia_Blue_State extends CF_Library{
+public class CF_Vuforia_Red_State extends CF_Library{
     OpenGLMatrix pose;
     VectorF translation = null;
 
@@ -57,8 +57,8 @@ public class CF_Vuforia_Blue_State extends CF_Library{
     double turnRear;
 
 
-    int FIRSTPICTURE = 2; // swap back
-    int SECONDPICTURE = 0;
+    int FIRSTPICTURE = 3;
+    int SECONDPICTURE = 1;
 
     int beaconFlagFirst = 0;
 
@@ -130,14 +130,14 @@ public class CF_Vuforia_Blue_State extends CF_Library{
                     System.out.println("FIRST STRAFE");
                     // This is to get the robot more or less lined up with the picture
                     this.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                    this.encoderStrafeLeft(3000, speed);
+                    this.encoderStrafeRight(3000, speed);
                     this.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                     robot.Shooter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-                    robot.Shooter.setPower(1.0f);
+                    robot.Shooter.setPower(-1.0f);
                     this.encoderMove(1500, 1500, 0.6f, 0.6f);
                     this.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                    robot.Shooter.setPower(-0.6f);
-                    this.encoderStrafeLeft(2250, speed);
+                    robot.Shooter.setPower(-0.45f);
+                    this.encoderStrafeRight(1900, 0.7f);
                     System.out.println("DONE STRAFING");
                     // Sleep to give the robot time to see the picture
 
@@ -261,7 +261,7 @@ public class CF_Vuforia_Blue_State extends CF_Library{
                     System.out.println("SECOND STRAFE");
                     // Move close to the second picture
                     setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                    encoderStrafeLeft(4500, 0.63f);
+                    encoderStrafeRight(4700, 0.63f);
                     //encoderStrafeLeftDualPower(3750, 0.7f, 1000, 0.4f);
                     State = driveState.DRIVETOSECONDBEACON;
                     x = stopCount + 10;
@@ -307,7 +307,7 @@ public class CF_Vuforia_Blue_State extends CF_Library{
                     // Push the beacon button
                     pushBeaconButton();
                     setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                    this.encoderMove(-1800, -1800, 0.4f, 0.4f);
+                    this.encoderMove(-500, -500, 0.4f, 0.4f);
                     State = driveState.END;
                     break;
                 case END:
@@ -395,23 +395,12 @@ public class CF_Vuforia_Blue_State extends CF_Library{
         telemetry.addData("Red Left", sensorRGBleft.red());
         TimeUnit.MILLISECONDS.sleep(280);
 //        telemetry.update();
+        if(!((sensorRGBright.blue() > sensorRGBright.red() && sensorRGBleft.red() > sensorRGBleft.blue()) || (sensorRGBright.red() > sensorRGBright.blue() && sensorRGBleft.blue() > sensorRGBleft.red()))){
+            setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            this.encoderMove(50, 50, 0.2f, 0.2f);
+        }
         if (sensorRGBright.blue() > sensorRGBright.red() && sensorRGBleft.red() > sensorRGBleft.blue()) {
 //            telemetry.update();
-            robot.SetButtonPusherPosition(0.90);
-            this.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            TimeUnit.SECONDS.sleep(1);
-            this.encoderMove(300, 300, 0.2f, 0.2f);
-            beaconFlagFirst = 1;
-            TimeUnit.MILLISECONDS.sleep(250);
-            this.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            int count = 100;
-            while(sensorRGBleft.red() > sensorRGBleft.blue() && count <= 160) {
-                this.encoderMove(count, count, 0.3f, 0.3f);
-                count+=50;
-            }
-            //requestOpModeStop();
-        } else if (sensorRGBright.red() > sensorRGBright.blue() && sensorRGBleft.blue() > sensorRGBleft.red()) {
-           // telemetry.update();
             robot.SetButtonPusherPosition(0.00);
             this.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             TimeUnit.SECONDS.sleep(1);
@@ -420,7 +409,22 @@ public class CF_Vuforia_Blue_State extends CF_Library{
             TimeUnit.MILLISECONDS.sleep(250);
             this.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             int count = 100;
-            while(sensorRGBright.red() > sensorRGBright.blue() && count <= 160){
+            while(sensorRGBright.red() < sensorRGBright.blue() && count <= 160) {
+                this.encoderMove(count, count, 0.3f, 0.3f);
+                count+=50;
+            }
+            //requestOpModeStop();
+        } else if (sensorRGBright.red() > sensorRGBright.blue() && sensorRGBleft.blue() > sensorRGBleft.red()) {
+            // telemetry.update();
+            robot.SetButtonPusherPosition(0.90);
+            this.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            TimeUnit.SECONDS.sleep(1);
+            this.encoderMove(300, 300, 0.2f, 0.2f);
+            beaconFlagFirst = 1;
+            TimeUnit.MILLISECONDS.sleep(250);
+            this.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            int count = 100;
+            while(sensorRGBleft.red() < sensorRGBleft.blue() && count <= 160){
                 this.encoderMove(count, count, 0.3f, 0.3f);
                 count+=50;
             }
