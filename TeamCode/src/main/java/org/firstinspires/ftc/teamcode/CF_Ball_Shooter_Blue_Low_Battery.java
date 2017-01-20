@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 import java.util.concurrent.TimeUnit;
@@ -9,7 +10,7 @@ import java.util.concurrent.TimeUnit;
  * Created by Ryley on 1/6/17.
  */
 @Autonomous(name="CF_Ball_Shooter_Blue_Low_Battery", group ="Blue")
-//@Disabled
+@Disabled
 public class CF_Ball_Shooter_Blue_Low_Battery extends CF_Library{
     private enum botState {
         FIRSTSTRAFE, BALLONE, BALLTWO, BALLKNOCKER

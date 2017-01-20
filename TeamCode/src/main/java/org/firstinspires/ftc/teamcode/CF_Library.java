@@ -138,9 +138,11 @@ public abstract class CF_Library extends LinearOpMode {
    }
    public void encoderStrafeRight(int count, float power) throws InterruptedException{
       boolean keepGoing = true;
-      setLeftPower(power);
-      setRightPower(power);
-      setPower(power);
+      robot.MotorMecanumLeftFront.setPower(power);
+      robot.MotorMecanumRightFront.setPower(power);
+      robot.MotorMecanumLeftRear.setPower(power + 0.1f);
+      robot.MotorMecanumRightRear.setPower(power + 0.1f);
+
       robot.MotorMecanumLeftFront.setTargetPosition(count * -1);
       robot.MotorMecanumRightFront.setTargetPosition(count);
       robot.MotorMecanumLeftRear.setTargetPosition(count);
@@ -149,11 +151,13 @@ public abstract class CF_Library extends LinearOpMode {
       while(keepGoing) {
          double leftPos = robot.MotorMecanumLeftRear.getCurrentPosition();
          double rightPos = robot.MotorMecanumRightRear.getCurrentPosition();
+
          telemetry.addData("Right",rightPos);
          telemetry.addData("Left",leftPos);
-         telemetry.update();
+         //telemetry.update();
          if(!robot.MotorMecanumRightRear.isBusy() || !robot.MotorMecanumRightFront.isBusy() || !robot.MotorMecanumLeftFront.isBusy() || !robot.MotorMecanumLeftRear.isBusy()) {
             keepGoing = false;
+            setPower(0.0f);
             //setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
          }
          try {
