@@ -24,7 +24,8 @@ import com.qualcomm.robotcore.util.Range;
  */
 public class Crossfire_Hardware
 {
-   /* Public OpMode members. */
+   //Sets all the existing hardware parts on the robot
+   //into code.
    public DcMotor MotorMecanumLeftFront;
    public DcMotor MotorMecanumRightFront;
    public DcMotor MotorMecanumLeftRear;
@@ -36,7 +37,6 @@ public class Crossfire_Hardware
    public Servo ButtonPusher;
    public ColorSensor sensorRGBright;
    public ColorSensor sensorRGBleft;
-   //public DcMotor BallLifter;
 
    /* local OpMode members. */
    HardwareMap hwMap = null;
@@ -59,7 +59,7 @@ public class Crossfire_Hardware
       // Save reference to Hardware map
       hwMap = ahwMap;
 
-      // Define and Initialize Motors
+      // Define and Initialize Motors; sets names for configuration
       MotorMecanumLeftFront = hwMap.dcMotor.get("left_front_drive");
       MotorMecanumRightFront = hwMap.dcMotor.get("right_front_drive");
       MotorMecanumLeftRear = hwMap.dcMotor.get("left_rear_drive");
@@ -71,9 +71,8 @@ public class Crossfire_Hardware
       Loader = hwMap.servo.get("loader");
       Shooter = hwMap.dcMotor.get("shooter");
       Lifter = hwMap.dcMotor.get("lifter");
-      //BallLifter = hwMap.dcMotor.get("ball_lifter")
 
-      // Set motor polarity.  We are using
+      // Sets the polarity of each of the motors.
       MotorMecanumLeftFront.setDirection(DcMotor.Direction.REVERSE);     // Set to REVERSE if using AndyMark motors
       MotorMecanumLeftRear.setDirection(DcMotor.Direction.REVERSE);      // Set to REVERSE if using AndyMark motors
       MotorMecanumRightFront.setDirection(DcMotor.Direction.FORWARD);    // Set to FORWARD if using AndyMark motors
@@ -82,7 +81,6 @@ public class Crossfire_Hardware
       Spinner.setDirection(DcMotor.Direction.FORWARD);
       Lifter.setDirection(DcMotorSimple.Direction.FORWARD);
 
-      //BallLifter.setDirection(DcMotor.Direction.FORWARD);
       SetButtonPusherPosition(0.45);
       SetLoaderPosition(0.05f);
 
