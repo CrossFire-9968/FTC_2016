@@ -99,8 +99,11 @@ public class CF_Manual extends OpMode
     */
    public void init()
    {
+       //This line inits all robot hardware
       robot.init(hardwareMap);
+
       // This makes the Vuforia picture appear on the screen
+       //of the robot phone
       VuforiaLocalizer.Parameters params = new VuforiaLocalizer.Parameters(R.id.cameraMonitorViewId);
       // Sets camera direction
       params.cameraDirection = VuforiaLocalizer.CameraDirection.BACK;
