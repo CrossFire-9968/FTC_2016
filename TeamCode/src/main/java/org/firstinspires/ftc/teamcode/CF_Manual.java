@@ -340,9 +340,11 @@ public class CF_Manual extends OpMode
    }
 
    /***
-    * Method operates the servo to push the beacon button.  To push
+    * This method operates the servo to push the beacon button.  To push
     * left-hand button, press and hold x to rotate serve CCW. To push
     * right-hand button, press and hold b button to rotate servo CW.
+    * This method was created to use Vuforia to drive the robot towards a beacon and
+    * press teh team's corresponding color. However, it is not currently in use.
     */
 
    //Sets controls and positions for both the Button Pusher servo and the Loader servo.
@@ -410,6 +412,7 @@ public class CF_Manual extends OpMode
       robot.Loader.setPosition(Pos);
    }
 
+    //This method allows the robot to recognize the four separate pictures.
    private void pushBlueButton(VuforiaTrackables pics)
    {
       if(((VuforiaTrackableDefaultListener) pics.get(0).getListener()).isVisible()) {
@@ -434,6 +437,8 @@ public class CF_Manual extends OpMode
       }
 
    }
+
+    //After the robot can "See" the picture, it will drive to it.
    private void driveToBeacon(VuforiaTrackables picsArray)
    {
       int x = stopCount + 1;
