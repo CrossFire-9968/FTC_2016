@@ -43,14 +43,14 @@ public class CF_Manual extends OpMode
    Crossfire_Hardware robot = new Crossfire_Hardware();
    CF_SensorLibrary colorSensor = new CF_SensorLibrary();
 
-// Joystick threshhold sets a minimum value for the controller
+// Joystick threshold sets a minimum value for the controller joysticks
 // to reach before the robot will begin to move.
    private static final float joystickThreshold = 0.003f;
 
-   //When two joysticks are held at once, the robot cannot fully do both functions.
-   // Priority sets the team's driving priority - whether strafing, turning, or
-   // driving straight should have more importance, causing to robot to perform more
-   // of one action than of the others. from the controller, turning, or driving straight.
+//    When both of the joysticks used for driving are held at the same time, the
+//    robot cannot fully do both functions. Priority sets the team's driving
+//    priority - whether strafing, turning, or driving straight should have more
+//    importance, causing to robot to perform more of one action than of the others.
    private static final float forwardPriority = 1.0f;
    private static final float strafePriority = 1.0f;
    private static final float steerPriority = 1.0f;
@@ -85,7 +85,6 @@ public class CF_Manual extends OpMode
    boolean shooterFlag = false;
    VuforiaTrackables beacons;
 
-
    ColorSensor sensorRGBright;
    ColorSensor sensorRGBleft;
 
@@ -100,8 +99,11 @@ public class CF_Manual extends OpMode
     */
    public void init()
    {
+       //This line inits all robot hardware
       robot.init(hardwareMap);
+
       // This makes the Vuforia picture appear on the screen
+       //of the robot phone
       VuforiaLocalizer.Parameters params = new VuforiaLocalizer.Parameters(R.id.cameraMonitorViewId);
       // Sets camera direction
       params.cameraDirection = VuforiaLocalizer.CameraDirection.BACK;
@@ -162,7 +164,7 @@ public class CF_Manual extends OpMode
          robot.setBallLifterMode();
       }
 
-      //runs the spinner. No way.
+      //runs the cap ball lifter.
       runLifter();
 
       try {
@@ -181,7 +183,7 @@ public class CF_Manual extends OpMode
 
 
    /***
-    * This method calculates the individual motor powers required to drive teh mecanum
+    * This method calculates the individual motor powers required to drive the mecanum
     * wheels based off the driver 1 controller.  This drive strategy uses the following
     * joystick assignments
     * <p/>
@@ -220,6 +222,8 @@ public class CF_Manual extends OpMode
 
          // Calculate power for each mecanum wheel based on joystick inputs.  Each power is
          // based on three drive components: forward/reverse, strafe, and tank turn.
+          //There are three drive modes. This mode, Beacon, drives the robot with the beacon
+          //pusher servo in the front.
          telemetry.addData("Mode: ", "Beacon");
          if (robot.driveMode == Crossfire_Hardware.driveModeEnum.beaconMode)
          {
@@ -229,6 +233,8 @@ public class CF_Manual extends OpMode
             RRPower = (forwardPriority * leftStickY) + (strafePriority * leftStickX) + (steerPriority * rightStickX);
          }
 
+          //The strafe drive mode sets the side of the robot with the cap ball lifter
+          //as the front. To drive forward, the robot strafes.
          telemetry.addData("Mode: ", "Strafe");
          if (robot.driveMode == Crossfire_Hardware.driveModeEnum.ballLifterMode)
          {
@@ -239,6 +245,7 @@ public class CF_Manual extends OpMode
             telemetry.addData("leftStickX", leftStickX);
          }
 
+          //The scoop drive mode sets the particle ball gatherer as the front of the robot.
          telemetry.addData("Mode: ", "Scoop");
          if (robot.driveMode == Crossfire_Hardware.driveModeEnum.scooperMode)
          {
@@ -332,18 +339,12 @@ public class CF_Manual extends OpMode
       }
    }
 
-//   public void runBallLifter()
-//   {
-//      if ((gamepad2.left_stick_y > 0.05) && (gamepad2.left_stick_y < -0.05));
-//      {
-//         robot.BallLifter.setPower(gamepad2.left_stick_y);
-//      }
-//   }
-
    /***
-    * Method operates the servo to push the beacon button.  To push
+    * This method operates the servo to push the beacon button.  To push
     * left-hand button, press and hold x to rotate serve CCW. To push
     * right-hand button, press and hold b button to rotate servo CW.
+    * This method was created to use Vuforia to drive the robot towards a beacon and
+    * press teh team's corresponding color. However, it is not currently in use.
     */
 
    //Sets controls and positions for both the Button Pusher servo and the Loader servo.
@@ -411,6 +412,7 @@ public class CF_Manual extends OpMode
       robot.Loader.setPosition(Pos);
    }
 
+    //This method allows the robot to recognize the four separate pictures.
    private void pushBlueButton(VuforiaTrackables pics)
    {
       if(((VuforiaTrackableDefaultListener) pics.get(0).getListener()).isVisible()) {
@@ -435,6 +437,8 @@ public class CF_Manual extends OpMode
       }
 
    }
+
+    //After the robot can "See" the picture, it will drive to it.
    private void driveToBeacon(VuforiaTrackables picsArray)
    {
       int x = stopCount + 1;
