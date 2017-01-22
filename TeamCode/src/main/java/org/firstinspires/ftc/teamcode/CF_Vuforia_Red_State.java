@@ -133,11 +133,11 @@ public class CF_Vuforia_Red_State extends CF_Library{
                     this.encoderStrafeRight(3000, speed);
                     this.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                     robot.Shooter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-                    robot.Shooter.setPower(-1.0f);
+                    //robot.Shooter.setPower(-1.0f);
                     this.encoderMove(1500, 1500, 0.6f, 0.6f);
                     this.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                    robot.Shooter.setPower(-0.45f);
-                    this.encoderStrafeRight(1900, 0.7f);
+                    robot.Shooter.setPower(-0.32f);
+                    this.encoderStrafeRight(1900, speed);
                     System.out.println("DONE STRAFING");
                     // Sleep to give the robot time to see the picture
 

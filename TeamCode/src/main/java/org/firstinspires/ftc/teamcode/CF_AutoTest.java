@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
  * Created by Ryley on 12/11/16.
  */
 @Autonomous(name="CF_AutoTest", group="Test")
-//@Disabled
+@Disabled
 public class CF_AutoTest extends CF_Library{
     public void runOpMode() throws InterruptedException {
         robot.init(hardwareMap);

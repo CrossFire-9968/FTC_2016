@@ -138,10 +138,9 @@ public abstract class CF_Library extends LinearOpMode {
    }
    public void encoderStrafeRight(int count, float power) throws InterruptedException{
       boolean keepGoing = true;
-      robot.MotorMecanumLeftFront.setPower(power);
-      robot.MotorMecanumRightFront.setPower(power);
-      robot.MotorMecanumLeftRear.setPower(power + 0.1f);
-      robot.MotorMecanumRightRear.setPower(power + 0.1f);
+      setRightPower(power);
+      setLeftPower(power);
+      setPower(power);
 
       robot.MotorMecanumLeftFront.setTargetPosition(count * -1);
       robot.MotorMecanumRightFront.setTargetPosition(count);

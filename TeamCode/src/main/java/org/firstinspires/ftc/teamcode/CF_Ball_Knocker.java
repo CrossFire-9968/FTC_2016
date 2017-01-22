@@ -16,7 +16,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
  * Created by Ryley on 11/4/16.
  */
 @Autonomous(name="CF_Ball_Knocker", group ="Knocker")
-//@Disabled
+@Disabled
 
 public class CF_Ball_Knocker extends CF_Library implements SensorEventListener
 {

@@ -299,7 +299,7 @@ public class CF_Manual extends OpMode
          }
          if(shooterFlag)
          {
-            robot.Shooter.setPower(-1.0f);
+            robot.Shooter.setPower(-0.8f);
          }
          if(!shooterFlag)
          {
