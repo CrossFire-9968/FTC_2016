@@ -308,7 +308,7 @@ public class CF_Manual extends OpMode
          {
             robot.Shooter.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             robot.Shooter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            robot.Shooter.setPower(-0.1f);
+            robot.Shooter.setPower(-0.5f);
          }
          if(!shooterFlag)
          {
