@@ -70,7 +70,7 @@ public class Crossfire_Hardware
       Spinner= hwMap.dcMotor.get("spinner");
       Loader = hwMap.servo.get("loader");
       Shooter = hwMap.dcMotor.get("shooter");
-      Lifter = hwMap.dcMotor.get("lifter");
+      Lifter = hwMap.dcMotor.get("ball_lifter");
 
       // Sets the polarity of each of the motors.
       MotorMecanumLeftFront.setDirection(DcMotor.Direction.REVERSE);     // Set to REVERSE if using AndyMark motors

@@ -62,6 +62,16 @@ public class CF_Manual extends OpMode
    private sensorColor beaconColor = sensorColor.unknown;
    int pictureNumber;
 
+   int state = 0;
+   float shooterPower = -0.3f;
+   boolean firstLastRightButton = false;
+   boolean firstButtonRight = false;
+   boolean firstLastLeftButton = false;
+   boolean firstButtonLeft = false;
+
+   boolean secondLastRightButton = false;
+   boolean secondButtonRight = false;
+
    //these variables set positions for the Loader servo.
    float basePos = 0.0f;
    float Pos = basePos;
@@ -71,7 +81,7 @@ public class CF_Manual extends OpMode
    final int stopCount = 200;
    boolean seeable;
    double kP = 0.0005;
-   double power = 0.2;
+   double power = 0.5;
    double effort;
    int error;
    double leftPower;
@@ -79,6 +89,8 @@ public class CF_Manual extends OpMode
    boolean spinnerFlag = false;
    boolean shooterFlag = false;
    VuforiaTrackables beacons;
+
+   boolean runShooter = false;
 
    ColorSensor sensorRGBright;
    ColorSensor sensorRGBleft;
@@ -159,6 +171,9 @@ public class CF_Manual extends OpMode
          robot.setBallLifterMode();
       }
 
+      if (gamepad1.b) {
+         driveToBeacon(beacons);
+      }
       //runs the cap ball lifter.
       runLifter();
 
@@ -169,7 +184,7 @@ public class CF_Manual extends OpMode
       }
       //runs ball shooter
       try {
-         runShooter();
+         runShooterState();
       } catch(InterruptedException e) {
          telemetry.addData("Exception: ", "Interrupted Exception");
       }
@@ -291,8 +306,44 @@ public class CF_Manual extends OpMode
    }
 
 
-   //Runs the two ruber coated wheels so they rotate opposite directions and launch
+   //Runs the two rubber coated wheels so they rotate opposite directions and launch
    //the particle balls into the center vortex
+   public void runShooterState() throws InterruptedException {
+      firstButtonRight = gamepad1.right_bumper;
+      firstButtonLeft = gamepad1.left_bumper;
+      if (firstButtonRight && !firstLastRightButton) {
+         if(shooterPower < -1.0f) {
+            shooterPower = 0.0f;
+         }
+         else {
+            shooterPower -= 0.05f;
+         }
+      }
+      if (firstButtonLeft && !firstLastLeftButton) {
+         if(shooterPower > 0.0f) {
+            shooterPower = -1.0f;
+         }
+         else {
+            shooterPower += 0.05f;
+         }
+      }
+      firstLastRightButton = firstButtonRight;
+      firstLastLeftButton = firstButtonLeft;
+
+      secondButtonRight = gamepad2.right_bumper;
+      if(secondButtonRight && !secondLastRightButton) {
+         runShooter = !runShooter;
+      }
+      if(runShooter) {
+         robot.Shooter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+         robot.Shooter.setPower(shooterPower);
+      }
+      if(!runShooter) {
+         robot.Shooter.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+         robot.Shooter.setPower(0.0f);
+      }
+      secondLastRightButton = secondButtonRight;
+   }
    public void runShooter() throws InterruptedException{
       if(gamepad2.right_bumper) {
          while(gamepad2.right_bumper)
@@ -301,14 +352,19 @@ public class CF_Manual extends OpMode
          }
          if(shooterFlag)
          {
-            robot.Shooter.setPower(-0.8f);
+            robot.Shooter.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            robot.Shooter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            robot.Shooter.setPower(-0.2f);
          }
          if(!shooterFlag)
          {
+            robot.Shooter.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            robot.Shooter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             robot.Shooter.setPower(0.0f);
          }
          shooterFlag = !shooterFlag;
       }
+      telemetry.addData("Speed", shooterPower);
    }
 
    //Runs the particle ball gatherer on the front of the robot.
@@ -357,7 +413,7 @@ public class CF_Manual extends OpMode
       {
          robot.SetButtonPusherPosition(ButtonPusherPosition - beaconPusherRate);
       }
-      telemetry.addData("Pos: ", robot.GetButtonPusherPosition());
+      //telemetry.addData("Pos: ", robot.GetButtonPusherPosition());
 
       // The servo we are using on the robot is NOT a true continuous rotation
       // servo.  It is a <i>winch<i> servo, and so it rotates about 6.5 rotations
@@ -377,12 +433,12 @@ public class CF_Manual extends OpMode
          if(Pos < basePos + 0.1)
          {
             Pos += 0.001f;
-            telemetry.addData("Pos: ", Pos);
+            //telemetry.addData("Pos: ", Pos);
          }
          else
          {
             Pos = basePos + 0.1f;
-            telemetry.addData("Pos: ", Pos);
+            //telemetry.addData("Pos: ", Pos);
          }
       }
       if (gamepad2.dpad_down)
@@ -407,32 +463,6 @@ public class CF_Manual extends OpMode
       robot.Loader.setPosition(Pos);
    }
 
-    //This method allows the robot to recognize the four separate pictures.
-   private void pushBlueButton(VuforiaTrackables pics)
-   {
-      if(((VuforiaTrackableDefaultListener) pics.get(0).getListener()).isVisible()) {
-         pictureNumber = 0;
-         //robot.SetButtonPusherPosition(0.45f);
-         driveToBeacon(pics);
-      }
-      if(((VuforiaTrackableDefaultListener) pics.get(1).getListener()).isVisible()) {
-         pictureNumber = 1;
-         //robot.SetButtonPusherPosition(0.45f);
-         driveToBeacon(pics);
-      }
-      if(((VuforiaTrackableDefaultListener) pics.get(2).getListener()).isVisible()) {
-         pictureNumber = 2;
-         //robot.SetButtonPusherPosition(0.45f);
-         driveToBeacon(pics);
-      }
-      if(((VuforiaTrackableDefaultListener) pics.get(3).getListener()).isVisible()) {
-         pictureNumber = 3;
-         //robot.SetButtonPusherPosition(0.45f);
-         driveToBeacon(pics);
-      }
-
-   }
-
     //After the robot can "See" the picture, it will drive to it.
    private void driveToBeacon(VuforiaTrackables picsArray)
    {
@@ -442,31 +472,33 @@ public class CF_Manual extends OpMode
       {
          requestOpModeStop();
       }
-      seeable = ((VuforiaTrackableDefaultListener) picsArray.get(pictureNumber).getListener()).isVisible();
-      while(gamepad1.x && !checkForStop() && seeable) {
-         pose = ((VuforiaTrackableDefaultListener) picsArray.get(pictureNumber).getListener()).getRawPose();
-         ServiceServos();
-         if(checkForStop()) {
-            requestOpModeStop();
-         }
-         telemetry.clearAll();
-         telemetry.addData("visible", "visible");
-         telemetry.addData("xValue: ", x);
+      for(int i = 0; i < 4; i++) {
+         seeable = ((VuforiaTrackableDefaultListener) picsArray.get(i).getListener()).isVisible();
+         while (gamepad1.b && !checkForStop() && seeable) {
+            pose = ((VuforiaTrackableDefaultListener) picsArray.get(i).getListener()).getRawPose();
+            ServiceServos();
+            if (checkForStop()) {
+               requestOpModeStop();
+            }
+            telemetry.clearAll();
+            telemetry.addData("visible", "visible");
+            telemetry.addData("xValue: ", x);
 
-         if (pose != null) {
-            translation = pose.getTranslation();
-            y = (int) translation.get(1);
-            x = (int) translation.get(2);
-            error = y + 10;
-            effort = kP * error;
-            rightPower = -1 * (power + effort);
-            leftPower = -1 * (power - effort);
-            robot.MotorMecanumLeftFront.setPower(leftPower);
-            robot.MotorMecanumRightFront.setPower(rightPower);
-            robot.MotorMecanumLeftRear.setPower(leftPower);
-            robot.MotorMecanumRightRear.setPower(rightPower);
+            if (pose != null) {
+               translation = pose.getTranslation();
+               y = (int) translation.get(1);
+               x = (int) translation.get(2);
+               error = y + 10;
+               effort = kP * error;
+               rightPower = -1 * (power + effort);
+               leftPower = -1 * (power - effort);
+               robot.MotorMecanumLeftFront.setPower(leftPower);
+               robot.MotorMecanumRightFront.setPower(rightPower);
+               robot.MotorMecanumLeftRear.setPower(leftPower);
+               robot.MotorMecanumRightRear.setPower(rightPower);
+            }
+            seeable = ((VuforiaTrackableDefaultListener) picsArray.get(i).getListener()).isVisible();
          }
-         seeable = ((VuforiaTrackableDefaultListener) picsArray.get(pictureNumber).getListener()).isVisible();
       }
       robot.MotorMecanumLeftFront.setPower(0.0f);
       robot.MotorMecanumRightFront.setPower(0.0f);
