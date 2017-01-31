@@ -193,6 +193,7 @@ public class CF_Manual extends OpMode
       } catch(InterruptedException e) {
          telemetry.addData("Exception: ", "Interrupted Exception");
       }
+      telemetry.addData("Shooter Power", shooterPower);
       telemetry.update();
    }
 
@@ -321,7 +322,7 @@ public class CF_Manual extends OpMode
             shooterPower = 0.0f;
          }
          else {
-            shooterPower -= 0.05f;
+            shooterPower -= 0.01f;
          }
       }
       if (firstButtonLeft && !firstLastLeftButton) {
@@ -329,7 +330,7 @@ public class CF_Manual extends OpMode
             shooterPower = -1.0f;
          }
          else {
-            shooterPower += 0.05f;
+            shooterPower += 0.01f;
          }
       }
       firstLastRightButton = firstButtonRight;
