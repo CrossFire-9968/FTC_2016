@@ -321,7 +321,7 @@ public class Crossfire_Hardware
    public double ScaleJoystickCommand(double input)
    {
       double scaledInput;
-      final int numPointsInMap = 25;
+      final int numPointsInMap = 34;
 
       // Ensure the values make sense.  Clip the values to max/min values
       double clippedPower = Range.clip(input, -1, 1);
@@ -332,7 +332,7 @@ public class Crossfire_Hardware
 
             // Array used to map joystick input to motor output
       double[] scalingArray =
-         {0, 0.004, 0.0045, 0.005, 0.01, 0.015, 0.02, 0.025, 0.03, 0.035, 0.04, 0.047, 0.05, 0.065, 0.08, 0.11,
+         {0, 0.001, 0.0015, 0.002, 0.0026, 0.003, 0.0036,  0.004, 0.0046, 0.005, 0.058, 0.0063, 0.007, 0.01, 0.015, 0.02, 0.025, 0.03, 0.035, 0.04, 0.047, 0.05, 0.065, 0.08, 0.11,
          0.13, 0.17, 0.23, 0.32, 0.4, 0.48, 0.61, 0.73, 0.89, 1};
 
       // Get the corresponding index for the specified argument/parameter.
