@@ -141,15 +141,15 @@ public class CF_Vuforia_Blue_State extends CF_Library{
                     this.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                     robot.Shooter.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                     robot.Shooter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-                    //robot.Shooter.setPower(-1.0f);
-                    this.encoderMove(1500, 1500, 0.6f, 0.6f);
+                    robot.Shooter.setPower(-0.25f);
+                    this.encoderMove(1200, 1200, 0.6f, 0.6f);
                     this.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                     //robot.Shooter.setPower(-0.3f);
                     this.encoderStrafeLeft(2100, speed);
                     System.out.println("DONE STRAFING");
 
                     // Increment the state to the next state
-                    State = driveState.DRIVETOFIRSTBEACON;
+                    State = driveState.BALLONE;
 
                     break;
                 case SQUARETOFIRSTBEACON:
@@ -213,6 +213,7 @@ public class CF_Vuforia_Blue_State extends CF_Library{
                     System.out.println("BALL ONE");
                     // Increment the first ball
                     robot.SetLoaderPosition(0.015);
+                    robot.Shooter.setPower(-0.28f);
                     TimeUnit.SECONDS.sleep(2);
                     State = driveState.BALLTWO;
                     break;

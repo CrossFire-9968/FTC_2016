@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.vuforia.HINT;
+import com.vuforia.ObjectTracker;
 import com.vuforia.Vuforia;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
@@ -80,7 +81,7 @@ public class CF_Manual extends OpMode
 
    final int stopCount = 200;
    boolean seeable;
-   double kP = 0.0005;
+   double kP = 0.0025;
    double power = 0.5;
    double effort;
    int error;
@@ -122,7 +123,7 @@ public class CF_Manual extends OpMode
       // Makes and instance of Vuforia
       VuforiaLocalizer vuforia = ClassFactory.createVuforiaLocalizer(params);
       // Lets VuForia see more than one object at one time
-      Vuforia.setHint(HINT.HINT_MAX_SIMULTANEOUS_IMAGE_TARGETS, 4);
+     // Vuforia.setHint(HINT.HINT_MAX_SIMULTANEOUS_IMAGE_TARGETS, 4);
 
       beacons = vuforia.loadTrackablesFromAsset("FTC_2016-17");
       beacons.get(0).setName("Wheels");
@@ -498,6 +499,7 @@ public class CF_Manual extends OpMode
                robot.MotorMecanumLeftRear.setPower(leftPower);
                robot.MotorMecanumRightRear.setPower(rightPower);
             }
+            seeable = false;
             seeable = ((VuforiaTrackableDefaultListener) picsArray.get(i).getListener()).isVisible();
          }
       }
@@ -505,6 +507,10 @@ public class CF_Manual extends OpMode
       robot.MotorMecanumRightFront.setPower(0.0f);
       robot.MotorMecanumLeftRear.setPower(0.0f);
       robot.MotorMecanumRightRear.setPower(0.0f);
+      rightPower = 0;
+      leftPower = 0;
+      pose = null;
+      seeable = false;
    }
 
 
