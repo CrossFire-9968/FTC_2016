@@ -142,7 +142,7 @@ public class CF_Vuforia_Blue_State extends CF_Library{
                     robot.Shooter.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                     robot.Shooter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
                     robot.Shooter.setPower(-0.25f);
-                    this.encoderMove(1200, 1200, 0.6f, 0.6f);
+                    this.encoderMove(1100, 1100, 0.6f, 0.6f);
                     this.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                     //robot.Shooter.setPower(-0.3f);
                     this.encoderStrafeLeft(2100, speed);
