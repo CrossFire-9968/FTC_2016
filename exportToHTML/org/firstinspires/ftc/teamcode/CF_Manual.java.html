@@ -1,0 +1,658 @@
+<html>
+<head>
+<title>CF_Manual.java</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.ln { color: rgb(0,0,0); font-weight: normal; font-style: normal; }
+.s0 { color: rgb(0,0,128); font-weight: bold; }
+.s1 { color: rgb(0,0,0); }
+.s2 { color: rgb(128,128,128); font-style: italic; }
+.s3 { color: rgb(128,128,128); font-style: italic; }
+.s4 { color: rgb(0,128,0); font-weight: bold; }
+.s5 { color: rgb(0,0,255); }
+</style>
+</head>
+<BODY BGCOLOR="#ffffff">
+<TABLE CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#C0C0C0" >
+<TR><TD><CENTER>
+<FONT FACE="Arial, Helvetica" COLOR="#000000">
+CF_Manual.java</FONT>
+</center></TD></TR></TABLE>
+<pre>
+<span class="s0">package </span><span class="s1">org.firstinspires.ftc.teamcode; 
+ 
+</span><span class="s0">import </span><span class="s1">com.qualcomm.robotcore.eventloop.opmode.OpMode; 
+</span><span class="s0">import </span><span class="s1">com.qualcomm.robotcore.eventloop.opmode.TeleOp; 
+</span><span class="s0">import </span><span class="s1">com.qualcomm.robotcore.hardware.ColorSensor; 
+</span><span class="s0">import </span><span class="s1">com.qualcomm.robotcore.hardware.DcMotor; 
+</span><span class="s0">import </span><span class="s1">com.vuforia.HINT; 
+</span><span class="s0">import </span><span class="s1">com.vuforia.ObjectTracker; 
+</span><span class="s0">import </span><span class="s1">com.vuforia.Vuforia; 
+ 
+</span><span class="s0">import </span><span class="s1">org.firstinspires.ftc.robotcore.external.ClassFactory; 
+</span><span class="s0">import </span><span class="s1">org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix; 
+</span><span class="s0">import </span><span class="s1">org.firstinspires.ftc.robotcore.external.matrices.VectorF; 
+</span><span class="s0">import </span><span class="s1">org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer; 
+</span><span class="s0">import </span><span class="s1">org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener; 
+</span><span class="s0">import </span><span class="s1">org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables; 
+</span><span class="s0">import </span><span class="s1">org.firstinspires.ftc.teamcode.Crossfire_Hardware.sensorColor; 
+</span><span class="s0">import </span><span class="s1">org.firstinspires.ftc.robotcore.internal.VuforiaTrackablesImpl; 
+ 
+</span><span class="s2">/*** 
+ * This file provides basic Telop driving for a robot with mecanum wheels. 
+ * The code is structured as an Iterative OpMode 
+ * </span><span class="s3">&lt;p/&gt;</span><span class="s2"> 
+ * This OpMode uses the CrossFire hardware class to define the devices on the robot. 
+ * All device access is managed through the Crossfire_Hardware class. 
+ * </span><span class="s3">&lt;p/&gt;</span><span class="s2"> 
+ * This OpMode takes joystick values from three independent axis and computes a 
+ * desired motor power for each of the mecanum drive motors (one per wheel) to 
+ * attain desired velocity, direction, and rotation of robot. If the calculated 
+ * desired power for any motor exceeds the maximum power limit (1.0F), then all 
+ * motor powers are proportionally reduced.  We do this to retain consistent 
+ * driving characteristics at the expense of vehicle speed and total power. 
+ */</span><span class="s1"> 
+ 
+@TeleOp(name = </span><span class="s4">&quot;CF_Manual&quot;</span><span class="s1">, group = </span><span class="s4">&quot;Drivetrain&quot;</span><span class="s1">) 
+</span><span class="s2">//@Disabled</span><span class="s1"> 
+ 
+</span><span class="s0">public class </span><span class="s1">CF_Manual </span><span class="s0">extends </span><span class="s1">OpMode 
+{ 
+   Crossfire_Hardware robot = </span><span class="s0">new </span><span class="s1">Crossfire_Hardware(); 
+   CF_SensorLibrary colorSensor = </span><span class="s0">new </span><span class="s1">CF_SensorLibrary(); 
+ 
+</span><span class="s2">// Joystick threshold sets a minimum value for the controller joysticks</span><span class="s1"> 
+</span><span class="s2">// to reach before the robot will begin to move.</span><span class="s1"> 
+   </span><span class="s0">private static final float </span><span class="s1">joystickThreshold = </span><span class="s5">0.003f</span><span class="s1">; 
+ 
+</span><span class="s2">//    When both of the joysticks used for driving are held at the same time, the</span><span class="s1"> 
+</span><span class="s2">//    robot cannot fully do both functions. Priority sets the team's driving</span><span class="s1"> 
+</span><span class="s2">//    priority - whether strafing, turning, or driving straight should have more</span><span class="s1"> 
+</span><span class="s2">//    importance, causing to robot to perform more of one action than of the others.</span><span class="s1"> 
+   </span><span class="s0">private static final float </span><span class="s1">forwardPriority = </span><span class="s5">1.0f</span><span class="s1">; 
+   </span><span class="s0">private static final float </span><span class="s1">strafePriority = </span><span class="s5">1.0f</span><span class="s1">; 
+   </span><span class="s0">private static final float </span><span class="s1">steerPriority = </span><span class="s5">1.0f</span><span class="s1">; 
+   </span><span class="s0">private static final float </span><span class="s1">forwardGain_Scoop = </span><span class="s5">1.0f</span><span class="s1">; 
+   </span><span class="s0">private static final float </span><span class="s1">strafeGain_Scoop = </span><span class="s5">1.0f</span><span class="s1">; 
+   </span><span class="s0">private static final float </span><span class="s1">steerGain_Scoop = </span><span class="s5">1.0f</span><span class="s1">; 
+   </span><span class="s0">private static final float </span><span class="s1">forwardGain_Lifter = </span><span class="s5">0.5f</span><span class="s1">; 
+   </span><span class="s0">private static final float </span><span class="s1">strafeGain_Lifter = </span><span class="s5">1.0f</span><span class="s1">; 
+   </span><span class="s0">private static final float </span><span class="s1">steerGain_Lifter = </span><span class="s5">0.5f</span><span class="s1">; 
+ 
+   </span><span class="s2">// Beacon button pusher servo increment rate</span><span class="s1"> 
+   </span><span class="s0">private static final double </span><span class="s1">beaconPusherRate = </span><span class="s5">0.005</span><span class="s1">; 
+ 
+   </span><span class="s0">private </span><span class="s1">sensorColor beaconColor = sensorColor.unknown; 
+   </span><span class="s0">int </span><span class="s1">pictureNumber; 
+ 
+   </span><span class="s0">int </span><span class="s1">state = </span><span class="s5">0</span><span class="s1">; 
+   </span><span class="s0">float </span><span class="s1">shooterPower = -</span><span class="s5">0.28f</span><span class="s1">; 
+   </span><span class="s0">boolean </span><span class="s1">firstLastRightButton = </span><span class="s0">false</span><span class="s1">; 
+   </span><span class="s0">boolean </span><span class="s1">firstButtonRight = </span><span class="s0">false</span><span class="s1">; 
+   </span><span class="s0">boolean </span><span class="s1">firstLastLeftButton = </span><span class="s0">false</span><span class="s1">; 
+   </span><span class="s0">boolean </span><span class="s1">firstButtonLeft = </span><span class="s0">false</span><span class="s1">; 
+ 
+   </span><span class="s0">boolean </span><span class="s1">secondLastRightButton = </span><span class="s0">false</span><span class="s1">; 
+   </span><span class="s0">boolean </span><span class="s1">secondButtonRight = </span><span class="s0">false</span><span class="s1">; 
+ 
+   </span><span class="s2">//these variables set positions for the Loader servo.</span><span class="s1"> 
+   </span><span class="s0">float </span><span class="s1">basePos = </span><span class="s5">0.0f</span><span class="s1">; 
+   </span><span class="s0">float </span><span class="s1">Pos = basePos; 
+ 
+   </span><span class="s2">// These variables are for the Vuforia navigation</span><span class="s1"> 
+   OpenGLMatrix pose = </span><span class="s0">null</span><span class="s1">; 
+ 
+   </span><span class="s0">final int </span><span class="s1">stopCount = </span><span class="s5">200</span><span class="s1">; 
+   </span><span class="s0">int </span><span class="s1">pic = -</span><span class="s5">1</span><span class="s1">; 
+   </span><span class="s0">boolean </span><span class="s1">seeable; 
+   </span><span class="s0">double </span><span class="s1">kP = </span><span class="s5">0.0025</span><span class="s1">; 
+   </span><span class="s0">double </span><span class="s1">power = </span><span class="s5">0.5</span><span class="s1">; 
+   </span><span class="s0">double </span><span class="s1">effort; 
+   </span><span class="s0">int </span><span class="s1">error; 
+   </span><span class="s0">double </span><span class="s1">leftPower; 
+   </span><span class="s0">double </span><span class="s1">rightPower; 
+   </span><span class="s0">boolean </span><span class="s1">spinnerFlag = </span><span class="s0">false</span><span class="s1">; 
+   </span><span class="s0">boolean </span><span class="s1">shooterFlag = </span><span class="s0">false</span><span class="s1">; 
+   VuforiaTrackables beacons; 
+ 
+   </span><span class="s0">boolean </span><span class="s1">runShooter = </span><span class="s0">false</span><span class="s1">; 
+ 
+   ColorSensor sensorRGBright; 
+   ColorSensor sensorRGBleft; 
+ 
+   </span><span class="s0">float </span><span class="s1">hsvValuesright[] = {</span><span class="s5">0F</span><span class="s1">, </span><span class="s5">0F</span><span class="s1">, </span><span class="s5">0F</span><span class="s1">}; 
+   </span><span class="s0">float </span><span class="s1">hsvValuesleft[] = {</span><span class="s5">0F</span><span class="s1">, </span><span class="s5">0F</span><span class="s1">, </span><span class="s5">0F</span><span class="s1">}; 
+ 
+   VectorF translation; 
+ 
+   </span><span class="s2">/*** 
+    *This method inits all hardware on the robot as well as the camera on the drivers' 
+    * phone. 
+    */</span><span class="s1"> 
+   </span><span class="s0">public void </span><span class="s1">init() 
+   { 
+       </span><span class="s2">//This line inits all robot hardware</span><span class="s1"> 
+      robot.init(hardwareMap); 
+ 
+      </span><span class="s2">// This makes the Vuforia picture appear on the screen</span><span class="s1"> 
+       </span><span class="s2">//of the robot phone</span><span class="s1"> 
+      VuforiaLocalizer.Parameters params = </span><span class="s0">new </span><span class="s1">VuforiaLocalizer.Parameters(R.id.cameraMonitorViewId); 
+      </span><span class="s2">// Sets camera direction</span><span class="s1"> 
+      params.cameraDirection = VuforiaLocalizer.CameraDirection.BACK; 
+      </span><span class="s2">// License key</span><span class="s1"> 
+      params.vuforiaLicenseKey = </span><span class="s4">&quot;AU2Vspr/////AAAAGSWZlF6AQEHFh9mbNlt5KlFGl/PX8qeeKea7jh5Xk8Ei573/nsoAjsJu9Cbi2MlRCuEIkZHQJoDGAxXmNgioA+0+DbRC6mG+1QbBu8ACMw0pBk6x3h+wvvqDeyZmjV0Fdji5Bk2bV3AaZ0AanljM2nuosjfFYOeUsoFqjE0+MQfJCOoG2ED2hxhJM88dhMaAH45kQqJ99Pn9c/F8whHUkRLeh71wW3O8qGdHEieX7WQO86VfVadHTrg0Ut8ALwiU/qVqB9pJPn+oVe9rYCixcJztb7XOp4T4Mo0IPUwVtkTUZtZTW1mAOPdbbWx3RX1OohA6q6BBU7ozDdQ1W33/L/mdETevYMf7rKPrb82Zbw8r&quot;</span><span class="s1">; 
+      </span><span class="s2">// Sets the thing you see on the screen.  Could be AXES, TEAPOT, BUILDINGS, or NONE</span><span class="s1"> 
+      params.cameraMonitorFeedback = VuforiaLocalizer.Parameters.CameraMonitorFeedback.AXES; 
+ 
+      </span><span class="s2">// Makes and instance of Vuforia</span><span class="s1"> 
+      VuforiaLocalizer vuforia = ClassFactory.createVuforiaLocalizer(params); 
+      </span><span class="s2">// Lets VuForia see more than one object at one time</span><span class="s1"> 
+     </span><span class="s2">// Vuforia.setHint(HINT.HINT_MAX_SIMULTANEOUS_IMAGE_TARGETS, 4);</span><span class="s1"> 
+ 
+      </span><span class="s2">// Makes and loads the beacons data set</span><span class="s1"> 
+      beacons = vuforia.loadTrackablesFromAsset(</span><span class="s4">&quot;FTC_2016-17&quot;</span><span class="s1">); 
+      beacons.get(</span><span class="s5">0</span><span class="s1">).setName(</span><span class="s4">&quot;Wheels&quot;</span><span class="s1">); 
+      beacons.get(</span><span class="s5">1</span><span class="s1">).setName(</span><span class="s4">&quot;Tools&quot;</span><span class="s1">); 
+      beacons.get(</span><span class="s5">2</span><span class="s1">).setName(</span><span class="s4">&quot;Legos&quot;</span><span class="s1">); 
+      beacons.get(</span><span class="s5">3</span><span class="s1">).setName(</span><span class="s4">&quot;Gears&quot;</span><span class="s1">); 
+ 
+      beacons.activate(); 
+ 
+      telemetry.addData(</span><span class="s4">&quot;Vuforia initialized&quot;</span><span class="s1">, </span><span class="s4">&quot;&quot;</span><span class="s1">); 
+ 
+      sensorRGBright = hardwareMap.colorSensor.get(</span><span class="s4">&quot;AdafruitRGBright&quot;</span><span class="s1">); 
+      sensorRGBleft = hardwareMap.colorSensor.get(</span><span class="s4">&quot;AdafruitRGBleft&quot;</span><span class="s1">); 
+   } 
+ 
+ 
+   </span><span class="s2">/*** 
+    * Method is the main loop for manual opmode.  Things in this method are iteratively 
+    * run until the stop button is pushed. 
+    */</span><span class="s1"> 
+   </span><span class="s0">public void </span><span class="s1">loop() 
+   { 
+      </span><span class="s2">// Calculate and apply motor power to drive wheels</span><span class="s1"> 
+      RunMecanumWheels(); 
+ 
+      </span><span class="s2">// Adjust the beacon button servo and the loader servo</span><span class="s1"> 
+      ServiceServos(); 
+ 
+      beaconColor = colorSensor.GetAdafruitColorRight(robot); 
+ 
+      </span><span class="s2">// Set steering to ball lifter driving mode</span><span class="s1"> 
+      </span><span class="s0">if </span><span class="s1">(gamepad1.a) 
+      { 
+         robot.setscooperMode(); 
+      } 
+ 
+      </span><span class="s2">// Set steering to beacon driving mode</span><span class="s1"> 
+      </span><span class="s0">if </span><span class="s1">(gamepad1.y) 
+      { 
+         robot.setBeaconMode(); 
+      } 
+ 
+      </span><span class="s2">// Set steering to scooper driving mode</span><span class="s1"> 
+      </span><span class="s0">if </span><span class="s1">(gamepad1.x) 
+      { 
+         robot.setBallLifterMode(); 
+      } 
+ 
+      </span><span class="s2">// Runs the drive to beacon method</span><span class="s1"> 
+      </span><span class="s0">if </span><span class="s1">(gamepad1.b) { 
+         driveToBeacon(beacons); 
+      } 
+      </span><span class="s2">//runs the cap ball lifter.</span><span class="s1"> 
+      runLifter(); 
+ 
+      </span><span class="s0">try </span><span class="s1">{ 
+         runSpinner(); 
+      } </span><span class="s0">catch</span><span class="s1">(InterruptedException e) { 
+         telemetry.addData(</span><span class="s4">&quot;Exception: &quot;</span><span class="s1">, </span><span class="s4">&quot;Interrupted Exception&quot;</span><span class="s1">); 
+      } 
+      </span><span class="s2">//runs ball shooter</span><span class="s1"> 
+      </span><span class="s0">try </span><span class="s1">{ 
+         runShooterState(); 
+      } </span><span class="s0">catch</span><span class="s1">(InterruptedException e) { 
+         telemetry.addData(</span><span class="s4">&quot;Exception: &quot;</span><span class="s1">, </span><span class="s4">&quot;Interrupted Exception&quot;</span><span class="s1">); 
+      } 
+      telemetry.addData(</span><span class="s4">&quot;Shooter Power&quot;</span><span class="s1">, shooterPower); 
+      telemetry.update(); 
+   } 
+ 
+ 
+   </span><span class="s2">/*** 
+    * This method calculates the individual motor powers required to drive the mecanum 
+    * wheels based off the driver 1 controller.  This drive strategy uses the following 
+    * joystick assignments 
+    * </span><span class="s3">&lt;p/&gt;</span><span class="s2"> 
+    * Left stick: 
+    * forward (+y)   - Forward drive 
+    * rearward (-y)  - Reverse drive 
+    * right (+x)     - Strafe right 
+    * left (-x)      - Strafe left 
+    * </span><span class="s3">&lt;p/&gt;</span><span class="s2"> 
+    * Right stick: 
+    * forward (+y)   - Not used 
+    * rearward (-y)  - Not used 
+    * right (+x)     - Tank turn right 
+    * left (-x)      - Tank turn left 
+    */</span><span class="s1"> 
+   </span><span class="s0">public void </span><span class="s1">RunMecanumWheels() 
+   { 
+      </span><span class="s0">double </span><span class="s1">LFPower = </span><span class="s5">0.0</span><span class="s1">; 
+      </span><span class="s0">double </span><span class="s1">RFPower = </span><span class="s5">0.0</span><span class="s1">; 
+      </span><span class="s0">double </span><span class="s1">LRPower = </span><span class="s5">0.0</span><span class="s1">; 
+      </span><span class="s0">double </span><span class="s1">RRPower = </span><span class="s5">0.0</span><span class="s1">; 
+      </span><span class="s0">double </span><span class="s1">leftStickY; 
+      </span><span class="s0">double </span><span class="s1">leftStickX; 
+      </span><span class="s0">double </span><span class="s1">rightStickX; 
+      </span><span class="s2">// Calculate motor powers but only if any of the joystick commands are greater then</span><span class="s1"> 
+      </span><span class="s2">// a minimum threshold.  Adjust this threshold if the motor has motion when the joystick</span><span class="s1"> 
+      </span><span class="s2">// is not being used and in the center position.</span><span class="s1"> 
+      </span><span class="s0">if </span><span class="s1">((Math.abs(gamepad1.left_stick_y) &gt;= joystickThreshold) || 
+         (Math.abs(gamepad1.left_stick_x) &gt;= joystickThreshold) || 
+         (Math.abs(gamepad1.right_stick_x) &gt;= joystickThreshold)) 
+      { 
+         leftStickY = robot.ScaleJoystickCommand(gamepad1.left_stick_y); 
+         leftStickX = robot.ScaleJoystickCommand(gamepad1.left_stick_x); 
+         rightStickX = robot.ScaleJoystickCommand(gamepad1.right_stick_x); 
+ 
+ 
+         </span><span class="s2">// Calculate power for each mecanum wheel based on joystick inputs.  Each power is</span><span class="s1"> 
+         </span><span class="s2">// based on three drive components: forward/reverse, strafe, and tank turn.</span><span class="s1"> 
+          </span><span class="s2">//There are three drive modes. This mode, Beacon, drives the robot with the beacon</span><span class="s1"> 
+          </span><span class="s2">//pusher servo in the front.</span><span class="s1"> 
+         telemetry.addData(</span><span class="s4">&quot;Mode: &quot;</span><span class="s1">, </span><span class="s4">&quot;Beacon&quot;</span><span class="s1">); 
+         </span><span class="s0">if </span><span class="s1">(robot.driveMode == Crossfire_Hardware.driveModeEnum.beaconMode) 
+         { 
+            LFPower = (forwardPriority * leftStickY) + (strafePriority * leftStickX) - (steerPriority * rightStickX); 
+            RFPower = (forwardPriority * leftStickY) - (strafePriority * leftStickX) + (steerPriority * rightStickX); 
+            LRPower = (forwardPriority * leftStickY) - (strafePriority * leftStickX) - (steerPriority * rightStickX); 
+            RRPower = (forwardPriority * leftStickY) + (strafePriority * leftStickX) + (steerPriority * rightStickX); 
+         } 
+ 
+          </span><span class="s2">//The strafe drive mode sets the side of the robot with the cap ball lifter</span><span class="s1"> 
+          </span><span class="s2">//as the front. To drive forward, the robot strafes.</span><span class="s1"> 
+         telemetry.addData(</span><span class="s4">&quot;Mode: &quot;</span><span class="s1">, </span><span class="s4">&quot;Strafe&quot;</span><span class="s1">); 
+         </span><span class="s0">if </span><span class="s1">(robot.driveMode == Crossfire_Hardware.driveModeEnum.ballLifterMode) 
+         { 
+            LFPower = (forwardGain_Lifter * -leftStickX) - (strafeGain_Lifter * -leftStickY) + (steerGain_Lifter * -rightStickX); 
+            RFPower = (forwardGain_Lifter * -leftStickX) + (strafeGain_Lifter * -leftStickY) - (steerGain_Lifter * -rightStickX); 
+            LRPower = (forwardGain_Lifter * -leftStickX) + (strafeGain_Lifter * -leftStickY) + (steerGain_Lifter * -rightStickX); 
+            RRPower = (forwardGain_Lifter * -leftStickX) - (strafeGain_Lifter * -leftStickY) - (steerGain_Lifter * -rightStickX); 
+            telemetry.addData(</span><span class="s4">&quot;leftStickX&quot;</span><span class="s1">, leftStickX); 
+         } 
+ 
+          </span><span class="s2">//The scoop drive mode sets the particle ball gatherer as the front of the robot.</span><span class="s1"> 
+         telemetry.addData(</span><span class="s4">&quot;Mode: &quot;</span><span class="s1">, </span><span class="s4">&quot;Scoop&quot;</span><span class="s1">); 
+         </span><span class="s0">if </span><span class="s1">(robot.driveMode == Crossfire_Hardware.driveModeEnum.scooperMode) 
+         { 
+            LFPower = (forwardGain_Scoop * -leftStickY) - (strafeGain_Scoop * leftStickX) + (steerGain_Scoop * -rightStickX); 
+            RFPower = (forwardGain_Scoop * -leftStickY) + (strafeGain_Scoop * leftStickX) - (steerGain_Scoop * -rightStickX); 
+            LRPower = (forwardGain_Scoop * -leftStickY) + (strafeGain_Scoop * leftStickX) + (steerGain_Scoop * -rightStickX); 
+            RRPower = (forwardGain_Scoop * -leftStickY) - (strafeGain_Scoop * leftStickX) - (steerGain_Scoop * -rightStickX); 
+         } 
+ 
+         </span><span class="s2">// Find maximum power commanded to all the mecanum wheels.  Using the above power</span><span class="s1"> 
+         </span><span class="s2">// equations, it is possible to calculate a power command greater than 1.0f (100%).</span><span class="s1"> 
+         </span><span class="s2">// We want to find the max value so we can proportionally reduce motor powers.</span><span class="s1"> 
+         </span><span class="s0">double </span><span class="s1">maxPower = Math.max(LFPower, Math.max(RFPower, Math.max(LRPower, RRPower))); 
+ 
+         </span><span class="s2">// If max power is greater than 1.0f (100% command), then proportionally reduce all motor</span><span class="s1"> 
+         </span><span class="s2">// powers by the maximum power calculated.  This will equally reduce all powers so no</span><span class="s1"> 
+         </span><span class="s2">// motor power is clipped and the robot responds predictably to joystick commands.  If we</span><span class="s1"> 
+         </span><span class="s2">// don't, then one or more motor commands will clip, others will not, and the robot will not</span><span class="s1"> 
+         </span><span class="s2">// behave predictably.  The end result of this reduction is the motor requesting max power</span><span class="s1"> 
+         </span><span class="s2">// will set power to 1.0f (100%) and all other powers will be reduced by the same ratio.</span><span class="s1"> 
+         </span><span class="s0">if </span><span class="s1">(Math.abs(maxPower) &gt; </span><span class="s5">1.0f</span><span class="s1">) 
+         { 
+            LFPower /= maxPower; </span><span class="s2">// Shorthand for LFPower = LFPower / maxPower</span><span class="s1"> 
+            RFPower /= maxPower; 
+            LRPower /= maxPower; 
+            RRPower /= maxPower; 
+         } 
+ 
+         </span><span class="s2">// Update motor powers with new value.</span><span class="s1"> 
+         robot.setMecanumPowers(LFPower, RFPower, LRPower, RRPower); 
+      } 
+      </span><span class="s0">else</span><span class="s1"> 
+      { 
+         </span><span class="s2">// Explicitly set powers to zero.  May not be necessary but is good practice.</span><span class="s1"> 
+         robot.setMecanumPowers(</span><span class="s5">0.0</span><span class="s1">, </span><span class="s5">0.0</span><span class="s1">, </span><span class="s5">0.0</span><span class="s1">, </span><span class="s5">0.0</span><span class="s1">); 
+      } 
+   } 
+ 
+ 
+   </span><span class="s0">public void </span><span class="s1">runLifter(){ 
+      </span><span class="s2">// This basically used the right and left triggers to drive the winch motor</span><span class="s1"> 
+      </span><span class="s2">// for the ball lifter.  The right trigger raises the lifer, and the left</span><span class="s1"> 
+      </span><span class="s2">// trigger lowers the lifter.</span><span class="s1"> 
+      </span><span class="s0">if</span><span class="s1">(gamepad2.right_trigger &gt; </span><span class="s5">0.05 </span><span class="s1">&amp;&amp; gamepad2.left_trigger &lt; </span><span class="s5">0.05</span><span class="s1">) { 
+         robot.Lifter.setPower(-</span><span class="s5">1 </span><span class="s1">* gamepad2.right_trigger); 
+      } </span><span class="s0">else if</span><span class="s1">(gamepad2.left_trigger &gt; </span><span class="s5">0.05 </span><span class="s1">&amp;&amp; gamepad2.right_trigger &lt; </span><span class="s5">0.05</span><span class="s1">) { 
+         robot.Lifter.setPower(gamepad2.left_trigger); 
+      } </span><span class="s0">else </span><span class="s1">{ 
+         robot.Lifter.setPower(</span><span class="s5">0.0f</span><span class="s1">); 
+      } 
+   } 
+ 
+ 
+   </span><span class="s2">//Runs the two rubber coated wheels so they rotate opposite directions and launch</span><span class="s1"> 
+   </span><span class="s2">//the particle balls into the center vortex</span><span class="s1"> 
+   </span><span class="s0">public void </span><span class="s1">runShooterState() </span><span class="s0">throws </span><span class="s1">InterruptedException { 
+      </span><span class="s2">// Gamepad 1 can modify the speed of the wheels on the fly if need be</span><span class="s1"> 
+      firstButtonRight = gamepad1.right_bumper; 
+      firstButtonLeft = gamepad1.left_bumper; 
+      </span><span class="s0">if </span><span class="s1">(firstButtonRight &amp;&amp; !firstLastRightButton) { 
+         </span><span class="s0">if</span><span class="s1">(shooterPower &lt; -</span><span class="s5">1.0f</span><span class="s1">) { 
+            shooterPower = </span><span class="s5">0.0f</span><span class="s1">; 
+         } 
+         </span><span class="s0">else </span><span class="s1">{ 
+            shooterPower -= </span><span class="s5">0.01f</span><span class="s1">; 
+         } 
+      } 
+      </span><span class="s0">if </span><span class="s1">(firstButtonLeft &amp;&amp; !firstLastLeftButton) { 
+         </span><span class="s0">if</span><span class="s1">(shooterPower &gt; </span><span class="s5">0.0f</span><span class="s1">) { 
+            shooterPower = -</span><span class="s5">1.0f</span><span class="s1">; 
+         } 
+         </span><span class="s0">else </span><span class="s1">{ 
+            shooterPower += </span><span class="s5">0.01f</span><span class="s1">; 
+         } 
+      } 
+      firstLastRightButton = firstButtonRight; 
+      firstLastLeftButton = firstButtonLeft; 
+ 
+      </span><span class="s2">// Gamepad 2 turns the wheels on and off</span><span class="s1"> 
+      secondButtonRight = gamepad2.right_bumper; 
+      </span><span class="s0">if</span><span class="s1">(secondButtonRight &amp;&amp; !secondLastRightButton) { 
+         runShooter = !runShooter; 
+      } 
+      </span><span class="s0">if</span><span class="s1">(runShooter) { 
+         robot.Shooter.setMode(DcMotor.RunMode.RUN_USING_ENCODER); 
+         robot.Shooter.setPower(shooterPower); 
+      } 
+      </span><span class="s0">if</span><span class="s1">(!runShooter) { 
+         robot.Shooter.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER); 
+         robot.Shooter.setPower(</span><span class="s5">0.0f</span><span class="s1">); 
+      } 
+      secondLastRightButton = secondButtonRight; 
+   } 
+   </span><span class="s2">// This is an unused method currently.  It has been phased out by the runShooterState() method</span><span class="s1"> 
+   </span><span class="s0">public void </span><span class="s1">runShooter() </span><span class="s0">throws </span><span class="s1">InterruptedException{ 
+      </span><span class="s0">if</span><span class="s1">(gamepad2.right_bumper) { 
+         </span><span class="s0">while</span><span class="s1">(gamepad2.right_bumper) 
+         { 
+            idle(); 
+         } 
+         </span><span class="s0">if</span><span class="s1">(shooterFlag) 
+         { 
+            robot.Shooter.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER); 
+            robot.Shooter.setMode(DcMotor.RunMode.RUN_USING_ENCODER); 
+            robot.Shooter.setPower(-</span><span class="s5">0.2f</span><span class="s1">); 
+         } 
+         </span><span class="s0">if</span><span class="s1">(!shooterFlag) 
+         { 
+            robot.Shooter.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER); 
+            robot.Shooter.setMode(DcMotor.RunMode.RUN_USING_ENCODER); 
+            robot.Shooter.setPower(</span><span class="s5">0.0f</span><span class="s1">); 
+         } 
+         shooterFlag = !shooterFlag; 
+      } 
+      telemetry.addData(</span><span class="s4">&quot;Speed&quot;</span><span class="s1">, shooterPower); 
+   } 
+ 
+   </span><span class="s2">//Runs the particle ball gatherer on the front of the robot.</span><span class="s1"> 
+   </span><span class="s0">public void </span><span class="s1">runSpinner() </span><span class="s0">throws </span><span class="s1">InterruptedException { 
+ 
+      </span><span class="s0">if</span><span class="s1">(gamepad2.left_bumper) 
+      { 
+         </span><span class="s0">while </span><span class="s1">(gamepad2.left_bumper) 
+         { 
+            Pos = basePos + </span><span class="s5">0.1f</span><span class="s1">; 
+            idle(); 
+         } 
+         </span><span class="s0">if </span><span class="s1">(spinnerFlag) 
+         { 
+            robot.Spinner.setPower(</span><span class="s5">1.0f</span><span class="s1">); 
+         } 
+         </span><span class="s0">if </span><span class="s1">(!spinnerFlag) 
+         { 
+            robot.Spinner.setPower(</span><span class="s5">0.0f</span><span class="s1">); 
+         } 
+         spinnerFlag = !spinnerFlag; 
+      } 
+   } 
+ 
+   </span><span class="s2">/*** 
+    * This method operates the servo to push the beacon button.  To push 
+    * left-hand button, press and hold x to rotate serve CCW. To push 
+    * right-hand button, press and hold b button to rotate servo CW. 
+    * This method was created to use Vuforia to drive the robot towards a beacon and 
+    * press teh team's corresponding color. However, it is not currently in use. 
+    */</span><span class="s1"> 
+ 
+   </span><span class="s2">//Sets controls and positions for both the Button Pusher servo and the Loader servo.</span><span class="s1"> 
+   </span><span class="s0">private void </span><span class="s1">ServiceServos() 
+   { 
+      </span><span class="s0">double </span><span class="s1">ButtonPusherPosition = robot.GetButtonPusherPosition(); 
+      </span><span class="s2">// Rotate CCW</span><span class="s1"> 
+      </span><span class="s0">if </span><span class="s1">(gamepad2.x &amp;&amp; robot.GetButtonPusherPosition() &lt;= </span><span class="s5">0.70</span><span class="s1">) 
+      { 
+         robot.SetButtonPusherPosition(ButtonPusherPosition + beaconPusherRate); 
+      } 
+ 
+      </span><span class="s2">// Rotate CW</span><span class="s1"> 
+      </span><span class="s0">else if </span><span class="s1">(gamepad2.b &amp;&amp; robot.GetButtonPusherPosition() &gt;= </span><span class="s5">0.29</span><span class="s1">) 
+      { 
+         robot.SetButtonPusherPosition(ButtonPusherPosition - beaconPusherRate); 
+      } 
+      </span><span class="s2">//telemetry.addData(&quot;Pos: &quot;, robot.GetButtonPusherPosition());</span><span class="s1"> 
+ 
+      </span><span class="s2">// The servo we are using on the robot is NOT a true continuous rotation</span><span class="s1"> 
+      </span><span class="s2">// servo.  It is a &lt;i&gt;winch&lt;i&gt; servo, and so it rotates about 6.5 rotations</span><span class="s1"> 
+      </span><span class="s2">// (with our hardware.  It CAN go farther, however.)  It also has feedback,</span><span class="s1"> 
+      </span><span class="s2">// which makes it basically the same as a normal servo, however it's range is *much*</span><span class="s1"> 
+      </span><span class="s2">// more sensitive.  So, after a little experimentation, I found that position 0 through position</span><span class="s1"> 
+      </span><span class="s2">// 0.12 is about 270 deg. of rotation, which is &lt;i&gt;about&lt;i&gt; what we want for our</span><span class="s1"> 
+      </span><span class="s2">// ball stuffer.  So, what this bit will do is start at a base case(whatever our</span><span class="s1"> 
+      </span><span class="s2">// default servo position will be), and then increment that base case slowly, thus moving the</span><span class="s1"> 
+      </span><span class="s2">// servo slowly.  It also will limit the servo to the ~270 degrees of rotation allowable.</span><span class="s1"> 
+ 
+      </span><span class="s0">if </span><span class="s1">(gamepad2.dpad_up) 
+      { 
+         </span><span class="s2">//robot.Loader.setPosition(0.50);</span><span class="s1"> 
+ 
+         </span><span class="s2">// The amount to add is a magic number, and can be adjusted as seen fit :)</span><span class="s1"> 
+         </span><span class="s0">if</span><span class="s1">(Pos &lt; basePos + </span><span class="s5">0.1</span><span class="s1">) 
+         { 
+            Pos += </span><span class="s5">0.001f</span><span class="s1">; 
+            </span><span class="s2">//telemetry.addData(&quot;Pos: &quot;, Pos);</span><span class="s1"> 
+         } 
+         </span><span class="s0">else</span><span class="s1"> 
+         { 
+            Pos = basePos + </span><span class="s5">0.1f</span><span class="s1">; 
+            </span><span class="s2">//telemetry.addData(&quot;Pos: &quot;, Pos);</span><span class="s1"> 
+         } 
+      } 
+      </span><span class="s0">if </span><span class="s1">(gamepad2.dpad_down) 
+      { 
+        </span><span class="s2">//robot.Loader.setPosition(0.85);</span><span class="s1"> 
+ 
+         </span><span class="s2">// The amount to subtract is a magic number, and can be adjusted as seen fit :)</span><span class="s1"> 
+         </span><span class="s0">if</span><span class="s1">(Pos &gt; basePos) 
+         { 
+            Pos -= </span><span class="s5">0.001f</span><span class="s1">; 
+         } 
+         </span><span class="s0">else </span><span class="s1">{ 
+            Pos = basePos; 
+         } 
+      } 
+      </span><span class="s0">if</span><span class="s1">(gamepad2.y) { 
+         Pos = basePos + </span><span class="s5">0.1f</span><span class="s1">; 
+      } 
+      </span><span class="s0">if</span><span class="s1">(gamepad2.a) { 
+         Pos = basePos; 
+      } 
+      robot.Loader.setPosition(Pos); 
+   } 
+ 
+    </span><span class="s2">//After the robot can &quot;See&quot; the picture, it will drive to it.</span><span class="s1"> 
+   </span><span class="s0">private void </span><span class="s1">driveToBeacon(VuforiaTrackables picsArray) 
+   { 
+      </span><span class="s0">int </span><span class="s1">x = stopCount + </span><span class="s5">1</span><span class="s1">; 
+      </span><span class="s0">int </span><span class="s1">y; 
+      </span><span class="s0">if</span><span class="s1">(checkForStop()) 
+      { 
+         requestOpModeStop(); 
+      } 
+      </span><span class="s2">// Determines which picture it is looking at</span><span class="s1"> 
+      </span><span class="s0">else if</span><span class="s1">(((VuforiaTrackableDefaultListener) picsArray.get(</span><span class="s5">0</span><span class="s1">).getListener()).isVisible()) { 
+         pic = </span><span class="s5">0</span><span class="s1">; 
+         seeable = </span><span class="s0">true</span><span class="s1">; 
+      } 
+      </span><span class="s0">else if</span><span class="s1">(((VuforiaTrackableDefaultListener) picsArray.get(</span><span class="s5">1</span><span class="s1">).getListener()).isVisible()) { 
+         pic = </span><span class="s5">1</span><span class="s1">; 
+         seeable = </span><span class="s0">true</span><span class="s1">; 
+      } 
+      </span><span class="s0">else if</span><span class="s1">(((VuforiaTrackableDefaultListener) picsArray.get(</span><span class="s5">2</span><span class="s1">).getListener()).isVisible()) { 
+         pic = </span><span class="s5">2</span><span class="s1">; 
+         seeable = </span><span class="s0">true</span><span class="s1">; 
+      } 
+      </span><span class="s0">else if</span><span class="s1">(((VuforiaTrackableDefaultListener) picsArray.get(</span><span class="s5">3</span><span class="s1">).getListener()).isVisible()) { 
+         pic = </span><span class="s5">3</span><span class="s1">; 
+         seeable = </span><span class="s0">true</span><span class="s1">; 
+      } </span><span class="s0">else </span><span class="s1">{ 
+         pic = -</span><span class="s5">1</span><span class="s1">; 
+         seeable = </span><span class="s0">false</span><span class="s1">; 
+      } 
+      telemetry.addData(</span><span class="s4">&quot;pic&quot;</span><span class="s1">, pic); 
+      telemetry.update(); 
+      </span><span class="s2">// If it sees a picture, it drives to said picture</span><span class="s1"> 
+      </span><span class="s0">if</span><span class="s1">(pic != -</span><span class="s5">1</span><span class="s1">) { 
+         seeable = ((VuforiaTrackableDefaultListener) picsArray.get(pic).getListener()).isVisible(); 
+         </span><span class="s0">while </span><span class="s1">(gamepad1.b &amp;&amp; !checkForStop() &amp;&amp; seeable) { 
+            pose = ((VuforiaTrackableDefaultListener) picsArray.get(pic).getListener()).getRawPose(); 
+            ServiceServos(); 
+            </span><span class="s0">if </span><span class="s1">(checkForStop()) { 
+               requestOpModeStop(); 
+            } 
+            telemetry.clearAll(); 
+            telemetry.addData(</span><span class="s4">&quot;visible&quot;</span><span class="s1">, </span><span class="s4">&quot;visible&quot;</span><span class="s1">); 
+            telemetry.addData(</span><span class="s4">&quot;xValue: &quot;</span><span class="s1">, x); 
+ 
+            </span><span class="s0">if </span><span class="s1">(pose != </span><span class="s0">null</span><span class="s1">) { 
+               </span><span class="s2">// This is the PID controller</span><span class="s1"> 
+               translation = pose.getTranslation(); 
+               y = (</span><span class="s0">int</span><span class="s1">) translation.get(</span><span class="s5">1</span><span class="s1">); 
+               x = (</span><span class="s0">int</span><span class="s1">) translation.get(</span><span class="s5">2</span><span class="s1">); 
+               error = y + </span><span class="s5">10</span><span class="s1">; 
+               effort = kP * error; 
+               rightPower = -</span><span class="s5">1 </span><span class="s1">* (power + effort); 
+               leftPower = -</span><span class="s5">1 </span><span class="s1">* (power - effort); 
+               robot.MotorMecanumLeftFront.setPower(leftPower); 
+               robot.MotorMecanumRightFront.setPower(rightPower); 
+               robot.MotorMecanumLeftRear.setPower(leftPower); 
+               robot.MotorMecanumRightRear.setPower(rightPower); 
+            } 
+            seeable = </span><span class="s0">false</span><span class="s1">; 
+            seeable = ((VuforiaTrackableDefaultListener) picsArray.get(pic).getListener()).isVisible(); 
+         } 
+ 
+      } 
+ 
+      </span><span class="s2">// Turns drive motors off when done driving to the picture</span><span class="s1"> 
+      robot.MotorMecanumLeftFront.setPower(</span><span class="s5">0.0f</span><span class="s1">); 
+      robot.MotorMecanumRightFront.setPower(</span><span class="s5">0.0f</span><span class="s1">); 
+      robot.MotorMecanumLeftRear.setPower(</span><span class="s5">0.0f</span><span class="s1">); 
+      robot.MotorMecanumRightRear.setPower(</span><span class="s5">0.0f</span><span class="s1">); 
+      rightPower = </span><span class="s5">0</span><span class="s1">; 
+      leftPower = </span><span class="s5">0</span><span class="s1">; 
+      pose = </span><span class="s0">null</span><span class="s1">; 
+      seeable = </span><span class="s0">false</span><span class="s1">; 
+   } 
+ 
+   </span><span class="s2">// Checks for a requested stop</span><span class="s1"> 
+   </span><span class="s0">private boolean </span><span class="s1">checkForStop() 
+   { 
+ 
+      </span><span class="s0">if</span><span class="s1">(gamepad1.back) 
+      { 
+         </span><span class="s0">return true</span><span class="s1">; 
+      } 
+      </span><span class="s0">else</span><span class="s1"> 
+      { 
+         </span><span class="s0">return false</span><span class="s1">; 
+      } 
+   } 
+ 
+   </span><span class="s2">// This is a method to drive to a certain encoder count</span><span class="s1"> 
+   </span><span class="s0">public void </span><span class="s1">encoderMove(</span><span class="s0">int </span><span class="s1">countLeft, </span><span class="s0">int </span><span class="s1">countRight, </span><span class="s0">double </span><span class="s1">leftPower, </span><span class="s0">double </span><span class="s1">rightPower) 
+   { 
+      robot.MotorMecanumLeftFront.setPower(leftPower); 
+      robot.MotorMecanumRightFront.setPower(rightPower); 
+      robot.MotorMecanumLeftRear.setPower(leftPower); 
+      robot.MotorMecanumRightRear.setPower(rightPower); 
+ 
+      setMode(DcMotor.RunMode.RUN_TO_POSITION); 
+ 
+      robot.MotorMecanumLeftFront.setTargetPosition(countLeft); 
+      robot.MotorMecanumRightFront.setTargetPosition(countRight); 
+      robot.MotorMecanumLeftRear.setTargetPosition(countLeft); 
+      robot.MotorMecanumRightRear.setTargetPosition(countRight); 
+ 
+      </span><span class="s0">while</span><span class="s1">(robot.MotorMecanumLeftFront.isBusy() &amp;&amp; robot.MotorMecanumRightFront.isBusy() &amp;&amp; robot.MotorMecanumLeftRear.isBusy() &amp;&amp; robot.MotorMecanumRightRear.isBusy()) 
+      { 
+         </span><span class="s0">double </span><span class="s1">leftPos = robot.MotorMecanumLeftFront.getCurrentPosition(); 
+         </span><span class="s0">double </span><span class="s1">rightPos = robot.MotorMecanumRightFront.getCurrentPosition(); 
+         telemetry.addData(</span><span class="s4">&quot;Right&quot;</span><span class="s1">,rightPos); 
+         telemetry.addData(</span><span class="s4">&quot;Left&quot;</span><span class="s1">,leftPos); 
+         </span><span class="s0">try</span><span class="s1"> 
+         { 
+            idle(); 
+         } 
+         </span><span class="s0">catch</span><span class="s1">(InterruptedException e) 
+         { 
+            telemetry.addData(</span><span class="s4">&quot;Idle Failed&quot;</span><span class="s1">, </span><span class="s4">&quot;Idle Failed&quot;</span><span class="s1">); 
+         } 
+ 
+      } 
+      setPower(</span><span class="s5">0.0f</span><span class="s1">); 
+      setMode(DcMotor.RunMode.RUN_USING_ENCODER); 
+   } 
+ 
+ 
+   </span><span class="s2">// Sets the mode of the drive motors</span><span class="s1"> 
+   </span><span class="s0">public void </span><span class="s1">setMode(DcMotor.RunMode mode) 
+   { 
+      robot.MotorMecanumLeftFront.setMode(mode); 
+      robot.MotorMecanumRightFront.setMode(mode); 
+      robot.MotorMecanumLeftRear.setMode(mode); 
+      robot.MotorMecanumRightRear.setMode(mode); 
+   } 
+ 
+ 
+   </span><span class="s2">// Sets the power of the drive motors</span><span class="s1"> 
+   </span><span class="s0">public void </span><span class="s1">setPower(</span><span class="s0">float </span><span class="s1">power) 
+   { 
+      robot.MotorMecanumLeftFront.setPower(power); 
+      robot.MotorMecanumRightFront.setPower(power); 
+      robot.MotorMecanumLeftRear.setPower(power); 
+      robot.MotorMecanumRightRear.setPower(power); 
+   } 
+ 
+ 
+   </span><span class="s2">// Idles</span><span class="s1"> 
+   </span><span class="s0">public final void </span><span class="s1">idle() </span><span class="s0">throws </span><span class="s1">InterruptedException 
+   { 
+      </span><span class="s2">// Abort the OpMode if we've been asked to stop</span><span class="s1"> 
+      </span><span class="s0">if </span><span class="s1">(checkForStop()) 
+         </span><span class="s0">throw new </span><span class="s1">InterruptedException(); 
+ 
+      </span><span class="s2">// Otherwise, yield back our thread scheduling quantum and give other threads at</span><span class="s1"> 
+      </span><span class="s2">// our priority level a chance to run</span><span class="s1"> 
+      Thread.yield(); 
+   } 
+} 
+</span></pre>
+</body>
+</html>

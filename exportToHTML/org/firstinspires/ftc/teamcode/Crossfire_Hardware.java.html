@@ -1,0 +1,392 @@
+<html>
+<head>
+<title>Crossfire_Hardware.java</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.ln { color: rgb(0,0,0); font-weight: normal; font-style: normal; }
+.s0 { color: rgb(0,0,128); font-weight: bold; }
+.s1 { color: rgb(0,0,0); }
+.s2 { color: rgb(128,128,128); font-style: italic; }
+.s3 { color: rgb(128,128,128); font-style: italic; }
+.s4 { color: rgb(128,128,128); font-weight: bold; font-style: italic; }
+.s5 { color: rgb(0,128,0); font-weight: bold; }
+.s6 { color: rgb(0,0,255); }
+</style>
+</head>
+<BODY BGCOLOR="#ffffff">
+<TABLE CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#C0C0C0" >
+<TR><TD><CENTER>
+<FONT FACE="Arial, Helvetica" COLOR="#000000">
+Crossfire_Hardware.java</FONT>
+</center></TD></TR></TABLE>
+<pre>
+<span class="s0">package </span><span class="s1">org.firstinspires.ftc.teamcode; 
+ 
+</span><span class="s0">import </span><span class="s1">com.qualcomm.robotcore.hardware.CRServo; 
+</span><span class="s0">import </span><span class="s1">com.qualcomm.robotcore.hardware.ColorSensor; 
+</span><span class="s0">import </span><span class="s1">com.qualcomm.robotcore.hardware.DcMotor; 
+</span><span class="s0">import </span><span class="s1">com.qualcomm.robotcore.hardware.DcMotorSimple; 
+</span><span class="s0">import </span><span class="s1">com.qualcomm.robotcore.hardware.HardwareMap; 
+</span><span class="s0">import </span><span class="s1">com.qualcomm.robotcore.hardware.Servo; 
+</span><span class="s0">import </span><span class="s1">com.qualcomm.robotcore.util.ElapsedTime; 
+</span><span class="s0">import </span><span class="s1">com.qualcomm.robotcore.util.Range; 
+ 
+</span><span class="s2">/** 
+ * This is NOT an opmode. 
+ * </span><span class="s3">&lt;p/&gt;</span><span class="s2"> 
+ * This class can be used to define all the specific hardware to the CrossFire robot. 
+ * </span><span class="s3">&lt;p/&gt;</span><span class="s2"> 
+ * This hardware class assumes the following device names have been configured on the robot: 
+ * Note:  All names are lower case and some have single spaces between words. 
+ * </span><span class="s3">&lt;p/&gt;</span><span class="s2"> 
+ * Motor channel:  Left front drive motor:      &quot;left_front_drive&quot; 
+ * Motor channel:  Right front drive motor:     &quot;right_front_drive&quot; 
+ * Motor channel:  Left rear drive motor:       &quot;left_rear_drive&quot; 
+ * Motor channel:  Right rear drive motor:      &quot;right_rear_drive&quot; 
+ */</span><span class="s1"> 
+</span><span class="s0">public class </span><span class="s1">Crossfire_Hardware 
+{ 
+   </span><span class="s2">//Sets all the existing hardware parts on the robot</span><span class="s1"> 
+   </span><span class="s2">//into code.</span><span class="s1"> 
+   </span><span class="s0">public </span><span class="s1">DcMotor MotorMecanumLeftFront; 
+   </span><span class="s0">public </span><span class="s1">DcMotor MotorMecanumRightFront; 
+   </span><span class="s0">public </span><span class="s1">DcMotor MotorMecanumLeftRear; 
+   </span><span class="s0">public </span><span class="s1">DcMotor MotorMecanumRightRear; 
+   </span><span class="s0">public </span><span class="s1">DcMotor Spinner; 
+   </span><span class="s0">public </span><span class="s1">DcMotor Lifter; 
+   </span><span class="s0">public </span><span class="s1">DcMotor Shooter; 
+   </span><span class="s0">public </span><span class="s1">Servo Loader; 
+   </span><span class="s0">public </span><span class="s1">Servo ButtonPusher; 
+   </span><span class="s0">public </span><span class="s1">ColorSensor sensorRGBright; 
+   </span><span class="s0">public </span><span class="s1">ColorSensor sensorRGBleft; 
+ 
+   </span><span class="s2">/* local OpMode members. */</span><span class="s1"> 
+   HardwareMap hwMap = </span><span class="s0">null</span><span class="s1">; 
+   </span><span class="s0">private </span><span class="s1">ElapsedTime period = </span><span class="s0">new </span><span class="s1">ElapsedTime(); 
+ 
+   </span><span class="s0">public enum </span><span class="s1">driveModeEnum {beaconMode, ballLifterMode, scooperMode}; 
+ 
+   </span><span class="s0">public enum </span><span class="s1">sensorColor { blue, red, unknown }; 
+ 
+   driveModeEnum driveMode = driveModeEnum.beaconMode; 
+ 
+ 
+   </span><span class="s2">/*** 
+    * Initialize standard Hardware interfaces 
+    * 
+    * </span><span class="s4">@param </span><span class="s2">ahwMap 
+    */</span><span class="s1"> 
+   </span><span class="s0">public void </span><span class="s1">init(HardwareMap ahwMap) 
+   { 
+      </span><span class="s2">// Save reference to Hardware map</span><span class="s1"> 
+      hwMap = ahwMap; 
+ 
+      </span><span class="s2">// Define and Initialize Motors; sets names for configuration</span><span class="s1"> 
+      MotorMecanumLeftFront = hwMap.dcMotor.get(</span><span class="s5">&quot;left_front_drive&quot;</span><span class="s1">); 
+      MotorMecanumRightFront = hwMap.dcMotor.get(</span><span class="s5">&quot;right_front_drive&quot;</span><span class="s1">); 
+      MotorMecanumLeftRear = hwMap.dcMotor.get(</span><span class="s5">&quot;left_rear_drive&quot;</span><span class="s1">); 
+      MotorMecanumRightRear = hwMap.dcMotor.get(</span><span class="s5">&quot;right_rear_drive&quot;</span><span class="s1">); 
+      ButtonPusher = hwMap.servo.get(</span><span class="s5">&quot;button_pusher&quot;</span><span class="s1">); 
+      sensorRGBright = hwMap.colorSensor.get(</span><span class="s5">&quot;AdafruitRGBright&quot;</span><span class="s1">); 
+      sensorRGBleft = hwMap.colorSensor.get(</span><span class="s5">&quot;AdafruitRGBleft&quot;</span><span class="s1">); 
+      Spinner= hwMap.dcMotor.get(</span><span class="s5">&quot;spinner&quot;</span><span class="s1">); 
+      Loader = hwMap.servo.get(</span><span class="s5">&quot;loader&quot;</span><span class="s1">); 
+      Shooter = hwMap.dcMotor.get(</span><span class="s5">&quot;shooter&quot;</span><span class="s1">); 
+      Lifter = hwMap.dcMotor.get(</span><span class="s5">&quot;ball_lifter&quot;</span><span class="s1">); 
+ 
+      </span><span class="s2">// Sets the polarity of each of the motors.</span><span class="s1"> 
+      MotorMecanumLeftFront.setDirection(DcMotor.Direction.REVERSE);     </span><span class="s2">// Set to REVERSE if using AndyMark motors</span><span class="s1"> 
+      MotorMecanumLeftRear.setDirection(DcMotor.Direction.REVERSE);      </span><span class="s2">// Set to REVERSE if using AndyMark motors</span><span class="s1"> 
+      MotorMecanumRightFront.setDirection(DcMotor.Direction.FORWARD);    </span><span class="s2">// Set to FORWARD if using AndyMark motors</span><span class="s1"> 
+      MotorMecanumRightRear.setDirection(DcMotor.Direction.FORWARD);  </span><span class="s2">// Set to FORWARD if using AndyMark motor</span><span class="s1"> 
+      Shooter.setDirection(DcMotor.Direction.FORWARD); 
+      Spinner.setDirection(DcMotor.Direction.FORWARD); 
+      Lifter.setDirection(DcMotorSimple.Direction.FORWARD); 
+ 
+      SetButtonPusherPosition(</span><span class="s6">0.45</span><span class="s1">); 
+      SetLoaderPosition(</span><span class="s6">0.05f</span><span class="s1">); 
+ 
+       </span><span class="s2">//Set all motors to zero power</span><span class="s1"> 
+      setMecanumPowers(</span><span class="s6">0.0f</span><span class="s1">, </span><span class="s6">0.0f</span><span class="s1">, </span><span class="s6">0.0f</span><span class="s1">, </span><span class="s6">0.0f</span><span class="s1">); 
+      GetButtonPusherPosition(); 
+ 
+      </span><span class="s2">// Initialize driver controls to beacon mode or ball kicker mode.</span><span class="s1"> 
+      </span><span class="s2">// Comment out the mode you don't want to start in.</span><span class="s1"> 
+      setBeaconMode(); 
+      </span><span class="s2">//setBallKickerMode();</span><span class="s1"> 
+   } 
+ 
+ 
+   </span><span class="s2">/*** 
+    * This method sets the position of the beacon button pusher servo.  The drive 
+    * holds down the controller button controller button (digital) which increases or 
+    * decreases the position value.  This method checks that the driver didn't fall 
+    * asleep holding the button making the servo rotate to a position it obviously 
+    * should go.  The limits are magic numbers by Lauren...</span><span class="s3">&lt;sigh&gt;</span><span class="s2">! 
+    * 
+    * </span><span class="s4">@param </span><span class="s2">servoPositionDesired Desired position for beacon button pusher servo 
+    */</span><span class="s1"> 
+   </span><span class="s0">public void </span><span class="s1">SetButtonPusherPosition(</span><span class="s0">double </span><span class="s1">servoPositionDesired) 
+   { 
+      </span><span class="s0">double </span><span class="s1">servoPositionActual = Range.clip(servoPositionDesired, </span><span class="s6">0.28</span><span class="s1">, </span><span class="s6">0.70</span><span class="s1">); 
+      ButtonPusher.setPosition(servoPositionActual); 
+   } 
+ 
+ 
+   </span><span class="s2">/*** 
+    * If you want to know where the beacon button servo has gone, this is the method for you. 
+    * 
+    * </span><span class="s4">@return </span><span class="s2">Relative position of servo, range is 0 to 1 
+    */</span><span class="s1"> 
+   </span><span class="s0">public double </span><span class="s1">GetButtonPusherPosition() 
+   { 
+      </span><span class="s0">double </span><span class="s1">position = </span><span class="s6">0.0</span><span class="s1">; 
+ 
+      </span><span class="s0">if </span><span class="s1">(ButtonPusher != </span><span class="s0">null</span><span class="s1">) 
+      { 
+         position = ButtonPusher.getPosition(); 
+      } 
+      </span><span class="s0">return </span><span class="s1">position; 
+   } 
+ 
+   </span><span class="s2">/*** 
+    * This method sets the position of the ball loader servo.  The driver 
+    * holds down the controller button (digital) which increases or 
+    * decreases the position value.  This method checks that the driver didn't fall 
+    * asleep holding the button making the servo rotate to a position it obviously 
+    * should go.  The limits are magic numbers by Lauren...</span><span class="s3">&lt;sigh&gt;</span><span class="s2">! 
+    * 
+    * </span><span class="s4">@param </span><span class="s2">servoPositionDesired Desired position for beacon button pusher servo 
+    */</span><span class="s1"> 
+   </span><span class="s0">public void </span><span class="s1">SetLoaderPosition(</span><span class="s0">double </span><span class="s1">servoPositionDesired) 
+   { 
+      </span><span class="s0">double </span><span class="s1">servoPositionActual = Range.clip(servoPositionDesired, </span><span class="s6">0.00</span><span class="s1">, </span><span class="s6">1.00</span><span class="s1">); 
+      Loader.setPosition(servoPositionActual); 
+   } 
+ 
+   </span><span class="s2">/*** 
+    * If you want to know where the beacon button servo has gone, this is the method for you. 
+    * 
+    * </span><span class="s4">@return </span><span class="s2">Relative position of servo, range is 0 to 1 
+    */</span><span class="s1"> 
+</span><span class="s2">//   public double GetLoaderPosition()</span><span class="s1"> 
+</span><span class="s2">//   {</span><span class="s1"> 
+</span><span class="s2">//      double position = 0.0;</span><span class="s1"> 
+</span><span class="s2">//</span><span class="s1"> 
+</span><span class="s2">//      if (Loader != null)</span><span class="s1"> 
+</span><span class="s2">//      {</span><span class="s1"> 
+</span><span class="s2">//         position = Loader.</span><span class="s1"> 
+</span><span class="s2">//      }</span><span class="s1"> 
+</span><span class="s2">//      return position;</span><span class="s1"> 
+</span><span class="s2">//   }</span><span class="s1"> 
+ 
+   </span><span class="s2">/*** 
+    * Convenience method to assign motor power for mecanum drive.  Each mecanum 
+    * wheel is independently driven. 
+    * 
+    * </span><span class="s4">@param </span><span class="s2">LFPower Left front mecanum wheel 
+    * </span><span class="s4">@param </span><span class="s2">RFPower Right front mecanum wheel 
+    * </span><span class="s4">@param </span><span class="s2">LRPower Left rear mecanum wheel 
+    * </span><span class="s4">@param </span><span class="s2">RRPower Right Rear mecanum wheel 
+    */</span><span class="s1"> 
+   </span><span class="s0">public void </span><span class="s1">setMecanumPowers(</span><span class="s0">double </span><span class="s1">LFPower, </span><span class="s0">double </span><span class="s1">RFPower, </span><span class="s0">double </span><span class="s1">LRPower, </span><span class="s0">double </span><span class="s1">RRPower) 
+   { 
+      MotorMecanumLeftFront.setPower(LFPower); 
+      MotorMecanumRightFront.setPower(RFPower); 
+      MotorMecanumLeftRear.setPower(LRPower); 
+      MotorMecanumRightRear.setPower(RRPower); 
+   } 
+ 
+ 
+   </span><span class="s2">/*** 
+    * Convenience method for setting encoder runmode for all four mecanum drive motors 
+    * 
+    * </span><span class="s4">@param </span><span class="s2">mode Encoder run mode 
+    */</span><span class="s1"> 
+   </span><span class="s0">public void </span><span class="s1">setMecanumEncoderMode(DcMotor.RunMode mode) 
+   { 
+      MotorMecanumLeftFront.setMode(mode); 
+      MotorMecanumRightFront.setMode(mode); 
+      MotorMecanumLeftRear.setMode(mode); 
+      MotorMecanumRightRear.setMode(mode); 
+   } 
+ 
+ 
+   </span><span class="s2">/*** 
+    * Convenience method for setting encoder counts to all four mecanum drive motors 
+    * 
+    * </span><span class="s4">@param </span><span class="s2">LFcount Left front encoder counts 
+    * </span><span class="s4">@param </span><span class="s2">RFcount Right front encoder counts 
+    * </span><span class="s4">@param </span><span class="s2">LRcount Left rear encoder counts 
+    * </span><span class="s4">@param </span><span class="s2">RRcount Right rear encoder counts 
+    */</span><span class="s1"> 
+   </span><span class="s0">public void </span><span class="s1">setMecanumEncoderTargetPosition(</span><span class="s0">int </span><span class="s1">LFcount, </span><span class="s0">int </span><span class="s1">RFcount, </span><span class="s0">int </span><span class="s1">LRcount, </span><span class="s0">int </span><span class="s1">RRcount) 
+   { 
+      </span><span class="s2">// Only want to use absolute values.  Take abs of inputs in case user sent negative value.</span><span class="s1"> 
+      MotorMecanumLeftFront.setTargetPosition(Math.abs(LFcount)); 
+      MotorMecanumRightFront.setTargetPosition(Math.abs(RFcount)); 
+      MotorMecanumLeftRear.setTargetPosition(Math.abs(LRcount)); 
+      MotorMecanumRightRear.setTargetPosition(Math.abs(RRcount)); 
+   } 
+ 
+ 
+   </span><span class="s2">/*** 
+    * Method determines if the mecanum motors are still busy trying to reach the target position. 
+    * As each encoder reaches it's target position, it is run mode is changed to RUN_WITHOUT_ENCODERS. 
+    * This is to disable the PID position control loop and de-energize the motor.  If this is not 
+    * done and the motors continue to hold position, we have seen cases where one or more motors 
+    * remain a few counts away from reaching their target due to having to overcome torque 
+    * applied by motors holding a static position.  This keeps the state machine from advancing 
+    * to the next state.  This method is a bit jerky looking at the end of a state but works. 
+    * Alternatively, you could just watch one motor or a pair (e.g. the fronts) and assume the 
+    * other wheels are close enough.  This method may not work well if the encoder counts and 
+    * motor power are not synchronized to turn off at roughly the same time. 
+    * 
+    * </span><span class="s4">@return </span><span class="s2">boolean flag TRUE - motors busy or FALSE - meaning all motors have reached target position 
+    * 
+   public boolean mecanumMotorsBusy() 
+   { 
+      boolean motorsBusy = true; 
+ 
+      // Turn off left front motor when target position reached 
+      if(!MotorMecanumLeftFront.isBusy()) 
+      { 
+         MotorMecanumLeftFront.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER); 
+      } 
+ 
+      // Turn off right front motor when target position reached 
+      if(!MotorMecanumRightFront.isBusy()) 
+      { 
+         MotorMecanumRightFront.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER); 
+      } 
+ 
+      // Turn off left rear motor when target position reached 
+      if(!MotorMecanumLeftRear.isBusy()) 
+      { 
+         MotorMecanumLeftRear.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER); 
+      } 
+ 
+      // Turn off right rear motor when target position reached 
+      if(!MotorMecanumRightRear.isBusy()) 
+      { 
+         MotorMecanumRightRear.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER); 
+      } 
+ 
+      // If all the motors are set to RUN_WITHOUT_ENCODERS, then we assume that the robot 
+      // has reached it's final destination and we can transition to the next state. 
+      if((MotorMecanumLeftFront.getMode() == DcMotor.RunMode.RUN_WITHOUT_ENCODER)   || 
+         (MotorMecanumRightFront.getMode() == DcMotor.RunMode.RUN_WITHOUT_ENCODER)  || 
+         (MotorMecanumLeftRear.getMode() == DcMotor.RunMode.RUN_WITHOUT_ENCODER)    || 
+         (MotorMecanumRightRear.getMode() == DcMotor.RunMode.RUN_WITHOUT_ENCODER)) 
+      { 
+         motorsBusy = false; 
+      } 
+ 
+      return (motorsBusy); 
+   } 
+ 
+ 
+   /*** 
+    * waitForTick implements a periodic delay. However, this acts like a metronome with a regular 
+    * periodic tick.  This is used to compensate for varying processing times for each cycle. 
+    * The function looks at the elapsed cycle time, and sleeps for the remaining time interval. 
+    * 
+    * </span><span class="s4">@param </span><span class="s2">periodMs Length of wait cycle in mSec. 
+    * </span><span class="s4">@throws </span><span class="s2">InterruptedException 
+    */</span><span class="s1"> 
+   </span><span class="s0">public void </span><span class="s1">waitForTick(</span><span class="s0">long </span><span class="s1">periodMs) </span><span class="s0">throws </span><span class="s1">InterruptedException 
+   { 
+ 
+      </span><span class="s0">long </span><span class="s1">remaining = periodMs - (</span><span class="s0">long</span><span class="s1">) period.milliseconds(); 
+ 
+      </span><span class="s2">// sleep for the remaining portion of the regular cycle period.</span><span class="s1"> 
+      </span><span class="s0">if </span><span class="s1">(remaining &gt; </span><span class="s6">0</span><span class="s1">) 
+      { 
+         Thread.sleep(remaining); 
+      } 
+ 
+      </span><span class="s2">// Reset the cycle clock for the next pass.</span><span class="s1"> 
+      period.reset(); 
+   } 
+ 
+ 
+   </span><span class="s2">/*** 
+    * 
+    */</span><span class="s1"> 
+   </span><span class="s0">public void </span><span class="s1">setBallLifterMode() 
+   { 
+      driveMode = driveModeEnum.ballLifterMode; 
+   } 
+ 
+   </span><span class="s2">/*** 
+    * 
+    */</span><span class="s1"> 
+   </span><span class="s0">public void </span><span class="s1">setscooperMode() 
+   { 
+      driveMode = driveModeEnum.scooperMode; 
+   } 
+ 
+   </span><span class="s2">/*** 
+    * 
+    */</span><span class="s1"> 
+   </span><span class="s0">public void </span><span class="s1">setBeaconMode() 
+   { 
+      driveMode = driveModeEnum.beaconMode; 
+   } 
+ 
+ 
+   </span><span class="s2">/*** 
+    * 
+    * </span><span class="s4">@param </span><span class="s2">input 
+    * </span><span class="s4">@return</span><span class="s2"> 
+    */</span><span class="s1"> 
+   </span><span class="s0">public double </span><span class="s1">ScaleJoystickCommand(</span><span class="s0">double </span><span class="s1">input) 
+   { 
+      </span><span class="s0">double </span><span class="s1">scaledInput; 
+      </span><span class="s0">final int </span><span class="s1">numPointsInMap = </span><span class="s6">34</span><span class="s1">; 
+ 
+      </span><span class="s2">// Ensure the values make sense.  Clip the values to max/min values</span><span class="s1"> 
+      </span><span class="s0">double </span><span class="s1">clippedPower = Range.clip(input, -</span><span class="s6">1</span><span class="s1">, </span><span class="s6">1</span><span class="s1">); 
+ 
+</span><span class="s2">//      // Array used to map joystick input to motor output</span><span class="s1"> 
+</span><span class="s2">//      double[] scalingArray = {0, 0.01, 0.02, 0.04, 0.05, 0.08, 0.11,</span><span class="s1"> 
+</span><span class="s2">//         0.13, 0.17, 0.23, 0.32, 0.4, 0.48, 0.61, 0.73, 0.89, 1};</span><span class="s1"> 
+ 
+            </span><span class="s2">// Array used to map joystick input to motor output</span><span class="s1"> 
+      </span><span class="s0">double</span><span class="s1">[] scalingArray = 
+         {</span><span class="s6">0</span><span class="s1">, </span><span class="s6">0.001</span><span class="s1">, </span><span class="s6">0.0015</span><span class="s1">, </span><span class="s6">0.002</span><span class="s1">, </span><span class="s6">0.0026</span><span class="s1">, </span><span class="s6">0.003</span><span class="s1">, </span><span class="s6">0.0036</span><span class="s1">,  </span><span class="s6">0.004</span><span class="s1">, </span><span class="s6">0.0046</span><span class="s1">, </span><span class="s6">0.005</span><span class="s1">, </span><span class="s6">0.058</span><span class="s1">, </span><span class="s6">0.0063</span><span class="s1">, </span><span class="s6">0.007</span><span class="s1">, </span><span class="s6">0.01</span><span class="s1">, </span><span class="s6">0.015</span><span class="s1">, </span><span class="s6">0.02</span><span class="s1">, </span><span class="s6">0.025</span><span class="s1">, </span><span class="s6">0.03</span><span class="s1">, </span><span class="s6">0.035</span><span class="s1">, </span><span class="s6">0.04</span><span class="s1">, </span><span class="s6">0.047</span><span class="s1">, </span><span class="s6">0.05</span><span class="s1">, </span><span class="s6">0.065</span><span class="s1">, </span><span class="s6">0.08</span><span class="s1">, </span><span class="s6">0.11</span><span class="s1">, 
+         </span><span class="s6">0.13</span><span class="s1">, </span><span class="s6">0.17</span><span class="s1">, </span><span class="s6">0.23</span><span class="s1">, </span><span class="s6">0.32</span><span class="s1">, </span><span class="s6">0.4</span><span class="s1">, </span><span class="s6">0.48</span><span class="s1">, </span><span class="s6">0.61</span><span class="s1">, </span><span class="s6">0.73</span><span class="s1">, </span><span class="s6">0.89</span><span class="s1">, </span><span class="s6">1</span><span class="s1">}; 
+ 
+      </span><span class="s2">// Get the corresponding index for the specified argument/parameter.</span><span class="s1"> 
+      </span><span class="s0">int </span><span class="s1">index = (</span><span class="s0">int</span><span class="s1">) (clippedPower * numPointsInMap); 
+ 
+      </span><span class="s2">// Array indexes can only be positive so we need to drop the negative</span><span class="s1"> 
+      </span><span class="s0">if </span><span class="s1">(index &lt; </span><span class="s6">0</span><span class="s1">) 
+      { 
+         index = -index; 
+      } 
+ 
+      </span><span class="s2">// Limit indexes to actual size of array so we don't overflow</span><span class="s1"> 
+      </span><span class="s0">if </span><span class="s1">(index &gt; numPointsInMap) 
+      { 
+         index = numPointsInMap; 
+      } 
+ 
+      </span><span class="s2">// Handle negative power values as the table only had positive values</span><span class="s1"> 
+      </span><span class="s0">if </span><span class="s1">(clippedPower &lt; </span><span class="s6">0</span><span class="s1">) 
+      { 
+         scaledInput = -scalingArray[index]; 
+      } 
+      </span><span class="s0">else</span><span class="s1"> 
+      { 
+         scaledInput = scalingArray[index]; 
+      } 
+ 
+      </span><span class="s0">return </span><span class="s1">scaledInput; 
+   } 
+} 
+ 
+ 
+</span></pre>
+</body>
+</html>
