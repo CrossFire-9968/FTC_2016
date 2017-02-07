@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.vuforia.HINT;
+import com.vuforia.ObjectTracker;
 import com.vuforia.Vuforia;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
@@ -14,6 +15,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
 import org.firstinspires.ftc.teamcode.Crossfire_Hardware.sensorColor;
+import org.firstinspires.ftc.robotcore.internal.VuforiaTrackablesImpl;
 
 /***
  * This file provides basic Telop driving for a robot with mecanum wheels.
@@ -63,7 +65,7 @@ public class CF_Manual extends OpMode
    int pictureNumber;
 
    int state = 0;
-   float shooterPower = -0.3f;
+   float shooterPower = -0.28f;
    boolean firstLastRightButton = false;
    boolean firstButtonRight = false;
    boolean firstLastLeftButton = false;
@@ -76,11 +78,13 @@ public class CF_Manual extends OpMode
    float basePos = 0.0f;
    float Pos = basePos;
 
+   // These variables are for the Vuforia navigation
    OpenGLMatrix pose = null;
 
    final int stopCount = 200;
+   int pic = -1;
    boolean seeable;
-   double kP = 0.0005;
+   double kP = 0.0025;
    double power = 0.5;
    double effort;
    int error;
@@ -122,8 +126,9 @@ public class CF_Manual extends OpMode
       // Makes and instance of Vuforia
       VuforiaLocalizer vuforia = ClassFactory.createVuforiaLocalizer(params);
       // Lets VuForia see more than one object at one time
-      Vuforia.setHint(HINT.HINT_MAX_SIMULTANEOUS_IMAGE_TARGETS, 4);
+     // Vuforia.setHint(HINT.HINT_MAX_SIMULTANEOUS_IMAGE_TARGETS, 4);
 
+      // Makes and loads the beacons data set
       beacons = vuforia.loadTrackablesFromAsset("FTC_2016-17");
       beacons.get(0).setName("Wheels");
       beacons.get(1).setName("Tools");
@@ -171,6 +176,7 @@ public class CF_Manual extends OpMode
          robot.setBallLifterMode();
       }
 
+      // Runs the drive to beacon method
       if (gamepad1.b) {
          driveToBeacon(beacons);
       }
@@ -188,6 +194,7 @@ public class CF_Manual extends OpMode
       } catch(InterruptedException e) {
          telemetry.addData("Exception: ", "Interrupted Exception");
       }
+      telemetry.addData("Shooter Power", shooterPower);
       telemetry.update();
    }
 
@@ -296,6 +303,9 @@ public class CF_Manual extends OpMode
 
 
    public void runLifter(){
+      // This basically used the right and left triggers to drive the winch motor
+      // for the ball lifter.  The right trigger raises the lifer, and the left
+      // trigger lowers the lifter.
       if(gamepad2.right_trigger > 0.05 && gamepad2.left_trigger < 0.05) {
          robot.Lifter.setPower(-1 * gamepad2.right_trigger);
       } else if(gamepad2.left_trigger > 0.05 && gamepad2.right_trigger < 0.05) {
@@ -309,6 +319,7 @@ public class CF_Manual extends OpMode
    //Runs the two rubber coated wheels so they rotate opposite directions and launch
    //the particle balls into the center vortex
    public void runShooterState() throws InterruptedException {
+      // Gamepad 1 can modify the speed of the wheels on the fly if need be
       firstButtonRight = gamepad1.right_bumper;
       firstButtonLeft = gamepad1.left_bumper;
       if (firstButtonRight && !firstLastRightButton) {
@@ -316,7 +327,7 @@ public class CF_Manual extends OpMode
             shooterPower = 0.0f;
          }
          else {
-            shooterPower -= 0.05f;
+            shooterPower -= 0.01f;
          }
       }
       if (firstButtonLeft && !firstLastLeftButton) {
@@ -324,12 +335,13 @@ public class CF_Manual extends OpMode
             shooterPower = -1.0f;
          }
          else {
-            shooterPower += 0.05f;
+            shooterPower += 0.01f;
          }
       }
       firstLastRightButton = firstButtonRight;
       firstLastLeftButton = firstButtonLeft;
 
+      // Gamepad 2 turns the wheels on and off
       secondButtonRight = gamepad2.right_bumper;
       if(secondButtonRight && !secondLastRightButton) {
          runShooter = !runShooter;
@@ -344,6 +356,7 @@ public class CF_Manual extends OpMode
       }
       secondLastRightButton = secondButtonRight;
    }
+   // This is an unused method currently.  It has been phased out by the runShooterState() method
    public void runShooter() throws InterruptedException{
       if(gamepad2.right_bumper) {
          while(gamepad2.right_bumper)
@@ -370,7 +383,6 @@ public class CF_Manual extends OpMode
    //Runs the particle ball gatherer on the front of the robot.
    public void runSpinner() throws InterruptedException {
 
-      //double LoaderPosition = robot.GetLoaderPosition();
       if(gamepad2.left_bumper)
       {
          while (gamepad2.left_bumper)
@@ -472,10 +484,33 @@ public class CF_Manual extends OpMode
       {
          requestOpModeStop();
       }
-      for(int i = 0; i < 4; i++) {
-         seeable = ((VuforiaTrackableDefaultListener) picsArray.get(i).getListener()).isVisible();
+      // Determines which picture it is looking at
+      else if(((VuforiaTrackableDefaultListener) picsArray.get(0).getListener()).isVisible()) {
+         pic = 0;
+         seeable = true;
+      }
+      else if(((VuforiaTrackableDefaultListener) picsArray.get(1).getListener()).isVisible()) {
+         pic = 1;
+         seeable = true;
+      }
+      else if(((VuforiaTrackableDefaultListener) picsArray.get(2).getListener()).isVisible()) {
+         pic = 2;
+         seeable = true;
+      }
+      else if(((VuforiaTrackableDefaultListener) picsArray.get(3).getListener()).isVisible()) {
+         pic = 3;
+         seeable = true;
+      } else {
+         pic = -1;
+         seeable = false;
+      }
+      telemetry.addData("pic", pic);
+      telemetry.update();
+      // If it sees a picture, it drives to said picture
+      if(pic != -1) {
+         seeable = ((VuforiaTrackableDefaultListener) picsArray.get(pic).getListener()).isVisible();
          while (gamepad1.b && !checkForStop() && seeable) {
-            pose = ((VuforiaTrackableDefaultListener) picsArray.get(i).getListener()).getRawPose();
+            pose = ((VuforiaTrackableDefaultListener) picsArray.get(pic).getListener()).getRawPose();
             ServiceServos();
             if (checkForStop()) {
                requestOpModeStop();
@@ -485,6 +520,7 @@ public class CF_Manual extends OpMode
             telemetry.addData("xValue: ", x);
 
             if (pose != null) {
+               // This is the PID controller
                translation = pose.getTranslation();
                y = (int) translation.get(1);
                x = (int) translation.get(2);
@@ -497,18 +533,27 @@ public class CF_Manual extends OpMode
                robot.MotorMecanumLeftRear.setPower(leftPower);
                robot.MotorMecanumRightRear.setPower(rightPower);
             }
-            seeable = ((VuforiaTrackableDefaultListener) picsArray.get(i).getListener()).isVisible();
+            seeable = false;
+            seeable = ((VuforiaTrackableDefaultListener) picsArray.get(pic).getListener()).isVisible();
          }
+
       }
+
+      // Turns drive motors off when done driving to the picture
       robot.MotorMecanumLeftFront.setPower(0.0f);
       robot.MotorMecanumRightFront.setPower(0.0f);
       robot.MotorMecanumLeftRear.setPower(0.0f);
       robot.MotorMecanumRightRear.setPower(0.0f);
+      rightPower = 0;
+      leftPower = 0;
+      pose = null;
+      seeable = false;
    }
 
-
+   // Checks for a requested stop
    private boolean checkForStop()
    {
+
       if(gamepad1.back)
       {
          return true;
@@ -519,7 +564,7 @@ public class CF_Manual extends OpMode
       }
    }
 
-
+   // This is a method to drive to a certain encoder count
    public void encoderMove(int countLeft, int countRight, double leftPower, double rightPower)
    {
       robot.MotorMecanumLeftFront.setPower(leftPower);
@@ -555,6 +600,7 @@ public class CF_Manual extends OpMode
    }
 
 
+   // Sets the mode of the drive motors
    public void setMode(DcMotor.RunMode mode)
    {
       robot.MotorMecanumLeftFront.setMode(mode);
@@ -564,6 +610,7 @@ public class CF_Manual extends OpMode
    }
 
 
+   // Sets the power of the drive motors
    public void setPower(float power)
    {
       robot.MotorMecanumLeftFront.setPower(power);
@@ -573,6 +620,7 @@ public class CF_Manual extends OpMode
    }
 
 
+   // Idles
    public final void idle() throws InterruptedException
    {
       // Abort the OpMode if we've been asked to stop

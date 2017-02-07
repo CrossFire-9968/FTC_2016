@@ -1,6 +1,6 @@
 <html>
 <head>
-<title>CF_Vuforia_Blue_State.java</title>
+<title>CF_Vuforia_Red_State.java</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <style type="text/css">
 .ln { color: rgb(0,0,0); font-weight: normal; font-style: normal; }
@@ -15,7 +15,7 @@
 <TABLE CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#C0C0C0" >
 <TR><TD><CENTER>
 <FONT FACE="Arial, Helvetica" COLOR="#000000">
-CF_Vuforia_Blue_State.java</FONT>
+CF_Vuforia_Red_State.java</FONT>
 </center></TD></TR></TABLE>
 <pre>
 <span class="s0">package </span><span class="s1">org.firstinspires.ftc.teamcode; 
@@ -43,9 +43,9 @@ CF_Vuforia_Blue_State.java</FONT>
 </span><span class="s2">/** 
  * Created by Ryley on 12/22/16. 
  */</span><span class="s1"> 
-@Autonomous(name=</span><span class="s3">&quot;CF_Vuforia_Blue_State&quot;</span><span class="s1">, group =</span><span class="s3">&quot;Blue&quot;</span><span class="s1">) 
+@Autonomous(name=</span><span class="s3">&quot;CF_Vuforia_Red_State&quot;</span><span class="s1">, group =</span><span class="s3">&quot;Red&quot;</span><span class="s1">) 
 </span><span class="s2">//@Disabled</span><span class="s1"> 
-</span><span class="s0">public class </span><span class="s1">CF_Vuforia_Blue_State </span><span class="s0">extends </span><span class="s1">CF_Library{ 
+</span><span class="s0">public class </span><span class="s1">CF_Vuforia_Red_State </span><span class="s0">extends </span><span class="s1">CF_Library{ 
     </span><span class="s2">// Position</span><span class="s1"> 
     OpenGLMatrix pose; 
     VectorF translation = </span><span class="s0">null</span><span class="s1">; 
@@ -66,26 +66,32 @@ CF_Vuforia_Blue_State.java</FONT>
     </span><span class="s0">double </span><span class="s1">kIangle = </span><span class="s4">0.000085</span><span class="s1">; 
     </span><span class="s0">double </span><span class="s1">kIangleBig = </span><span class="s4">0.00023</span><span class="s1">; 
     </span><span class="s0">double </span><span class="s1">integral = </span><span class="s4">0.0</span><span class="s1">; 
+ 
     </span><span class="s0">float </span><span class="s1">effortAngle; 
-    </span><span class="s0">int </span><span class="s1">angle; 
-    </span><span class="s0">int </span><span class="s1">errorY; 
-    </span><span class="s0">double </span><span class="s1">errorAngle; 
-    </span><span class="s0">int </span><span class="s1">ySquare; 
-    </span><span class="s0">double </span><span class="s1">turnFront; 
-    </span><span class="s0">double </span><span class="s1">turnRear; 
  
     </span><span class="s2">// This matrix holds the data for the Vuforia matrix</span><span class="s1"> 
     </span><span class="s0">float</span><span class="s1">[] data; 
  
+    </span><span class="s0">int </span><span class="s1">angle; 
+    </span><span class="s0">int </span><span class="s1">errorY; 
+    </span><span class="s0">double </span><span class="s1">errorAngle; 
+ 
+    </span><span class="s0">int </span><span class="s1">ySquare; 
+ 
+    </span><span class="s0">double </span><span class="s1">turnFront; 
+    </span><span class="s0">double </span><span class="s1">turnRear; 
+ 
     </span><span class="s2">// Picture constants</span><span class="s1"> 
-    </span><span class="s0">int </span><span class="s1">FIRSTPICTURE = </span><span class="s4">0</span><span class="s1">; 
-    </span><span class="s0">int </span><span class="s1">SECONDPICTURE = </span><span class="s4">2</span><span class="s1">; 
+    </span><span class="s0">int </span><span class="s1">FIRSTPICTURE = </span><span class="s4">3</span><span class="s1">; 
+    </span><span class="s0">int </span><span class="s1">SECONDPICTURE = </span><span class="s4">1</span><span class="s1">; 
  
     </span><span class="s0">int </span><span class="s1">beaconFlagFirst = </span><span class="s4">0</span><span class="s1">; 
  
     </span><span class="s2">// Color sensor variables</span><span class="s1"> 
     ColorSensor sensorRGBright; 
     ColorSensor sensorRGBleft; 
+ 
+    </span><span class="s0">private </span><span class="s1">SensorManager sensorManager; 
  
     </span><span class="s2">// Enumeration for the state machine</span><span class="s1"> 
     </span><span class="s0">private enum </span><span class="s1">driveState { 
@@ -142,9 +148,11 @@ CF_Vuforia_Blue_State.java</FONT>
         driveState State = driveState.FIRSTSTRAFE; 
  
         </span><span class="s2">// Run initializing routine</span><span class="s1"> 
+ 
         beacons.activate(); 
  
-        </span><span class="s2">// Run initializing routine</span><span class="s1"> 
+        DcMotor.RunMode norm = robot.MotorMecanumLeftFront.getMode(); 
+ 
         initalize(); 
  
         </span><span class="s2">// Reset runtime</span><span class="s1"> 
@@ -154,27 +162,26 @@ CF_Vuforia_Blue_State.java</FONT>
                 </span><span class="s0">case </span><span class="s1">FIRSTSTRAFE: 
                     </span><span class="s2">// Runs the check time method</span><span class="s1"> 
                     checkTime(); 
- 
                     System.out.println(</span><span class="s3">&quot;FIRST STRAFE&quot;</span><span class="s1">); 
                     </span><span class="s2">// This is to get the robot more or less lined up with the picture</span><span class="s1"> 
                     </span><span class="s0">this</span><span class="s1">.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER); 
-                    </span><span class="s0">this</span><span class="s1">.encoderStrafeLeft(</span><span class="s4">3000</span><span class="s1">, speed); 
+                    </span><span class="s0">this</span><span class="s1">.encoderStrafeRight(</span><span class="s4">3000</span><span class="s1">, speed); 
                     </span><span class="s0">this</span><span class="s1">.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER); 
-                    robot.Shooter.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER); 
                     robot.Shooter.setMode(DcMotor.RunMode.RUN_USING_ENCODER); 
-                    robot.Shooter.setPower(-</span><span class="s4">0.25f</span><span class="s1">); 
-                    </span><span class="s0">this</span><span class="s1">.encoderMove(</span><span class="s4">1100</span><span class="s1">, </span><span class="s4">1100</span><span class="s1">, </span><span class="s4">0.6f</span><span class="s1">, </span><span class="s4">0.6f</span><span class="s1">); 
+                    </span><span class="s0">this</span><span class="s1">.encoderMove(</span><span class="s4">1500</span><span class="s1">, </span><span class="s4">1500</span><span class="s1">, </span><span class="s4">0.6f</span><span class="s1">, </span><span class="s4">0.6f</span><span class="s1">); 
                     </span><span class="s0">this</span><span class="s1">.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER); 
-                    </span><span class="s2">//robot.Shooter.setPower(-0.3f);</span><span class="s1"> 
-                    </span><span class="s0">this</span><span class="s1">.encoderStrafeLeft(</span><span class="s4">2100</span><span class="s1">, speed); 
+                    robot.Shooter.setPower(-</span><span class="s4">0.25f</span><span class="s1">); 
+                    </span><span class="s0">this</span><span class="s1">.encoderStrafeRight(</span><span class="s4">1900</span><span class="s1">, speed); 
                     System.out.println(</span><span class="s3">&quot;DONE STRAFING&quot;</span><span class="s1">); 
  
                     </span><span class="s2">// Increment the state to the next state</span><span class="s1"> 
-                    State = driveState.BALLONE; 
+                    State = driveState.SQUARETOFIRSTBEACON; 
  
                     </span><span class="s0">break</span><span class="s1">; 
                 </span><span class="s0">case </span><span class="s1">SQUARETOFIRSTBEACON: 
-                    </span><span class="s2">// This is a currently unused method</span><span class="s1"> 
+                    </span><span class="s2">// This is a currently unused method, however, we</span><span class="s1"> 
+                    </span><span class="s2">// will still document it</span><span class="s1"> 
+ 
                     </span><span class="s2">// Runs the check time method</span><span class="s1"> 
                     checkTime(); 
  
@@ -184,7 +191,7 @@ CF_Vuforia_Blue_State.java</FONT>
                     pose = ((VuforiaTrackableDefaultListener) beacons.get(</span><span class="s4">2</span><span class="s1">).getListener()).getRawPose(); 
  
                     </span><span class="s0">if</span><span class="s1">(pose != </span><span class="s0">null</span><span class="s1">) { 
-                        </span><span class="s2">// This runs the pid controller</span><span class="s1"> 
+                        </span><span class="s2">// This runs the</span><span class="s1"> 
                         translation = pose.getTranslation(); 
                         data = pose.getData(); 
                         angle = (</span><span class="s0">int</span><span class="s1">) Math.toDegrees(Math.acos(data[</span><span class="s4">2</span><span class="s1">])); 
@@ -232,17 +239,16 @@ CF_Vuforia_Blue_State.java</FONT>
                     pose = </span><span class="s0">null</span><span class="s1">; 
                     </span><span class="s0">break</span><span class="s1">; 
                 </span><span class="s0">case </span><span class="s1">BALLONE: 
-                    </span><span class="s2">// Runs checkTime method</span><span class="s1"> 
+                    </span><span class="s2">// Checks time</span><span class="s1"> 
                     checkTime(); 
                     System.out.println(</span><span class="s3">&quot;BALL ONE&quot;</span><span class="s1">); 
                     </span><span class="s2">// Increment the first ball</span><span class="s1"> 
                     robot.SetLoaderPosition(</span><span class="s4">0.015</span><span class="s1">); 
-                    robot.Shooter.setPower(-</span><span class="s4">0.28f</span><span class="s1">); 
                     TimeUnit.SECONDS.sleep(</span><span class="s4">2</span><span class="s1">); 
                     State = driveState.BALLTWO; 
                     </span><span class="s0">break</span><span class="s1">; 
                 </span><span class="s0">case </span><span class="s1">BALLTWO: 
-                    </span><span class="s2">// Runs checkTime method</span><span class="s1"> 
+                    </span><span class="s2">// Checks time</span><span class="s1"> 
                     checkTime(); 
                     </span><span class="s2">// Increment the second ball</span><span class="s1"> 
                     robot.SetLoaderPosition(</span><span class="s4">0.0f</span><span class="s1">); 
@@ -253,12 +259,14 @@ CF_Vuforia_Blue_State.java</FONT>
                     State = driveState.DRIVETOFIRSTBEACON; 
                     </span><span class="s0">break</span><span class="s1">; 
                 </span><span class="s0">case </span><span class="s1">DRIVETOFIRSTBEACON: 
-                    </span><span class="s2">// Runs the checkTime method</span><span class="s1"> 
+                    </span><span class="s2">// Checks time</span><span class="s1"> 
                     checkTime(); 
                     System.out.println(</span><span class="s3">&quot;DRIVE TO FIRST BEACON&quot;</span><span class="s1">); 
  
-                    </span><span class="s2">// Get pose</span><span class="s1"> 
                     robot.SetButtonPusherPosition(</span><span class="s4">0.45f</span><span class="s1">); 
+                    </span><span class="s2">//setMode(norm);</span><span class="s1"> 
+ 
+                    </span><span class="s2">// Get pose</span><span class="s1"> 
                     pose = ((VuforiaTrackableDefaultListener) beacons.get(FIRSTPICTURE).getListener()).getRawPose(); 
  
                     </span><span class="s0">if</span><span class="s1">(pose != </span><span class="s0">null </span><span class="s1">&amp;&amp; x &gt; stopCount) { 
@@ -274,7 +282,6 @@ CF_Vuforia_Blue_State.java</FONT>
  
                         </span><span class="s2">// Drive to beacon using PID controller</span><span class="s1"> 
                         System.out.println(</span><span class="s3">&quot;PID DRIVE&quot;</span><span class="s1">); 
-                        </span><span class="s2">// This runs the PID controller</span><span class="s1"> 
                         pidDrive(y); 
                     } 
  
@@ -285,6 +292,7 @@ CF_Vuforia_Blue_State.java</FONT>
                     } 
                     </span><span class="s0">if</span><span class="s1">(x &lt;= stopCount) { 
                         </span><span class="s2">// Stops if close enough to the picture</span><span class="s1"> 
+                        </span><span class="s2">// and increments to the next state</span><span class="s1"> 
                         setPower(</span><span class="s4">0.0f</span><span class="s1">); 
                         State = driveState.PUSHFIRSTBEACON; 
  
@@ -292,7 +300,7 @@ CF_Vuforia_Blue_State.java</FONT>
                     } 
                     </span><span class="s0">break</span><span class="s1">; 
                 </span><span class="s0">case </span><span class="s1">PUSHFIRSTBEACON: 
-                    </span><span class="s2">// Runs the checkTime method</span><span class="s1"> 
+                    </span><span class="s2">// Makes sure the time hasn't run out</span><span class="s1"> 
                     checkTime(); 
                     System.out.println(</span><span class="s3">&quot;PUSH FIRST BEACON&quot;</span><span class="s1">); 
                     </span><span class="s2">// Push the beacon button</span><span class="s1"> 
@@ -304,33 +312,33 @@ CF_Vuforia_Blue_State.java</FONT>
                     </span><span class="s2">//breakLoop = true;</span><span class="s1"> 
                     </span><span class="s0">break</span><span class="s1">; 
                 </span><span class="s0">case </span><span class="s1">SECONDSTRAFE: 
-                    </span><span class="s2">// Runs the checkTime method</span><span class="s1"> 
+                    </span><span class="s2">// Makes sure the time hasn't run out</span><span class="s1"> 
                     checkTime(); 
                     System.out.println(</span><span class="s3">&quot;SECOND STRAFE&quot;</span><span class="s1">); 
                     </span><span class="s2">// Move close to the second picture</span><span class="s1"> 
                     setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER); 
-                    </span><span class="s2">// Strafes left to the next beacon</span><span class="s1"> 
-                    encoderStrafeLeft(</span><span class="s4">4650</span><span class="s1">, </span><span class="s4">0.63f</span><span class="s1">); 
+                    </span><span class="s2">// Strafes right to the next beacon</span><span class="s1"> 
+                    encoderStrafeRight(</span><span class="s4">4700</span><span class="s1">, </span><span class="s4">0.63f</span><span class="s1">); 
                     </span><span class="s2">//encoderStrafeLeftDualPower(3750, 0.7f, 1000, 0.4f);</span><span class="s1"> 
                     State = driveState.DRIVETOSECONDBEACON; 
                     x = stopCount + </span><span class="s4">10</span><span class="s1">; 
                     </span><span class="s0">break</span><span class="s1">; 
                 </span><span class="s0">case </span><span class="s1">DRIVETOSECONDBEACON: 
-                    </span><span class="s2">// Runs the checkTime method</span><span class="s1"> 
+                    </span><span class="s2">// Ensures time hasn't run out</span><span class="s1"> 
                     checkTime(); 
                     System.out.println(</span><span class="s3">&quot;DRIVE TO SECOND BEACON&quot;</span><span class="s1">); 
+ 
                     </span><span class="s2">// Get pose and translation</span><span class="s1"> 
                     robot.SetButtonPusherPosition(</span><span class="s4">0.45f</span><span class="s1">); 
                     </span><span class="s2">//setMode(norm);</span><span class="s1"> 
- 
                     </span><span class="s2">// Gets the position matrix</span><span class="s1"> 
                     pose = ((VuforiaTrackableDefaultListener) beacons.get(SECONDPICTURE).getListener()).getRawPose(); 
  
                     </span><span class="s0">if</span><span class="s1">(pose != </span><span class="s0">null </span><span class="s1">&amp;&amp; x &gt; stopCount) { 
                         System.out.println(</span><span class="s3">&quot;SEEABLE&quot;</span><span class="s1">); 
-                        </span><span class="s2">// Gets the transation matrix out of the pose matrix</span><span class="s1"> 
+                        </span><span class="s2">// Gets the translation matrix out of the pose matrix</span><span class="s1"> 
                         translation = pose.getTranslation(); 
-                        </span><span class="s2">// Gets the elements out of the translation matrix</span><span class="s1"> 
+                        </span><span class="s2">// Gets the useful elements out of the translation matrix</span><span class="s1"> 
                         y = (</span><span class="s0">int</span><span class="s1">) translation.get(</span><span class="s4">1</span><span class="s1">); 
                         x = (</span><span class="s0">int</span><span class="s1">) translation.get(</span><span class="s4">2</span><span class="s1">); 
                         System.out.println(</span><span class="s3">&quot;X: &quot; </span><span class="s1">+ x); 
@@ -343,11 +351,14 @@ CF_Vuforia_Blue_State.java</FONT>
                         pidDrive(y); 
                     } 
  
-                    </span><span class="s2">// Stop if close enough to picture</span><span class="s1"> 
+                    </span><span class="s2">// Stops under certain conditions</span><span class="s1"> 
                     </span><span class="s0">if</span><span class="s1">(pose == </span><span class="s0">null</span><span class="s1">) { 
+                        </span><span class="s2">// Stops if can't see the picture</span><span class="s1"> 
                         setPower(</span><span class="s4">0.0f</span><span class="s1">); 
                     } 
                     </span><span class="s0">if</span><span class="s1">(x &lt;= stopCount) { 
+                        </span><span class="s2">// Stops if close enough to the picture, and increments</span><span class="s1"> 
+                        </span><span class="s2">// to the next state</span><span class="s1"> 
                         setPower(</span><span class="s4">0.0f</span><span class="s1">); 
                         State = driveState.PUSHSECONDBEACON; 
  
@@ -355,13 +366,13 @@ CF_Vuforia_Blue_State.java</FONT>
                     } 
                     </span><span class="s0">break</span><span class="s1">; 
                 </span><span class="s0">case </span><span class="s1">PUSHSECONDBEACON: 
-                    </span><span class="s2">// Runs the checkTime method</span><span class="s1"> 
+                    </span><span class="s2">// Ensures time hasn't run out</span><span class="s1"> 
                     checkTime(); 
                     System.out.println(</span><span class="s3">&quot;PUSH SECOND BEACON&quot;</span><span class="s1">); 
                     </span><span class="s2">// Push the beacon button</span><span class="s1"> 
                     pushBeaconButton(); 
                     setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER); 
-                    </span><span class="s2">// Moves backward after pushing the beacon</span><span class="s1"> 
+                    </span><span class="s2">// Move backward after pushing the beacon</span><span class="s1"> 
                     </span><span class="s0">this</span><span class="s1">.encoderMove(-</span><span class="s4">500</span><span class="s1">, -</span><span class="s4">500</span><span class="s1">, </span><span class="s4">0.4f</span><span class="s1">, </span><span class="s4">0.4f</span><span class="s1">); 
                     State = driveState.END; 
                     </span><span class="s0">break</span><span class="s1">; 
@@ -425,6 +436,7 @@ CF_Vuforia_Blue_State.java</FONT>
  
     </span><span class="s0">private void </span><span class="s1">pidDrive(</span><span class="s0">int </span><span class="s1">yDist) { 
         </span><span class="s0">int </span><span class="s1">error; 
+ 
         </span><span class="s0">double </span><span class="s1">kP = </span><span class="s4">0.00045</span><span class="s1">; </span><span class="s2">// 0.0005</span><span class="s1"> 
         </span><span class="s0">double </span><span class="s1">power = </span><span class="s4">0.2</span><span class="s1">; 
         </span><span class="s0">double </span><span class="s1">effort; 
@@ -452,23 +464,12 @@ CF_Vuforia_Blue_State.java</FONT>
         telemetry.addData(</span><span class="s3">&quot;Red Left&quot;</span><span class="s1">, sensorRGBleft.red()); 
         TimeUnit.MILLISECONDS.sleep(</span><span class="s4">280</span><span class="s1">); 
 </span><span class="s2">//        telemetry.update();</span><span class="s1"> 
+        </span><span class="s0">if</span><span class="s1">(!((sensorRGBright.blue() &gt; sensorRGBright.red() &amp;&amp; sensorRGBleft.red() &gt; sensorRGBleft.blue()) || (sensorRGBright.red() &gt; sensorRGBright.blue() &amp;&amp; sensorRGBleft.blue() &gt; sensorRGBleft.red()))){ 
+            setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER); 
+            </span><span class="s0">this</span><span class="s1">.encoderMove(</span><span class="s4">50</span><span class="s1">, </span><span class="s4">50</span><span class="s1">, </span><span class="s4">0.2f</span><span class="s1">, </span><span class="s4">0.2f</span><span class="s1">); 
+        } 
         </span><span class="s0">if </span><span class="s1">(sensorRGBright.blue() &gt; sensorRGBright.red() &amp;&amp; sensorRGBleft.red() &gt; sensorRGBleft.blue()) { 
 </span><span class="s2">//            telemetry.update();</span><span class="s1"> 
-            robot.SetButtonPusherPosition(</span><span class="s4">0.90</span><span class="s1">); 
-            </span><span class="s0">this</span><span class="s1">.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER); 
-            TimeUnit.SECONDS.sleep(</span><span class="s4">1</span><span class="s1">); 
-            </span><span class="s0">this</span><span class="s1">.encoderMove(</span><span class="s4">300</span><span class="s1">, </span><span class="s4">300</span><span class="s1">, </span><span class="s4">0.2f</span><span class="s1">, </span><span class="s4">0.2f</span><span class="s1">); 
-            beaconFlagFirst = </span><span class="s4">1</span><span class="s1">; 
-            TimeUnit.MILLISECONDS.sleep(</span><span class="s4">250</span><span class="s1">); 
-            </span><span class="s0">this</span><span class="s1">.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER); 
-            </span><span class="s0">int </span><span class="s1">count = </span><span class="s4">100</span><span class="s1">; 
-            </span><span class="s0">while</span><span class="s1">(sensorRGBleft.red() &gt; sensorRGBleft.blue() &amp;&amp; count &lt;= </span><span class="s4">160</span><span class="s1">) { 
-                </span><span class="s0">this</span><span class="s1">.encoderMove(count, count, </span><span class="s4">0.3f</span><span class="s1">, </span><span class="s4">0.3f</span><span class="s1">); 
-                count+=</span><span class="s4">50</span><span class="s1">; 
-            } 
-            </span><span class="s2">//requestOpModeStop();</span><span class="s1"> 
-        } </span><span class="s0">else if </span><span class="s1">(sensorRGBright.red() &gt; sensorRGBright.blue() &amp;&amp; sensorRGBleft.blue() &gt; sensorRGBleft.red()) { 
-           </span><span class="s2">// telemetry.update();</span><span class="s1"> 
             robot.SetButtonPusherPosition(</span><span class="s4">0.00</span><span class="s1">); 
             </span><span class="s0">this</span><span class="s1">.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER); 
             TimeUnit.SECONDS.sleep(</span><span class="s4">1</span><span class="s1">); 
@@ -477,7 +478,22 @@ CF_Vuforia_Blue_State.java</FONT>
             TimeUnit.MILLISECONDS.sleep(</span><span class="s4">250</span><span class="s1">); 
             </span><span class="s0">this</span><span class="s1">.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER); 
             </span><span class="s0">int </span><span class="s1">count = </span><span class="s4">100</span><span class="s1">; 
-            </span><span class="s0">while</span><span class="s1">(sensorRGBright.red() &gt; sensorRGBright.blue() &amp;&amp; count &lt;= </span><span class="s4">160</span><span class="s1">){ 
+            </span><span class="s0">while</span><span class="s1">(sensorRGBright.red() &lt; sensorRGBright.blue() &amp;&amp; count &lt;= </span><span class="s4">160</span><span class="s1">) { 
+                </span><span class="s0">this</span><span class="s1">.encoderMove(count, count, </span><span class="s4">0.3f</span><span class="s1">, </span><span class="s4">0.3f</span><span class="s1">); 
+                count+=</span><span class="s4">50</span><span class="s1">; 
+            } 
+            </span><span class="s2">//requestOpModeStop();</span><span class="s1"> 
+        } </span><span class="s0">else if </span><span class="s1">(sensorRGBright.red() &gt; sensorRGBright.blue() &amp;&amp; sensorRGBleft.blue() &gt; sensorRGBleft.red()) { 
+            </span><span class="s2">// telemetry.update();</span><span class="s1"> 
+            robot.SetButtonPusherPosition(</span><span class="s4">0.90</span><span class="s1">); 
+            </span><span class="s0">this</span><span class="s1">.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER); 
+            TimeUnit.SECONDS.sleep(</span><span class="s4">1</span><span class="s1">); 
+            </span><span class="s0">this</span><span class="s1">.encoderMove(</span><span class="s4">300</span><span class="s1">, </span><span class="s4">300</span><span class="s1">, </span><span class="s4">0.2f</span><span class="s1">, </span><span class="s4">0.2f</span><span class="s1">); 
+            beaconFlagFirst = </span><span class="s4">1</span><span class="s1">; 
+            TimeUnit.MILLISECONDS.sleep(</span><span class="s4">250</span><span class="s1">); 
+            </span><span class="s0">this</span><span class="s1">.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER); 
+            </span><span class="s0">int </span><span class="s1">count = </span><span class="s4">100</span><span class="s1">; 
+            </span><span class="s0">while</span><span class="s1">(sensorRGBleft.red() &lt; sensorRGBleft.blue() &amp;&amp; count &lt;= </span><span class="s4">160</span><span class="s1">){ 
                 </span><span class="s0">this</span><span class="s1">.encoderMove(count, count, </span><span class="s4">0.3f</span><span class="s1">, </span><span class="s4">0.3f</span><span class="s1">); 
                 count+=</span><span class="s4">50</span><span class="s1">; 
             } 

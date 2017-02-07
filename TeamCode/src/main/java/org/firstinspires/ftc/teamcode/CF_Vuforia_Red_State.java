@@ -26,25 +26,30 @@ import java.util.concurrent.TimeUnit;
 @Autonomous(name="CF_Vuforia_Red_State", group ="Red")
 //@Disabled
 public class CF_Vuforia_Red_State extends CF_Library{
+    // Position
     OpenGLMatrix pose;
     VectorF translation = null;
 
+    // This is how far from the picture to stop
     final int stopCount = 120;
     boolean breakLoop = false;
+
+    // If x is smaller than stopCount, it doesn't work, so we instantiate
+    // it to a value greater than stopCount
     int x = stopCount + 100;
     int y;
 
+    // Gains for the PID controllers
     double kPy = 0.00097;
-
     double kPangle = 0.0095;
     double kPangleSmall = 0.0009;
     double kIangle = 0.000085;
     double kIangleBig = 0.00023;
-
     double integral = 0.0;
 
     float effortAngle;
 
+    // This matrix holds the data for the Vuforia matrix
     float[] data;
 
     int angle;
@@ -56,34 +61,42 @@ public class CF_Vuforia_Red_State extends CF_Library{
     double turnFront;
     double turnRear;
 
-
+    // Picture constants
     int FIRSTPICTURE = 3;
     int SECONDPICTURE = 1;
 
     int beaconFlagFirst = 0;
 
+    // Color sensor variables
     ColorSensor sensorRGBright;
     ColorSensor sensorRGBleft;
 
     private SensorManager sensorManager;
 
+    // Enumeration for the state machine
     private enum driveState {
         FIRSTSTRAFE, SQUARETOFIRSTBEACON, BALLONE, BALLTWO, DRIVETOFIRSTBEACON, PUSHFIRSTBEACON, SECONDSTRAFE, DRIVETOSECONDBEACON, PUSHSECONDBEACON, END
     }
 
+    // Timer so the robot will stop when 30 seconds are elapsed
     private ElapsedTime runtime = new ElapsedTime();
 
+    // Number of seconds for the total time of the auto mode
     final int endTime = 29;
 
 
     @Override
     public void runOpMode() throws InterruptedException {
+        // Init robot object
         robot.init(hardwareMap);
+
+        // Set drive motor direction
         robot.MotorMecanumLeftFront.setDirection(DcMotor.Direction.FORWARD);
         robot.MotorMecanumLeftRear.setDirection(DcMotor.Direction.FORWARD);
         robot.MotorMecanumRightFront.setDirection(DcMotor.Direction.REVERSE);
         robot.MotorMecanumRightRear.setDirection(DcMotor.Direction.REVERSE);
 
+        // This is a default speed
         final float speed = 0.5f;
 
         // Instantiates a paramaters file for Vuforia
@@ -122,10 +135,12 @@ public class CF_Vuforia_Red_State extends CF_Library{
 
         initalize();
 
+        // Reset runtime
         runtime.reset();
         while(opModeIsActive() && !breakLoop && runtime.seconds() < endTime) {
             switch(State) {
                 case FIRSTSTRAFE:
+                    // Runs the check time method
                     checkTime();
                     System.out.println("FIRST STRAFE");
                     // This is to get the robot more or less lined up with the picture
@@ -133,25 +148,32 @@ public class CF_Vuforia_Red_State extends CF_Library{
                     this.encoderStrafeRight(3000, speed);
                     this.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                     robot.Shooter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-                    //robot.Shooter.setPower(-1.0f);
                     this.encoderMove(1500, 1500, 0.6f, 0.6f);
                     this.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                    robot.Shooter.setPower(-0.32f);
-                    this.encoderStrafeRight(1900, speed);
+                    robot.Shooter.setPower(-0.29f);
+                    this.encoderStrafeRight(1800, speed);
+                    this.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                    this.encoderMove(-100, 100, 0.3f, 0.3f);
                     System.out.println("DONE STRAFING");
-                    // Sleep to give the robot time to see the picture
-
-                    //TimeUnit.SECONDS.sleep((long)0.5);
 
                     // Increment the state to the next state
                     State = driveState.SQUARETOFIRSTBEACON;
 
                     break;
                 case SQUARETOFIRSTBEACON:
+                    // This is a currently unused method, however, we
+                    // will still document it
+
+                    // Runs the check time method
                     checkTime();
-                    pose = ((VuforiaTrackableDefaultListener) beacons.get(2).getListener()).getRawPose();
+
+                    // Wait to acquire the picture
                     TimeUnit.SECONDS.sleep(2);
+                    // Gets position
+                    pose = ((VuforiaTrackableDefaultListener) beacons.get(2).getListener()).getRawPose();
+
                     if(pose != null) {
+                        // This runs the
                         translation = pose.getTranslation();
                         data = pose.getData();
                         angle = (int) Math.toDegrees(Math.acos(data[2]));
@@ -160,11 +182,13 @@ public class CF_Vuforia_Red_State extends CF_Library{
 
                         errorY = ySquare;
 
+                        // Multiplies the gain by the error to get the effort
                         turnRear = kPy * errorY;
                         turnFront = kPy * errorY * -1;
 
                         errorAngle = 90 - angle;
 
+                        // Integral
                         if(errorAngle < 10 && errorAngle > -10) {
                             integral = 0;
                         } else {
@@ -197,33 +221,42 @@ public class CF_Vuforia_Red_State extends CF_Library{
                     pose = null;
                     break;
                 case BALLONE:
+                    // Checks time
                     checkTime();
                     System.out.println("BALL ONE");
+                    // Increment the first ball
                     robot.SetLoaderPosition(0.015);
                     TimeUnit.SECONDS.sleep(2);
+                    robot.Shooter.setPower(-0.29f);
                     State = driveState.BALLTWO;
                     break;
                 case BALLTWO:
+                    // Checks time
                     checkTime();
+                    // Increment the second ball
                     robot.SetLoaderPosition(0.0f);
                     TimeUnit.SECONDS.sleep(1);
+                    // Turns off the shooter
                     robot.Shooter.setPower(0.0f);
                     System.out.println("DONE SHOOTING");
                     State = driveState.DRIVETOFIRSTBEACON;
                     break;
                 case DRIVETOFIRSTBEACON:
+                    // Checks time
                     checkTime();
                     System.out.println("DRIVE TO FIRST BEACON");
 
-                    // Get pose and translation
                     robot.SetButtonPusherPosition(0.45f);
                     //setMode(norm);
 
+                    // Get pose
                     pose = ((VuforiaTrackableDefaultListener) beacons.get(FIRSTPICTURE).getListener()).getRawPose();
 
                     if(pose != null && x > stopCount) {
                         System.out.println("SEEABLE");
+                        // Gets the translation matrix out of the position matrix
                         translation = pose.getTranslation();
+                        // Gets the useful elements out of the translation matrix
                         y = (int) translation.get(1);
                         x = (int) translation.get(2);
                         System.out.println("X: " + x);
@@ -235,11 +268,14 @@ public class CF_Vuforia_Red_State extends CF_Library{
                         pidDrive(y);
                     }
 
-                    // Stop if close enough to picture
+                    // Stops under certain conditions
                     if(pose == null) {
+                        // Stops if can't see the picture
                         setPower(0.0f);
                     }
                     if(x <= stopCount) {
+                        // Stops if close enough to the picture
+                        // and increments to the next state
                         setPower(0.0f);
                         State = driveState.PUSHFIRSTBEACON;
 
@@ -247,38 +283,47 @@ public class CF_Vuforia_Red_State extends CF_Library{
                     }
                     break;
                 case PUSHFIRSTBEACON:
+                    // Makes sure the time hasn't run out
                     checkTime();
                     System.out.println("PUSH FIRST BEACON");
                     // Push the beacon button
                     pushBeaconButton();
                     setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                    // Backs up after pushing the button
                     this.encoderMove(-1800, -1800, 0.6f, 0.6f);
                     State = driveState.SECONDSTRAFE;
                     //breakLoop = true;
                     break;
                 case SECONDSTRAFE:
+                    // Makes sure the time hasn't run out
                     checkTime();
                     System.out.println("SECOND STRAFE");
                     // Move close to the second picture
                     setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                    encoderStrafeRight(4700, 0.63f);
+                    // Strafes right to the next beacon
+                    encoderStrafeRight(4550, 0.63f);
+                    setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                    encoderMove(-100, 100, 0.3f, 0.3f);
                     //encoderStrafeLeftDualPower(3750, 0.7f, 1000, 0.4f);
                     State = driveState.DRIVETOSECONDBEACON;
                     x = stopCount + 10;
                     break;
                 case DRIVETOSECONDBEACON:
+                    // Ensures time hasn't run out
                     checkTime();
                     System.out.println("DRIVE TO SECOND BEACON");
 
                     // Get pose and translation
                     robot.SetButtonPusherPosition(0.45f);
                     //setMode(norm);
-
+                    // Gets the position matrix
                     pose = ((VuforiaTrackableDefaultListener) beacons.get(SECONDPICTURE).getListener()).getRawPose();
 
                     if(pose != null && x > stopCount) {
                         System.out.println("SEEABLE");
+                        // Gets the translation matrix out of the pose matrix
                         translation = pose.getTranslation();
+                        // Gets the useful elements out of the translation matrix
                         y = (int) translation.get(1);
                         x = (int) translation.get(2);
                         System.out.println("X: " + x);
@@ -287,14 +332,18 @@ public class CF_Vuforia_Red_State extends CF_Library{
 
                         // Drive to beacon using PID controller
                         System.out.println("PID DRIVE");
+                        // Runs the PID controller
                         pidDrive(y);
                     }
 
-                    // Stop if close enough to picture
+                    // Stops under certain conditions
                     if(pose == null) {
+                        // Stops if can't see the picture
                         setPower(0.0f);
                     }
                     if(x <= stopCount) {
+                        // Stops if close enough to the picture, and increments
+                        // to the next state
                         setPower(0.0f);
                         State = driveState.PUSHSECONDBEACON;
 
@@ -302,11 +351,13 @@ public class CF_Vuforia_Red_State extends CF_Library{
                     }
                     break;
                 case PUSHSECONDBEACON:
+                    // Ensures time hasn't run out
                     checkTime();
                     System.out.println("PUSH SECOND BEACON");
                     // Push the beacon button
                     pushBeaconButton();
                     setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                    // Move backward after pushing the beacon
                     this.encoderMove(-500, -500, 0.4f, 0.4f);
                     State = driveState.END;
                     break;
@@ -315,6 +366,7 @@ public class CF_Vuforia_Red_State extends CF_Library{
                     System.out.println("END");
                     setPower(0.0f);
                     breakLoop = true;
+                    break;
                 default:
                     checkTime();
                     System.out.println("DEFAULT");
@@ -338,6 +390,7 @@ public class CF_Vuforia_Red_State extends CF_Library{
     }
 
     private void checkTime() {
+        // Kills the robot if time is over the endTime
         if(runtime.seconds() >= endTime) {
             breakLoop = true;
             requestOpModeStop();
@@ -387,6 +440,7 @@ public class CF_Vuforia_Red_State extends CF_Library{
         robot.MotorMecanumLeftRear.setPower(leftPower);
         robot.MotorMecanumRightRear.setPower(rightPower);
     }
+    // Pushes the correct beacon button depending on the color
     public void pushBeaconButton() throws InterruptedException{
         //if (beaconFlagFirst == 0) {
         telemetry.addData("Blue Right", sensorRGBright.blue());
