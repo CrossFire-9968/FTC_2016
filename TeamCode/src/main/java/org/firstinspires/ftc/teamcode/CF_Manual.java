@@ -28,7 +28,7 @@ import org.firstinspires.ftc.teamcode.Crossfire_Hardware.sensorColor;
 public class CF_Manual extends OpMode
 {
    Crossfire_Hardware robot = new Crossfire_Hardware();
-   CF_SensorLibrary colorSensor = new CF_SensorLibrary();
+   //CF_SensorLibrary colorSensor = new CF_SensorLibrary();
 
    // Minimum joystick position before we assume value is good.
    // Near center, value could contain noise or offset that we want to ignore.
@@ -70,7 +70,7 @@ public class CF_Manual extends OpMode
       // Adjust the beacon button servo
       ServiceServo();
 
-      beaconColor = colorSensor.GetAdafruitColorRight(robot);
+      //beaconColor = colorSensor.GetAdafruitColorRight(robot);
 
       // Set steering to ball kicker driving mode
       if (gamepad1.right_bumper)
@@ -84,7 +84,7 @@ public class CF_Manual extends OpMode
          robot.setBeaconMode();
       }
 
-      SetBallLifterControls();
+      //SetBallLifterControls();
    }
 
 
@@ -178,24 +178,24 @@ public class CF_Manual extends OpMode
       }
    }
 
-   public void SetBallLifterControls()
-   {
-      if (gamepad2.right_bumper)
-      {
-         robot.BallLifterMotor.setPower(0.30);
-
-      }
-
-      else if (gamepad2.left_bumper)
-      {
-         robot.BallLifterMotor.setPower(-0.30);
-      }
-
-      else
-      {
-         robot.BallLifterMotor.setPower(0.0);
-      }
-   }
+//   public void SetBallLifterControls()
+//   {
+//      if (gamepad2.right_bumper)
+//      {
+//         robot.BallLifterMotor.setPower(0.30);
+//
+//      }
+//
+//      else if (gamepad2.left_bumper)
+//      {
+//         robot.BallLifterMotor.setPower(-0.30);
+//      }
+//
+//      else
+//      {
+//         robot.BallLifterMotor.setPower(0.0);
+//      }
+   //}
 
 
    /***
@@ -208,13 +208,13 @@ public class CF_Manual extends OpMode
       double ButtonPusherPosition = robot.GetButtonPusherPosition();
 
       // Rotate CCW
-      if (gamepad2.x)
+      if (gamepad1.x)
       {
          robot.SetButtonPusherPosition(ButtonPusherPosition + beaconPusherRate);
       }
 
       // Rotate CW
-      else if (gamepad2.b)
+      else if (gamepad1.b)
       {
          robot.SetButtonPusherPosition(ButtonPusherPosition - beaconPusherRate);
       }
