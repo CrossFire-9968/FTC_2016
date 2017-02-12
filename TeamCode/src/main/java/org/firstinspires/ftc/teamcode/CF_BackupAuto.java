@@ -39,6 +39,8 @@ public class CF_BackupAuto extends LinearOpMode
             stopBallShooter();
 
             autoComplete();
+
+            requestOpModeStop();
         }
     }
 
@@ -53,27 +55,33 @@ public class CF_BackupAuto extends LinearOpMode
     {
         robot.init(hardwareMap);
         telemetry.clear();
+        telemetry.clear();
         telemetry.addData("State: ", "init");
         telemetry.update();
     }
 
     private void startBallShooter()
     {
-        robot.Shooter.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        robot.Shooter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         robot.Shooter.setPower(-0.4f);
+        telemetry.clear();
+        telemetry.addData("State: ", "Start Ball Shooter");
+        telemetry.update();
     }
 
     private void loadBalls()
     {
         robot.Loader.setPosition(0);
+        telemetry.clear();
+        telemetry.addData("State: ", "Load");
+        telemetry.update();
     }
 
     private void stopBallShooter()
     {
-        robot.Shooter.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        robot.Shooter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         robot.Shooter.setPower(0.0f);
+        telemetry.clear();
+        telemetry.addData("State: ", "Stop Ball Shooter");
+        telemetry.update();
     }
 
     /***
