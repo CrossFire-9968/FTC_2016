@@ -18,7 +18,14 @@ public abstract class CF_Library extends LinearOpMode {
       robot.MotorMecanumLeftRear.setPower(power);
       robot.MotorMecanumRightRear.setPower(power);
    }
-
+   public void setFrontPower(float power) {
+      robot.MotorMecanumRightFront.setPower(power);
+      robot.MotorMecanumLeftFront.setPower(power);
+   }
+   public void setRearPower(float power) {
+      robot.MotorMecanumLeftRear.setPower(power);
+      robot.MotorMecanumRightRear.setPower(power);
+   }
    public void setLeftPower(float power) {
       robot.MotorMecanumLeftFront.setPower(power);
       robot.MotorMecanumLeftRear.setPower(power);
@@ -74,9 +81,12 @@ public abstract class CF_Library extends LinearOpMode {
    }
    public void encoderStrafeLeft(int count, float power) throws InterruptedException{
       boolean keepGoing = true;
-      setLeftPower(power);
-      setRightPower(power);
-      setPower(power);
+      robot.MotorMecanumLeftFront.setPower(power);
+      robot.MotorMecanumRightFront.setPower(power);
+      robot.MotorMecanumLeftRear.setPower(power/* + 0.05f*/);
+      robot.MotorMecanumRightRear.setPower(power/* + 0.05f*/);
+//      setFrontPower(power);
+//      setRearPower(power + 0.05f);
       robot.MotorMecanumLeftFront.setTargetPosition(count);
       robot.MotorMecanumRightFront.setTargetPosition(count * -1);
       robot.MotorMecanumLeftRear.setTargetPosition(count * -1);
