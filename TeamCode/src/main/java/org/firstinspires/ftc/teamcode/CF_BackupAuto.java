@@ -6,12 +6,14 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import java.util.concurrent.TimeUnit;
+
 /**
  * Created by dawso on 2/6/2017.
  */
 
 @Autonomous(name = "Backup_Auto", group = "Autonomous")
-@Disabled
+//@Disabled
 public class CF_BackupAuto extends LinearOpMode
 {
     Crossfire_Hardware robot = new Crossfire_Hardware();
@@ -33,8 +35,6 @@ public class CF_BackupAuto extends LinearOpMode
             autoInit();
 
             startBallShooter();
-
-            loadBalls();
 
             stopBallShooter();
 
@@ -60,24 +60,20 @@ public class CF_BackupAuto extends LinearOpMode
         telemetry.update();
     }
 
-    private void startBallShooter()
+    private void startBallShooter() throws InterruptedException
     {
+        robot.setShooterEncoderMode(DcMotor.RunMode.RUN_USING_ENCODER);
         robot.Shooter.setPower(-0.4f);
+        robot.SetLoaderPosition(0.0);
+        TimeUnit.SECONDS.sleep(6);
         telemetry.clear();
-        telemetry.addData("State: ", "Start Ball Shooter");
-        telemetry.update();
-    }
-
-    private void loadBalls()
-    {
-        robot.Loader.setPosition(0);
-        telemetry.clear();
-        telemetry.addData("State: ", "Load");
+        telemetry.addData("State: ", "Ball Shooter");
         telemetry.update();
     }
 
     private void stopBallShooter()
     {
+        robot.setShooterEncoderMode(DcMotor.RunMode.RUN_USING_ENCODER);
         robot.Shooter.setPower(0.0f);
         telemetry.clear();
         telemetry.addData("State: ", "Stop Ball Shooter");
@@ -94,7 +90,9 @@ public class CF_BackupAuto extends LinearOpMode
     {
         // Set motors to run by encoders and turn off power
         robot.setMecanumEncoderMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.setShooterEncoderMode(DcMotor.RunMode.RUN_USING_ENCODER);
         robot.setMecanumPowers(0.0, 0.0, 0.0, 0.0);
+        robot.Shooter.setPower(0.0);
 
         telemetry.clear();
         telemetry.addData("State: ", "Auto Done");

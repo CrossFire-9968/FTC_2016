@@ -189,6 +189,11 @@ public class Crossfire_Hardware
       MotorMecanumRightRear.setMode(mode);
    }
 
+   public void setShooterEncoderMode(DcMotor.RunMode mode)
+   {
+      Shooter.setMode(mode);
+   }
+
 
    /***
     * Convenience method for setting encoder counts to all four mecanum drive motors
