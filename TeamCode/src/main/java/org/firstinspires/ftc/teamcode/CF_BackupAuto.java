@@ -9,7 +9,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Created by dawso on 2/6/2017.
+ * Created by dawson on 2/6/2017.
  */
 
 @Autonomous(name = "Backup_Auto", group = "Autonomous")
@@ -34,9 +34,15 @@ public class CF_BackupAuto extends LinearOpMode
             // Initialization routines
             autoInit();
 
+            driveToPosition();
+
             startBallShooter();
 
             stopBallShooter();
+
+            driveToBall();
+
+            Park();
 
             autoComplete();
 
@@ -51,21 +57,33 @@ public class CF_BackupAuto extends LinearOpMode
      * are added, the their initializations would happen here
      * (e.g. initial servo position)
      */
+
     private void autoInit()
     {
         robot.init(hardwareMap);
+        robot.Loader.setPosition(0.08);
         telemetry.clear();
         telemetry.clear();
         telemetry.addData("State: ", "init");
         telemetry.update();
     }
 
+    private void driveToPosition()
+    {
+        robot.setMecanumEncoderMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.setMecanumEncoderMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.setMecanumEncoderMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.setMecanumEncoderTargetPosition(2000, 2000, 2000, 2000);
+        robot.setMecanumPowers(0.4, 0.4, 0.4, 0.4);
+    }
+
     private void startBallShooter() throws InterruptedException
     {
         robot.setShooterEncoderMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        robot.Shooter.setPower(-0.4f);
+        robot.Shooter.setPower(-0.45f);
+        TimeUnit.SECONDS.sleep(2);
         robot.SetLoaderPosition(0.0);
-        TimeUnit.SECONDS.sleep(6);
+        TimeUnit.SECONDS.sleep(4);
         telemetry.clear();
         telemetry.addData("State: ", "Ball Shooter");
         telemetry.update();
@@ -73,11 +91,27 @@ public class CF_BackupAuto extends LinearOpMode
 
     private void stopBallShooter()
     {
-        robot.setShooterEncoderMode(DcMotor.RunMode.RUN_USING_ENCODER);
         robot.Shooter.setPower(0.0f);
         telemetry.clear();
         telemetry.addData("State: ", "Stop Ball Shooter");
         telemetry.update();
+    }
+
+    private void driveToBall()
+    {
+        robot.setMecanumEncoderMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.setMecanumEncoderMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.setMecanumEncoderTargetPosition(300, 300, 300, 300);
+        robot.setMecanumPowers(0.4, 0.4, 0.4, 0.4);
+    }
+
+    private void Park()
+    {
+        robot.setMecanumEncoderMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.setMecanumEncoderMode(DcMotor.RunMode.RUN_TO_POSITION);
+        telemetry.clear();
+        telemetry.addData("State: ", "Park");
+        robot.setMecanumPowers(0, 0, 0, 0);
     }
 
     /***
@@ -89,8 +123,6 @@ public class CF_BackupAuto extends LinearOpMode
     private void autoComplete()
     {
         // Set motors to run by encoders and turn off power
-        robot.setMecanumEncoderMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        robot.setShooterEncoderMode(DcMotor.RunMode.RUN_USING_ENCODER);
         robot.setMecanumPowers(0.0, 0.0, 0.0, 0.0);
         robot.Shooter.setPower(0.0);
 

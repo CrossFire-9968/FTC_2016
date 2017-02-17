@@ -68,7 +68,7 @@ public class CF_ParkOnSquare extends LinearOpMode
     */
    private void autoDriveFromWall() throws InterruptedException
    {
-      // Reset encoder counts and set encoders to use RUN_TO_POSITION MODE
+      // Reset encoder counts and set encoders to use RUN_TO_POSITION MODE.
       robot.setMecanumEncoderMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
       robot.setMecanumEncoderMode(DcMotor.RunMode.RUN_TO_POSITION);
 
