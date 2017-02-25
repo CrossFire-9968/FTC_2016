@@ -56,7 +56,7 @@ public class CF_BackupAuto extends LinearOpMode
                     robot.setMecanumEncoderMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                     robot.setMecanumEncoderMode(DcMotor.RunMode.RUN_TO_POSITION);
                     robot.setMecanumEncoderTargetPosition(2200, 2200, 2200, 2200);
-                    robot.setMecanumPowers(0.4, 0.4, 0.4, 0.4);
+                    robot.setMecanumPowers(0.4, 0.4, -0.4, -0.4);
                     robot.setMecanumEncoderMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
                     State = states.STARTBALLSHOOTER;
                     TimeUnit.MILLISECONDS.sleep(500);
