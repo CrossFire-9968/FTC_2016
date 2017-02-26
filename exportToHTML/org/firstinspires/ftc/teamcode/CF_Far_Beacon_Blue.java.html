@@ -1,0 +1,497 @@
+<html>
+<head>
+<title>CF_Far_Beacon_Blue.java</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.ln { color: rgb(0,0,0); font-weight: normal; font-style: normal; }
+.s0 { color: rgb(0,0,128); font-weight: bold; }
+.s1 { color: rgb(0,0,0); }
+.s2 { color: rgb(128,128,128); font-style: italic; }
+.s3 { color: rgb(0,128,0); font-weight: bold; }
+.s4 { color: rgb(0,0,255); }
+</style>
+</head>
+<BODY BGCOLOR="#ffffff">
+<TABLE CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#C0C0C0" >
+<TR><TD><CENTER>
+<FONT FACE="Arial, Helvetica" COLOR="#000000">
+CF_Far_Beacon_Blue.java</FONT>
+</center></TD></TR></TABLE>
+<pre>
+<span class="s0">package </span><span class="s1">org.firstinspires.ftc.teamcode; 
+ 
+</span><span class="s0">import </span><span class="s1">android.hardware.SensorManager; 
+ 
+</span><span class="s0">import </span><span class="s1">com.qualcomm.robotcore.eventloop.opmode.Autonomous; 
+</span><span class="s0">import </span><span class="s1">com.qualcomm.robotcore.hardware.ColorSensor; 
+</span><span class="s0">import </span><span class="s1">com.qualcomm.robotcore.hardware.DcMotor; 
+</span><span class="s0">import </span><span class="s1">com.qualcomm.robotcore.hardware.DcMotorSimple; 
+</span><span class="s0">import </span><span class="s1">com.qualcomm.robotcore.hardware.DeviceInterfaceModule; 
+</span><span class="s0">import </span><span class="s1">com.qualcomm.robotcore.util.ElapsedTime; 
+</span><span class="s0">import </span><span class="s1">com.vuforia.HINT; 
+</span><span class="s0">import </span><span class="s1">com.vuforia.Vuforia; 
+ 
+</span><span class="s0">import </span><span class="s1">org.firstinspires.ftc.robotcore.external.ClassFactory; 
+</span><span class="s0">import </span><span class="s1">org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix; 
+</span><span class="s0">import </span><span class="s1">org.firstinspires.ftc.robotcore.external.matrices.VectorF; 
+</span><span class="s0">import </span><span class="s1">org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer; 
+</span><span class="s0">import </span><span class="s1">org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener; 
+</span><span class="s0">import </span><span class="s1">org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables; 
+ 
+</span><span class="s0">import </span><span class="s1">java.util.concurrent.TimeUnit; 
+ 
+</span><span class="s2">/** 
+ * Created by Ryley on 12/22/16. 
+ */</span><span class="s1"> 
+@Autonomous(name=</span><span class="s3">&quot;CF_Far_Beacon_Blue&quot;</span><span class="s1">, group =</span><span class="s3">&quot;Blue&quot;</span><span class="s1">) 
+</span><span class="s2">//@Disabled</span><span class="s1"> 
+</span><span class="s0">public class </span><span class="s1">CF_Far_Beacon_Blue </span><span class="s0">extends </span><span class="s1">CF_Library{ 
+    </span><span class="s2">// Position</span><span class="s1"> 
+    OpenGLMatrix pose; 
+    VectorF translation = </span><span class="s0">null</span><span class="s1">; 
+ 
+    </span><span class="s2">// This is how far from the picture to stop</span><span class="s1"> 
+    </span><span class="s0">final int </span><span class="s1">stopCount = </span><span class="s4">120</span><span class="s1">; 
+    </span><span class="s0">boolean </span><span class="s1">breakLoop = </span><span class="s0">false</span><span class="s1">; 
+ 
+    </span><span class="s2">// If x is smaller than stopCount, it doesn't work, so we instantiate</span><span class="s1"> 
+    </span><span class="s2">// it to a value greater than stopCount</span><span class="s1"> 
+    </span><span class="s0">int </span><span class="s1">x = stopCount + </span><span class="s4">100</span><span class="s1">; 
+    </span><span class="s0">int </span><span class="s1">y; 
+ 
+    </span><span class="s2">// Gains for the PID controllers</span><span class="s1"> 
+    </span><span class="s0">double </span><span class="s1">kPy = </span><span class="s4">0.00097</span><span class="s1">; 
+    </span><span class="s0">double </span><span class="s1">kPangle = </span><span class="s4">0.0095</span><span class="s1">; 
+    </span><span class="s0">double </span><span class="s1">kPangleSmall = </span><span class="s4">0.0009</span><span class="s1">; 
+    </span><span class="s0">double </span><span class="s1">kIangle = </span><span class="s4">0.000085</span><span class="s1">; 
+    </span><span class="s0">double </span><span class="s1">kIangleBig = </span><span class="s4">0.00023</span><span class="s1">; 
+    </span><span class="s0">double </span><span class="s1">integral = </span><span class="s4">0.0</span><span class="s1">; 
+    </span><span class="s0">float </span><span class="s1">effortAngle; 
+    </span><span class="s0">int </span><span class="s1">angle; 
+    </span><span class="s0">int </span><span class="s1">errorY; 
+    </span><span class="s0">double </span><span class="s1">errorAngle; 
+    </span><span class="s0">int </span><span class="s1">ySquare; 
+    </span><span class="s0">double </span><span class="s1">turnFront; 
+    </span><span class="s0">double </span><span class="s1">turnRear; 
+ 
+    </span><span class="s2">// This matrix holds the data for the Vuforia matrix</span><span class="s1"> 
+    </span><span class="s0">float</span><span class="s1">[] data; 
+ 
+    </span><span class="s2">// Picture constants</span><span class="s1"> 
+    </span><span class="s0">int </span><span class="s1">FIRSTPICTURE = </span><span class="s4">2</span><span class="s1">; 
+    </span><span class="s0">int </span><span class="s1">SECONDPICTURE = </span><span class="s4">0</span><span class="s1">; 
+ 
+    </span><span class="s0">int </span><span class="s1">beaconFlagFirst = </span><span class="s4">0</span><span class="s1">; 
+ 
+    </span><span class="s2">// Color sensor variables</span><span class="s1"> 
+    ColorSensor sensorRGBright; 
+    ColorSensor sensorRGBleft; 
+ 
+    </span><span class="s2">// Enumeration for the state machine</span><span class="s1"> 
+    </span><span class="s0">private enum </span><span class="s1">driveState { 
+        FIRSTSTRAFE, SQUARETOFIRSTBEACON, BALLONE, BALLTWO, DRIVETOFIRSTBEACON, PUSHFIRSTBEACON, SECONDSTRAFE, DRIVETOSECONDBEACON, PUSHSECONDBEACON, END 
+    } 
+ 
+    </span><span class="s2">// Timer so the robot will stop when 30 seconds are elapsed</span><span class="s1"> 
+    </span><span class="s0">private </span><span class="s1">ElapsedTime runtime = </span><span class="s0">new </span><span class="s1">ElapsedTime(); 
+ 
+    </span><span class="s2">// Number of seconds for the total time of the auto mode</span><span class="s1"> 
+    </span><span class="s0">final int </span><span class="s1">endTime = </span><span class="s4">29</span><span class="s1">; 
+ 
+ 
+    @Override 
+    </span><span class="s0">public void </span><span class="s1">runOpMode() </span><span class="s0">throws </span><span class="s1">InterruptedException { 
+        </span><span class="s2">// Init robot object</span><span class="s1"> 
+        robot.init(hardwareMap); 
+ 
+        </span><span class="s2">// Set drive motor direction</span><span class="s1"> 
+        robot.MotorMecanumLeftFront.setDirection(DcMotor.Direction.FORWARD); 
+        robot.MotorMecanumLeftRear.setDirection(DcMotor.Direction.FORWARD); 
+        robot.MotorMecanumRightFront.setDirection(DcMotor.Direction.REVERSE); 
+        robot.MotorMecanumRightRear.setDirection(DcMotor.Direction.REVERSE); 
+ 
+        </span><span class="s2">// This is a default speed</span><span class="s1"> 
+        </span><span class="s0">final float </span><span class="s1">speed = </span><span class="s4">0.5f</span><span class="s1">; </span><span class="s2">// 0.5</span><span class="s1"> 
+ 
+        </span><span class="s2">// Instantiates a paramaters file for Vuforia</span><span class="s1"> 
+        VuforiaLocalizer.Parameters params = </span><span class="s0">new </span><span class="s1">VuforiaLocalizer.Parameters(R.id.cameraMonitorViewId); 
+        </span><span class="s2">// Sets camera direction</span><span class="s1"> 
+        params.cameraDirection = VuforiaLocalizer.CameraDirection.BACK; 
+        </span><span class="s2">// License key</span><span class="s1"> 
+        params.vuforiaLicenseKey = </span><span class="s3">&quot;AU2Vspr/////AAAAGSWZlF6AQEHFh9mbNlt5KlFGl/PX8qeeKea7jh5Xk8Ei573/nsoAjsJu9Cbi2MlRCuEIkZHQJoDGAxXmNgioA+0+DbRC6mG+1QbBu8ACMw0pBk6x3h+wvvqDeyZmjV0Fdji5Bk2bV3AaZ0AanljM2nuosjfFYOeUsoFqjE0+MQfJCOoG2ED2hxhJM88dhMaAH45kQqJ99Pn9c/F8whHUkRLeh71wW3O8qGdHEieX7WQO86VfVadHTrg0Ut8ALwiU/qVqB9pJPn+oVe9rYCixcJztb7XOp4T4Mo0IPUwVtkTUZtZTW1mAOPdbbWx3RX1OohA6q6BBU7ozDdQ1W33/L/mdETevYMf7rKPrb82Zbw8r&quot;</span><span class="s1">; 
+        </span><span class="s2">// Sets the thing you see on the screen.  Coule be AXES, TEAPOT, BUILDINGS, or NONE</span><span class="s1"> 
+        params.cameraMonitorFeedback = VuforiaLocalizer.Parameters.CameraMonitorFeedback.AXES; 
+ 
+        </span><span class="s2">// Creates a new instance of Vuforia named vuforia(lower case) with parameters = params</span><span class="s1"> 
+        VuforiaLocalizer vuforia = ClassFactory.createVuforiaLocalizer(params); 
+        </span><span class="s2">// Lets Vuforia see more than one thing at a time</span><span class="s1"> 
+        Vuforia.setHint(HINT.HINT_MAX_SIMULTANEOUS_IMAGE_TARGETS, </span><span class="s4">4</span><span class="s1">); 
+ 
+        </span><span class="s2">// Gets a beacon class and puts the pictures into it</span><span class="s1"> 
+        VuforiaTrackables beacons = vuforia.loadTrackablesFromAsset(</span><span class="s3">&quot;FTC_2016-17&quot;</span><span class="s1">); 
+        beacons.get(</span><span class="s4">0</span><span class="s1">).setName(</span><span class="s3">&quot;Wheels&quot;</span><span class="s1">); 
+        beacons.get(</span><span class="s4">1</span><span class="s1">).setName(</span><span class="s3">&quot;Tools&quot;</span><span class="s1">); 
+        beacons.get(</span><span class="s4">2</span><span class="s1">).setName(</span><span class="s3">&quot;Legos&quot;</span><span class="s1">); 
+        beacons.get(</span><span class="s4">3</span><span class="s1">).setName(</span><span class="s3">&quot;Gears&quot;</span><span class="s1">); 
+ 
+        </span><span class="s2">// Instantiates color sensors</span><span class="s1"> 
+        sensorRGBright = hardwareMap.colorSensor.get(</span><span class="s3">&quot;AdafruitRGBright&quot;</span><span class="s1">); 
+        sensorRGBleft = hardwareMap.colorSensor.get(</span><span class="s3">&quot;AdafruitRGBleft&quot;</span><span class="s1">); 
+ 
+        </span><span class="s2">// Instantiates switch enumeration</span><span class="s1"> 
+        driveState State = driveState.FIRSTSTRAFE; 
+ 
+        </span><span class="s2">// Run initializing routine</span><span class="s1"> 
+        beacons.activate(); 
+ 
+        </span><span class="s2">// Run initializing routine</span><span class="s1"> 
+        initalize(); 
+ 
+        </span><span class="s2">// Reset runtime</span><span class="s1"> 
+        runtime.reset(); 
+        </span><span class="s0">while</span><span class="s1">(opModeIsActive() &amp;&amp; !breakLoop &amp;&amp; runtime.seconds() &lt; endTime) { 
+            </span><span class="s0">switch</span><span class="s1">(State) { 
+                </span><span class="s0">case </span><span class="s1">FIRSTSTRAFE: 
+                    </span><span class="s2">// Runs the check time method</span><span class="s1"> 
+                    checkTime(); 
+ 
+                    System.out.println(</span><span class="s3">&quot;FIRST STRAFE&quot;</span><span class="s1">); 
+                    </span><span class="s2">// This is to get the robot more or less lined up with the picture</span><span class="s1"> 
+                    </span><span class="s0">this</span><span class="s1">.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER); 
+                    </span><span class="s0">this</span><span class="s1">.encoderMove(</span><span class="s4">2000</span><span class="s1">, </span><span class="s4">2000</span><span class="s1">, </span><span class="s4">0.8f</span><span class="s1">, </span><span class="s4">0.8f</span><span class="s1">); 
+                    </span><span class="s0">this</span><span class="s1">.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER); 
+                    </span><span class="s0">this</span><span class="s1">.encoderStrafeRight(</span><span class="s4">1000</span><span class="s1">, speed); 
+                    </span><span class="s0">this</span><span class="s1">.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER); 
+                    </span><span class="s2">//this.encoderMove(6600, 6600, 1.0f, 1.0f);</span><span class="s1"> 
+                    </span><span class="s0">this</span><span class="s1">.encoderMove(</span><span class="s4">6750</span><span class="s1">, </span><span class="s4">6750</span><span class="s1">, </span><span class="s4">0.9f</span><span class="s1">, </span><span class="s4">0.9f</span><span class="s1">); </span><span class="s2">//0.9</span><span class="s1"> 
+                    </span><span class="s0">this</span><span class="s1">.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER); 
+                    </span><span class="s0">this</span><span class="s1">.encoderMove(</span><span class="s4">2150</span><span class="s1">, -</span><span class="s4">2150</span><span class="s1">, </span><span class="s4">0.5f</span><span class="s1">, </span><span class="s4">0.5f</span><span class="s1">); 
+                    System.out.println(</span><span class="s3">&quot;DONE STRAFING&quot;</span><span class="s1">); 
+ 
+                    </span><span class="s2">// Increment the state to the next state</span><span class="s1"> 
+                    State = driveState.DRIVETOFIRSTBEACON; 
+ 
+                    </span><span class="s0">break</span><span class="s1">; 
+                </span><span class="s0">case </span><span class="s1">SQUARETOFIRSTBEACON: 
+                    </span><span class="s2">// This is a currently unused method</span><span class="s1"> 
+                    </span><span class="s2">// Runs the check time method</span><span class="s1"> 
+                    checkTime(); 
+ 
+                    </span><span class="s2">// Wait to acquire the picture</span><span class="s1"> 
+                    TimeUnit.SECONDS.sleep(</span><span class="s4">2</span><span class="s1">); 
+                    </span><span class="s2">// Gets position</span><span class="s1"> 
+                    pose = ((VuforiaTrackableDefaultListener) beacons.get(</span><span class="s4">2</span><span class="s1">).getListener()).getRawPose(); 
+ 
+                    </span><span class="s0">if</span><span class="s1">(pose != </span><span class="s0">null</span><span class="s1">) { 
+                        </span><span class="s2">// This runs the pid controller</span><span class="s1"> 
+                        translation = pose.getTranslation(); 
+                        data = pose.getData(); 
+                        angle = (</span><span class="s0">int</span><span class="s1">) Math.toDegrees(Math.acos(data[</span><span class="s4">2</span><span class="s1">])); 
+ 
+                        ySquare = (</span><span class="s0">int</span><span class="s1">) translation.get(</span><span class="s4">1</span><span class="s1">); 
+ 
+                        errorY = ySquare; 
+ 
+                        </span><span class="s2">// Multiplies the gain by the error to get the effort</span><span class="s1"> 
+                        turnRear = kPy * errorY; 
+                        turnFront = kPy * errorY * -</span><span class="s4">1</span><span class="s1">; 
+ 
+                        errorAngle = </span><span class="s4">90 </span><span class="s1">- angle; 
+ 
+                        </span><span class="s2">// Integral</span><span class="s1"> 
+                        </span><span class="s0">if</span><span class="s1">(errorAngle &lt; </span><span class="s4">10 </span><span class="s1">&amp;&amp; errorAngle &gt; -</span><span class="s4">10</span><span class="s1">) { 
+                            integral = </span><span class="s4">0</span><span class="s1">; 
+                        } </span><span class="s0">else </span><span class="s1">{ 
+                            integral = integral + errorAngle; 
+                        } 
+                        </span><span class="s0">if</span><span class="s1">(integral * kIangle &gt; </span><span class="s4">1.0</span><span class="s1">) { 
+                            integral = </span><span class="s4">1000</span><span class="s1">; 
+                        } 
+ 
+                        </span><span class="s0">if</span><span class="s1">(x &lt; </span><span class="s4">700</span><span class="s1">) { 
+                            effortAngle = (</span><span class="s0">float</span><span class="s1">) ((errorAngle * kPangleSmall) + (integral * kIangleBig)); 
+                        } 
+                        </span><span class="s0">else</span><span class="s1">{ 
+                            effortAngle = (</span><span class="s0">float</span><span class="s1">) ((errorAngle * kPangle) + (integral * kIangle)); 
+                        } 
+ 
+                        </span><span class="s0">if</span><span class="s1">((errorAngle &lt; </span><span class="s4">10 </span><span class="s1">|| -</span><span class="s4">10 </span><span class="s1">&lt; errorAngle) &amp;&amp; (errorY &lt; </span><span class="s4">10 </span><span class="s1">|| -</span><span class="s4">10 </span><span class="s1">&lt; errorY)) { 
+                            setPower(</span><span class="s4">0.0f</span><span class="s1">); 
+                            State = driveState.BALLONE; 
+                        }</span><span class="s0">else </span><span class="s1">{ 
+                            strafe(effortAngle + turnFront, effortAngle + turnRear); 
+                        } 
+                        telemetry.addData(</span><span class="s3">&quot;error&quot;</span><span class="s1">, errorY); 
+                        telemetry.addData(</span><span class="s3">&quot;turnRear&quot;</span><span class="s1">, turnRear); 
+</span><span class="s2">//                        telemetry.update();</span><span class="s1"> 
+                    } 
+                    </span><span class="s0">if</span><span class="s1">(pose == </span><span class="s0">null</span><span class="s1">) { 
+                        State = driveState.BALLONE; 
+                    } 
+                    pose = </span><span class="s0">null</span><span class="s1">; 
+                    </span><span class="s0">break</span><span class="s1">; 
+                </span><span class="s0">case </span><span class="s1">BALLONE: 
+                    </span><span class="s2">// Runs checkTime method</span><span class="s1"> 
+                    checkTime(); 
+                    </span><span class="s2">//TimeUnit.SECONDS.sleep(1);</span><span class="s1"> 
+                    System.out.println(</span><span class="s3">&quot;BALL ONE&quot;</span><span class="s1">); 
+                    </span><span class="s2">// Increment the first ball</span><span class="s1"> 
+                    robot.SetLoaderPosition(</span><span class="s4">0.015</span><span class="s1">); 
+                    TimeUnit.MILLISECONDS.sleep(</span><span class="s4">500</span><span class="s1">); 
+                    State = driveState.BALLTWO; 
+                    </span><span class="s0">break</span><span class="s1">; 
+                </span><span class="s0">case </span><span class="s1">BALLTWO: 
+                    </span><span class="s2">// Runs checkTime method</span><span class="s1"> 
+                    checkTime(); 
+                    </span><span class="s2">// Increment the second ball</span><span class="s1"> 
+                    robot.SetLoaderPosition(</span><span class="s4">0.0f</span><span class="s1">); 
+                    TimeUnit.MILLISECONDS.sleep(</span><span class="s4">2000</span><span class="s1">); 
+                    </span><span class="s2">// Turns off the shooter</span><span class="s1"> 
+                    robot.Shooter.setPower(</span><span class="s4">0.0f</span><span class="s1">); 
+                    System.out.println(</span><span class="s3">&quot;DONE SHOOTING&quot;</span><span class="s1">); 
+                    State = driveState.END; 
+                    </span><span class="s0">break</span><span class="s1">; 
+                </span><span class="s0">case </span><span class="s1">DRIVETOFIRSTBEACON: 
+                    </span><span class="s2">// Runs the checkTime method</span><span class="s1"> 
+                    checkTime(); 
+                    System.out.println(</span><span class="s3">&quot;DRIVE TO FIRST BEACON&quot;</span><span class="s1">); 
+ 
+                    </span><span class="s2">// Get pose</span><span class="s1"> 
+                    robot.SetButtonPusherPosition(</span><span class="s4">0.45f</span><span class="s1">); 
+                    pose = ((VuforiaTrackableDefaultListener) beacons.get(FIRSTPICTURE).getListener()).getRawPose(); 
+ 
+                    </span><span class="s0">if</span><span class="s1">(pose != </span><span class="s0">null </span><span class="s1">&amp;&amp; x &gt; stopCount) { 
+                        System.out.println(</span><span class="s3">&quot;SEEABLE&quot;</span><span class="s1">); 
+                        </span><span class="s2">// Gets the translation matrix out of the position matrix</span><span class="s1"> 
+                        translation = pose.getTranslation(); 
+                        </span><span class="s2">// Gets the useful elements out of the translation matrix</span><span class="s1"> 
+                        y = (</span><span class="s0">int</span><span class="s1">) translation.get(</span><span class="s4">1</span><span class="s1">); 
+                        x = (</span><span class="s0">int</span><span class="s1">) translation.get(</span><span class="s4">2</span><span class="s1">); 
+                        System.out.println(</span><span class="s3">&quot;X: &quot; </span><span class="s1">+ x); 
+                        telemetry.addData(</span><span class="s3">&quot;x: &quot;</span><span class="s1">, x); 
+                        </span><span class="s2">//telemetry.update();</span><span class="s1"> 
+ 
+                        </span><span class="s2">// Drive to beacon using PID controller</span><span class="s1"> 
+                        System.out.println(</span><span class="s3">&quot;PID DRIVE&quot;</span><span class="s1">); 
+                        </span><span class="s2">// This runs the PID controller</span><span class="s1"> 
+                        pidDrive(y); 
+                    } 
+ 
+                    </span><span class="s2">// Stops under certain conditions</span><span class="s1"> 
+                    </span><span class="s0">if</span><span class="s1">(pose == </span><span class="s0">null</span><span class="s1">) { 
+                        </span><span class="s2">// Stops if can't see the picture</span><span class="s1"> 
+                        setPower(</span><span class="s4">0.0f</span><span class="s1">); 
+                    } 
+                    </span><span class="s0">if</span><span class="s1">(x &lt;= stopCount) { 
+                        </span><span class="s2">// Stops if close enough to the picture</span><span class="s1"> 
+                        setPower(</span><span class="s4">0.0f</span><span class="s1">); 
+                        State = driveState.PUSHFIRSTBEACON; 
+ 
+                        </span><span class="s2">//breakLoop = true;</span><span class="s1"> 
+                    } 
+                    </span><span class="s0">break</span><span class="s1">; 
+                </span><span class="s0">case </span><span class="s1">PUSHFIRSTBEACON: 
+                    </span><span class="s2">// Runs the checkTime method</span><span class="s1"> 
+                    checkTime(); 
+                    System.out.println(</span><span class="s3">&quot;PUSH FIRST BEACON&quot;</span><span class="s1">); 
+                    </span><span class="s2">// Push the beacon button</span><span class="s1"> 
+                    pushBeaconButton(); 
+                    setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER); 
+                    </span><span class="s2">// Backs up after pushing the button</span><span class="s1"> 
+                    </span><span class="s0">this</span><span class="s1">.encoderMove(-</span><span class="s4">1800</span><span class="s1">, -</span><span class="s4">1800</span><span class="s1">, </span><span class="s4">0.63f</span><span class="s1">, </span><span class="s4">0.63f</span><span class="s1">); 
+                    State = driveState.SECONDSTRAFE; 
+                    </span><span class="s2">//breakLoop = true;</span><span class="s1"> 
+                    </span><span class="s0">break</span><span class="s1">; 
+                </span><span class="s0">case </span><span class="s1">SECONDSTRAFE: 
+                    </span><span class="s2">// Runs the checkTime method</span><span class="s1"> 
+                    checkTime(); 
+                    System.out.println(</span><span class="s3">&quot;SECOND STRAFE&quot;</span><span class="s1">); 
+                    </span><span class="s2">// Move close to the second picture</span><span class="s1"> 
+                    setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER); 
+                    </span><span class="s2">// Strafes left to the next beacon</span><span class="s1"> 
+                    encoderStrafeRight(</span><span class="s4">4650</span><span class="s1">, speed); 
+                    setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER); 
+                    encoderMove(-</span><span class="s4">100</span><span class="s1">, </span><span class="s4">100</span><span class="s1">, </span><span class="s4">0.3f</span><span class="s1">, </span><span class="s4">0.3f</span><span class="s1">); 
+                    </span><span class="s2">//encoderStrafeLeftDualPower(3750, 0.7f, 1000, 0.4f);</span><span class="s1"> 
+                    State = driveState.DRIVETOSECONDBEACON; 
+                    x = stopCount + </span><span class="s4">10</span><span class="s1">; 
+                    </span><span class="s0">break</span><span class="s1">; 
+                </span><span class="s0">case </span><span class="s1">DRIVETOSECONDBEACON: 
+                    </span><span class="s2">// Runs the checkTime method</span><span class="s1"> 
+                    checkTime(); 
+                    System.out.println(</span><span class="s3">&quot;DRIVE TO SECOND BEACON&quot;</span><span class="s1">); 
+                    </span><span class="s2">// Get pose and translation</span><span class="s1"> 
+                    robot.SetButtonPusherPosition(</span><span class="s4">0.45f</span><span class="s1">); 
+                    </span><span class="s2">//setMode(norm);</span><span class="s1"> 
+ 
+                    </span><span class="s2">// Gets the position matrix</span><span class="s1"> 
+                    pose = ((VuforiaTrackableDefaultListener) beacons.get(SECONDPICTURE).getListener()).getRawPose(); 
+ 
+                    </span><span class="s0">if</span><span class="s1">(pose != </span><span class="s0">null </span><span class="s1">&amp;&amp; x &gt; stopCount) { 
+                        System.out.println(</span><span class="s3">&quot;SEEABLE&quot;</span><span class="s1">); 
+                        </span><span class="s2">// Gets the transation matrix out of the pose matrix</span><span class="s1"> 
+                        translation = pose.getTranslation(); 
+                        </span><span class="s2">// Gets the elements out of the translation matrix</span><span class="s1"> 
+                        y = (</span><span class="s0">int</span><span class="s1">) translation.get(</span><span class="s4">1</span><span class="s1">); 
+                        x = (</span><span class="s0">int</span><span class="s1">) translation.get(</span><span class="s4">2</span><span class="s1">); 
+                        System.out.println(</span><span class="s3">&quot;X: &quot; </span><span class="s1">+ x); 
+                        telemetry.addData(</span><span class="s3">&quot;x: &quot;</span><span class="s1">, x); 
+                        </span><span class="s2">//telemetry.update();</span><span class="s1"> 
+ 
+                        </span><span class="s2">// Drive to beacon using PID controller</span><span class="s1"> 
+                        System.out.println(</span><span class="s3">&quot;PID DRIVE&quot;</span><span class="s1">); 
+                        </span><span class="s2">// Runs the PID controller</span><span class="s1"> 
+                        pidDrive(y); 
+                    } 
+ 
+                    </span><span class="s2">// Stop if close enough to picture</span><span class="s1"> 
+                    </span><span class="s0">if</span><span class="s1">(pose == </span><span class="s0">null</span><span class="s1">) { 
+                        setPower(</span><span class="s4">0.0f</span><span class="s1">); 
+                    } 
+                    </span><span class="s0">if</span><span class="s1">(x &lt;= stopCount) { 
+                        setPower(</span><span class="s4">0.0f</span><span class="s1">); 
+                        State = driveState.PUSHSECONDBEACON; 
+ 
+                        </span><span class="s2">//breakLoop = true;</span><span class="s1"> 
+                    } 
+                    </span><span class="s0">break</span><span class="s1">; 
+                </span><span class="s0">case </span><span class="s1">PUSHSECONDBEACON: 
+                    </span><span class="s2">// Runs the checkTime method</span><span class="s1"> 
+                    checkTime(); 
+                    robot.Shooter.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER); 
+                    robot.Shooter.setMode(DcMotor.RunMode.RUN_USING_ENCODER); 
+                    robot.Shooter.setPower(-</span><span class="s4">0.35f</span><span class="s1">); </span><span class="s2">// -0.29</span><span class="s1"> 
+                    System.out.println(</span><span class="s3">&quot;PUSH SECOND BEACON&quot;</span><span class="s1">); 
+                    </span><span class="s2">// Push the beacon button</span><span class="s1"> 
+                    pushBeaconButton(); 
+                    setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER); 
+                    </span><span class="s2">// Moves backward after pushing the beacon</span><span class="s1"> 
+                    </span><span class="s0">this</span><span class="s1">.encoderMove(-</span><span class="s4">2000</span><span class="s1">, -</span><span class="s4">2000</span><span class="s1">, </span><span class="s4">0.4f</span><span class="s1">, </span><span class="s4">0.4f</span><span class="s1">); 
+                    State = driveState.BALLONE; 
+                    </span><span class="s0">break</span><span class="s1">; 
+                </span><span class="s0">case </span><span class="s1">END: 
+                    checkTime(); 
+                    System.out.println(</span><span class="s3">&quot;END&quot;</span><span class="s1">); 
+                    setPower(</span><span class="s4">0.0f</span><span class="s1">); 
+                    breakLoop = </span><span class="s0">true</span><span class="s1">; 
+                    </span><span class="s0">break</span><span class="s1">; 
+                </span><span class="s0">default</span><span class="s1">: 
+                    checkTime(); 
+                    System.out.println(</span><span class="s3">&quot;DEFAULT&quot;</span><span class="s1">); 
+                    </span><span class="s2">// Turn on the boolean that breaks out of the loop</span><span class="s1"> 
+                    breakLoop = </span><span class="s0">true</span><span class="s1">; 
+                    </span><span class="s0">break</span><span class="s1">; 
+            } 
+            System.out.println(</span><span class="s3">&quot;TIME: &quot; </span><span class="s1">+ runtime.seconds()); 
+            </span><span class="s0">if</span><span class="s1">(isStopRequested()) { 
+                setPower(</span><span class="s4">0.0f</span><span class="s1">); 
+            } 
+            checkTime(); 
+</span><span class="s2">//            telemetry.update();</span><span class="s1"> 
+        } 
+        </span><span class="s2">// Stop op mode when the loop has been broken out of</span><span class="s1"> 
+        requestOpModeStop(); 
+ 
+ 
+ 
+ 
+    } 
+ 
+    </span><span class="s0">private void </span><span class="s1">checkTime() { 
+        </span><span class="s2">// Kills the robot if time is over the endTime</span><span class="s1"> 
+        </span><span class="s0">if</span><span class="s1">(runtime.seconds() &gt;= endTime) { 
+            breakLoop = </span><span class="s0">true</span><span class="s1">; 
+            requestOpModeStop(); 
+        } 
+    } 
+    </span><span class="s0">private void </span><span class="s1">initalize() </span><span class="s0">throws </span><span class="s1">InterruptedException { 
+        </span><span class="s2">// Sends telemetry message to signify robot waiting</span><span class="s1"> 
+        telemetry.addData(</span><span class="s3">&quot;Status&quot;</span><span class="s1">, </span><span class="s3">&quot;Resetting Encoders&quot;</span><span class="s1">); 
+        telemetry.update(); 
+ 
+        </span><span class="s2">// Reset motor encoders</span><span class="s1"> 
+        setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER); 
+ 
+        </span><span class="s2">// Run using encoders</span><span class="s1"> 
+        setMode(DcMotor.RunMode.RUN_USING_ENCODER); 
+ 
+        </span><span class="s2">// Sends telemetry message to signify encoder reset</span><span class="s1"> 
+        </span><span class="s0">if</span><span class="s1">(robot.MotorMecanumLeftFront.getMode() == DcMotor.RunMode.RUN_USING_ENCODER) { 
+            telemetry.addData(</span><span class="s3">&quot;Encoder Reset&quot;</span><span class="s1">, </span><span class="s3">&quot;Encoder Reset&quot;</span><span class="s1">); 
+            telemetry.update(); 
+        } </span><span class="s0">else </span><span class="s1">{ 
+            telemetry.addData(</span><span class="s3">&quot;Encoder NOT Reset&quot;</span><span class="s1">, </span><span class="s3">&quot;Encoder NOT Reset&quot;</span><span class="s1">); 
+        } 
+ 
+        </span><span class="s2">// Wait for start button to be pressed</span><span class="s1"> 
+        waitForStart(); 
+    } 
+ 
+    </span><span class="s0">private void </span><span class="s1">pidDrive(</span><span class="s0">int </span><span class="s1">yDist) { 
+        </span><span class="s0">int </span><span class="s1">error; 
+        </span><span class="s0">double </span><span class="s1">kP = </span><span class="s4">0.00045</span><span class="s1">; </span><span class="s2">// 0.0005</span><span class="s1"> 
+        </span><span class="s0">double </span><span class="s1">power = </span><span class="s4">0.2</span><span class="s1">; </span><span class="s2">// 0.2</span><span class="s1"> 
+        </span><span class="s0">double </span><span class="s1">effort; 
+        </span><span class="s0">double </span><span class="s1">leftPower; 
+        </span><span class="s0">double </span><span class="s1">rightPower; 
+        </span><span class="s2">// Make the error equal to the y distance</span><span class="s1"> 
+        error = yDist; 
+        </span><span class="s2">// Multiply the error by our gain to get a control effort</span><span class="s1"> 
+        effort = kP * error; 
+        </span><span class="s2">// Set the right and left powers by subtracting or adding the control effort from a base power</span><span class="s1"> 
+        rightPower = power + effort; 
+        leftPower = power - effort; 
+        </span><span class="s2">// Set powers</span><span class="s1"> 
+        robot.MotorMecanumLeftFront.setPower(leftPower); 
+        robot.MotorMecanumRightFront.setPower(rightPower); 
+        robot.MotorMecanumLeftRear.setPower(leftPower); 
+        robot.MotorMecanumRightRear.setPower(rightPower); 
+    } 
+    </span><span class="s2">// Pushes the correct beacon button depending on the color</span><span class="s1"> 
+    </span><span class="s0">public void </span><span class="s1">pushBeaconButton() </span><span class="s0">throws </span><span class="s1">InterruptedException{ 
+        </span><span class="s2">//if (beaconFlagFirst == 0) {</span><span class="s1"> 
+        telemetry.addData(</span><span class="s3">&quot;Blue Right&quot;</span><span class="s1">, sensorRGBright.blue()); 
+        telemetry.addData(</span><span class="s3">&quot;Red Right&quot;</span><span class="s1">, sensorRGBright.red()); 
+        telemetry.addData(</span><span class="s3">&quot;Blue Left&quot;</span><span class="s1">, sensorRGBleft.blue()); 
+        telemetry.addData(</span><span class="s3">&quot;Red Left&quot;</span><span class="s1">, sensorRGBleft.red()); 
+        TimeUnit.MILLISECONDS.sleep(</span><span class="s4">280</span><span class="s1">); 
+</span><span class="s2">//        telemetry.update();</span><span class="s1"> 
+        </span><span class="s0">if </span><span class="s1">(sensorRGBright.blue() &gt; sensorRGBright.red() &amp;&amp; sensorRGBleft.red() &gt; sensorRGBleft.blue()) { 
+</span><span class="s2">//            telemetry.update();</span><span class="s1"> 
+            robot.SetButtonPusherPosition(</span><span class="s4">0.90</span><span class="s1">); 
+            </span><span class="s0">this</span><span class="s1">.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER); 
+            TimeUnit.SECONDS.sleep(</span><span class="s4">1</span><span class="s1">); 
+            </span><span class="s0">this</span><span class="s1">.encoderMove(</span><span class="s4">300</span><span class="s1">, </span><span class="s4">300</span><span class="s1">, </span><span class="s4">0.2f</span><span class="s1">, </span><span class="s4">0.2f</span><span class="s1">); 
+            beaconFlagFirst = </span><span class="s4">1</span><span class="s1">; 
+            TimeUnit.MILLISECONDS.sleep(</span><span class="s4">250</span><span class="s1">); 
+            </span><span class="s0">this</span><span class="s1">.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER); 
+            </span><span class="s0">int </span><span class="s1">count = </span><span class="s4">100</span><span class="s1">; 
+            </span><span class="s0">while</span><span class="s1">(sensorRGBleft.red() &gt; sensorRGBleft.blue() &amp;&amp; count &lt;= </span><span class="s4">160</span><span class="s1">) { 
+                </span><span class="s0">this</span><span class="s1">.encoderMove(count, count, </span><span class="s4">0.3f</span><span class="s1">, </span><span class="s4">0.3f</span><span class="s1">); 
+                count+=</span><span class="s4">50</span><span class="s1">; 
+            } 
+            </span><span class="s2">//requestOpModeStop();</span><span class="s1"> 
+        } </span><span class="s0">else if </span><span class="s1">(sensorRGBright.red() &gt; sensorRGBright.blue() &amp;&amp; sensorRGBleft.blue() &gt; sensorRGBleft.red()) { 
+            </span><span class="s2">// telemetry.update();</span><span class="s1"> 
+            robot.SetButtonPusherPosition(</span><span class="s4">0.00</span><span class="s1">); 
+            </span><span class="s0">this</span><span class="s1">.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER); 
+            TimeUnit.SECONDS.sleep(</span><span class="s4">1</span><span class="s1">); 
+            </span><span class="s0">this</span><span class="s1">.encoderMove(</span><span class="s4">300</span><span class="s1">, </span><span class="s4">300</span><span class="s1">, </span><span class="s4">0.2f</span><span class="s1">, </span><span class="s4">0.2f</span><span class="s1">); 
+            beaconFlagFirst = </span><span class="s4">1</span><span class="s1">; 
+            TimeUnit.MILLISECONDS.sleep(</span><span class="s4">250</span><span class="s1">); 
+            </span><span class="s0">this</span><span class="s1">.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER); 
+            </span><span class="s0">int </span><span class="s1">count = </span><span class="s4">100</span><span class="s1">; 
+            </span><span class="s0">while</span><span class="s1">(sensorRGBright.red() &gt; sensorRGBright.blue() &amp;&amp; count &lt;= </span><span class="s4">160</span><span class="s1">){ 
+                </span><span class="s0">this</span><span class="s1">.encoderMove(count, count, </span><span class="s4">0.3f</span><span class="s1">, </span><span class="s4">0.3f</span><span class="s1">); 
+                count+=</span><span class="s4">50</span><span class="s1">; 
+            } 
+        } </span><span class="s0">else </span><span class="s1">{ 
+            telemetry.addData(</span><span class="s3">&quot;unknown&quot;</span><span class="s1">, </span><span class="s3">&quot;unknown&quot;</span><span class="s1">); 
+</span><span class="s2">//            telemetry.update();</span><span class="s1"> 
+        } 
+        </span><span class="s2">//}</span><span class="s1"> 
+    } 
+} 
+</span></pre>
+</body>
+</html>
