@@ -144,9 +144,9 @@ public class CF_Vuforia_Blue_State extends CF_Library{
                     robot.Shooter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
                     this.encoderMove(1100, 1100, 0.6f, 0.6f);
                     this.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                    robot.Shooter.setPower(-0.29f);
+                    robot.Shooter.setPower(-0.31f);
                     //robot.Shooter.setPower(-0.3f);
-                    this.encoderStrafeLeft(2100, speed);
+                    this.encoderStrafeLeft(1950, speed);
                     System.out.println("DONE STRAFING");
 
                     // Increment the state to the next state
@@ -218,7 +218,6 @@ public class CF_Vuforia_Blue_State extends CF_Library{
                     System.out.println("BALL ONE");
                     // Increment the first ball
                     robot.SetLoaderPosition(0.015);
-                    robot.Shooter.setPower(-0.29f);
                     TimeUnit.SECONDS.sleep(2);
                     State = driveState.BALLTWO;
                     break;

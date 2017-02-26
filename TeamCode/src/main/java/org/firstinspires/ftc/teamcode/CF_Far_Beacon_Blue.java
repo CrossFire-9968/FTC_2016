@@ -340,7 +340,7 @@ public class CF_Far_Beacon_Blue extends CF_Library{
                     checkTime();
                     robot.Shooter.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                     robot.Shooter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-                    robot.Shooter.setPower(-0.35f); // -0.29
+                    robot.Shooter.setPower(-0.31f); // -0.29
                     System.out.println("PUSH SECOND BEACON");
                     // Push the beacon button
                     pushBeaconButton();

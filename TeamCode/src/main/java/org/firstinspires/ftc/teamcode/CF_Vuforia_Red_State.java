@@ -150,7 +150,7 @@ public class CF_Vuforia_Red_State extends CF_Library{
                     robot.Shooter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
                     this.encoderMove(1500, 1500, 0.6f, 0.6f);
                     this.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                    robot.Shooter.setPower(-0.29f);
+                    robot.Shooter.setPower(-0.31f);
                     this.encoderStrafeRight(1800, speed);
                     this.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                     this.encoderMove(-100, 100, 0.3f, 0.3f);

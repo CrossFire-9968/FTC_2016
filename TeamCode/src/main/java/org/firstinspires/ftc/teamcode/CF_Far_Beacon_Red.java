@@ -278,7 +278,7 @@ public class CF_Far_Beacon_Red extends CF_Library{
                     pushBeaconButton();
                     setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                     // Backs up after pushing the button
-                    this.encoderMove(-1800, -1800, 0.63f, 0.63f);
+                    this.encoderMove(-1700, -1700, 0.63f, 0.63f);
                     State = driveState.SECONDSTRAFE;
                     //breakLoop = true;
                     break;
@@ -340,7 +340,7 @@ public class CF_Far_Beacon_Red extends CF_Library{
                     checkTime();
                     robot.Shooter.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                     robot.Shooter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-                    robot.Shooter.setPower(-0.35f); // -0.29
+                    robot.Shooter.setPower(-0.31f); // -0.29
                     System.out.println("PUSH SECOND BEACON");
                     // Push the beacon button
                     pushBeaconButton();
