@@ -83,26 +83,29 @@ public class CF_BackupAuto extends LinearOpMode
                     telemetry.addData("AutoFlag = " , "4");
                     telemetry.update();
                     robot.Shooter.setPower(0.0f);
+                    robot.setMecanumEncoderMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                    robot.setMecanumEncoderMode(DcMotor.RunMode.RUN_TO_POSITION);
+                    robot.setMecanumEncoderTargetPosition(800, 800, 800, 800);
+                    robot.setMecanumPowers(0.4, 0.4, 0.4, 0.4);
+                    if(!robot.MotorMecanumLeftFront.isBusy())
+                    {
+                        State = states.DRIVETOBALL;
+                    }
+                    break;
+                case DRIVETOBALL:
+                    AutoFlag = 5;
+                    telemetry.addData("AutoFlag = " , "5");
+                    telemetry.update();
+                    robot.setMecanumEncoderMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
                     State = states.END;
                     break;
-//                case DRIVETOBALL:
-//                    AutoFlag = 5;
-//                    telemetry.addData("AutoFlag = " , "5");
-//                    telemetry.update();
-//                    robot.setMecanumEncoderMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                //                    robot.setMecanumEncoderMode(DcMotor.RunMode.RUN_TO_POSITION);
-//                    robot.setMecanumEncoderTargetPosition(800, 800, 800, 800);
-//                    robot.setMecanumPowers(0.4, 0.4, 0.4, 0.4);
-//                    robot.setMecanumEncoderMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-//                    State = states.END;
-//                    break;
                 case END:
                     AutoFlag = 6;
-//                    telemetry.addData("AutoFlag = " , "6");
-//                    telemetry.update();
-                    // Set motors to run by encoders and turn off power
+                    telemetry.addData("AutoFlag = " , "6");
+                    telemetry.update();
+//                   Set motors to run by encoders and turn off power
                     robot.setMecanumPowers(0.0, 0.0, 0.0, 0.0);
-                    //robot.Shooter.setPower(0.0);
+                    robot.Shooter.setPower(0.0);
                     telemetry.clear();
                     telemetry.addData("LF:", robot.MotorMecanumLeftFront.getCurrentPosition());
                     telemetry.addData("RF:", robot.MotorMecanumRightFront.getCurrentPosition());
