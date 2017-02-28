@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -81,19 +80,21 @@ public class CF_BackupAuto extends LinearOpMode
 //                    telemetry.addData("AutoFlag = " , "4");
 //                    telemetry.update();
 //                    robot.Shooter.setPower(0.0f);
-//                    State = states.DRIVETOBALL;
+                    //robot.setMecanumEncoderMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                    //robot.setMecanumEncoderMode(DcMotor.RunMode.RUN_TO_POSITION);
+                    //robot.setMecanumEncoderTargetPosition(800, 800, 800, 800);
+                    //robot.setMecanumPowers(0.4, 0.4, 0.4, 0.4);
+//                if(!robot.MotorMecanumLeftFront.isBusy())
+//                {
+//                    State = states.DRVIETOBALL;
+//                }
 //                    break;
-//                case DRIVETOBALL:
-//                    AutoFlag = 5;
-//                    telemetry.addData("AutoFlag = " , "5");
-//                    telemetry.update();
-//                    robot.setMecanumEncoderMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                //                    robot.setMecanumEncoderMode(DcMotor.RunMode.RUN_TO_POSITION);
-//                    robot.setMecanumEncoderTargetPosition(800, 800, 800, 800);
-//                    robot.setMecanumPowers(0.4, 0.4, 0.4, 0.4);
-//                    robot.setMecanumEncoderMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-//                    State = states.END;
-//                    break;
+                case DRIVETOBALL:
+                    AutoFlag = 5;
+                    telemetry.addData("AutoFlag = " , "5");
+                    telemetry.update();
+                    State = states.END;
+                    break;
                 case END:
                     AutoFlag = 6;
 //                    telemetry.addData("AutoFlag = " , "6");
