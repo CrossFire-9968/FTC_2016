@@ -1,19 +1,15 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
+
 import java.util.concurrent.TimeUnit;
 
-/**
- * Created by dawson on 2/6/2017.
- */
-
-@Autonomous(name = "Backup_Auto", group = "Autonomous")
+@Autonomous(name = "CF_Jeff_StateMachine", group = "Autonomous")
 //@Disabled
-public class CF_BackupAuto extends LinearOpMode
+public class CF_Jeff_StateMachine extends opmode
 {
     Crossfire_Hardware robot = new Crossfire_Hardware();
 
