@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -61,34 +62,36 @@ public class CF_BackupAuto extends LinearOpMode
 
                     if(!robot.MotorMecanumLeftFront.isBusy())
                     {
-                        State = states.END;
+                        State = states.STARTBALLSHOOTER;
                     }
                     //TimeUnit.MILLISECONDS.sleep(500);
                     break;
-//                case STARTBALLSHOOTER:
-//                    AutoFlag = 3;
-//                    telemetry.addData("AutoFlag = " , "3");
-//                    telemetry.update();
-//                    robot.Shooter.setPower(-0.45f);
-//                    TimeUnit.SECONDS.sleep(2);
+                case STARTBALLSHOOTER:
+                    AutoFlag = 3;
+                    telemetry.addData("AutoFlag = " , "3");
+                    telemetry.update();
+//                    robot.Shooter.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//                    robot.Shooter.setTargetPosition(5000);
+//                    robot.Shooter.setPower(-0.35);
+//                    TimeUnit.SECONDS.sleep(1);
 //                    robot.SetLoaderPosition(0.0);
 //                    TimeUnit.SECONDS.sleep(4);
-//                    State = states.STOPBALLSHOOTER;
-//                    break;
-//                case STOPBALLSHOOTER:
-//                    AutoFlag = 4;
-//                    telemetry.addData("AutoFlag = " , "4");
-//                    telemetry.update();
+                    State = states.STOPBALLSHOOTER;
+                    break;
+                case STOPBALLSHOOTER:
+                    AutoFlag = 4;
+                    telemetry.addData("AutoFlag = " , "4");
+                    telemetry.update();
 //                    robot.Shooter.setPower(0.0f);
-                    //robot.setMecanumEncoderMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                    //robot.setMecanumEncoderMode(DcMotor.RunMode.RUN_TO_POSITION);
-                    //robot.setMecanumEncoderTargetPosition(800, 800, 800, 800);
-                    //robot.setMecanumPowers(0.4, 0.4, 0.4, 0.4);
-//                if(!robot.MotorMecanumLeftFront.isBusy())
-//                {
-//                    State = states.DRVIETOBALL;
-//                }
-//                    break;
+                    robot.setMecanumEncoderMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                    robot.setMecanumEncoderMode(DcMotor.RunMode.RUN_TO_POSITION);
+                    robot.setMecanumEncoderTargetPosition(800, 800, 800, 800);
+                    robot.setMecanumPowers(0.4, 0.4, 0.4, 0.4);
+                    if(!robot.MotorMecanumLeftFront.isBusy())
+                    {
+                        State = states.DRIVETOBALL;
+                    }
+                    break;
                 case DRIVETOBALL:
                     AutoFlag = 5;
                     telemetry.addData("AutoFlag = " , "5");
