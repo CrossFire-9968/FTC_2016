@@ -176,6 +176,18 @@ public class CF_Manual extends OpMode
          robot.setBallLifterMode();
       }
 
+      // Set steering to scooper driving mode
+      if (gamepad1.dpad_left)
+      {
+         robot.setleftDriveMode();
+      }
+
+      // Set steering to scooper driving mode
+      if (gamepad1.dpad_right)
+      {
+         robot.setrightDriveMode();
+      }
+
       // Runs the drive to beacon method
       if (gamepad1.b) {
          driveToBeacon(beacons);
@@ -262,13 +274,38 @@ public class CF_Manual extends OpMode
             telemetry.addData("leftStickX", leftStickX);
          }
 
-          //The scoop drive mode sets the particle ball gatherer as the front of the robot.
+
+         //The scoop drive mode sets the particle ball gatherer as the front of the robot.
          telemetry.addData("Mode: ", "Scoop");
          if (robot.driveMode == Crossfire_Hardware.driveModeEnum.scooperMode)
          {
             LFPower = (forwardGain_Scoop * -leftStickY) - (strafeGain_Scoop * leftStickX) + (steerGain_Scoop * -rightStickX);
             RFPower = (forwardGain_Scoop * -leftStickY) + (strafeGain_Scoop * leftStickX) - (steerGain_Scoop * -rightStickX);
             LRPower = (forwardGain_Scoop * -leftStickY) + (strafeGain_Scoop * leftStickX) + (steerGain_Scoop * -rightStickX);
+            RRPower = (forwardGain_Scoop * -leftStickY) - (strafeGain_Scoop * leftStickX) - (steerGain_Scoop * -rightStickX);
+         }
+
+          //Drives only the motors on the left side of the robot
+         telemetry.addData("Mode: ", "Left Drive");
+         if (robot.driveMode == Crossfire_Hardware.driveModeEnum.leftDrive)
+         {
+            LFPower = (forwardGain_Scoop * -leftStickY) - (strafeGain_Scoop * leftStickX) + (steerGain_Scoop * -rightStickX);
+            RFPower = 0;
+            //RFPower = (forwardGain_Scoop * -leftStickY) + (strafeGain_Scoop * leftStickX) - (steerGain_Scoop * -rightStickX);
+            LRPower = (forwardGain_Scoop * -leftStickY) + (strafeGain_Scoop * leftStickX) + (steerGain_Scoop * -rightStickX);
+            RRPower = 0;
+            //RRPower = (forwardGain_Scoop * -leftStickY) - (strafeGain_Scoop * leftStickX) - (steerGain_Scoop * -rightStickX);
+         }
+
+         //Drives only the motors on the right side of the robot.
+         telemetry.addData("Mode" , "Right Drive");
+         if (robot.driveMode == Crossfire_Hardware.driveModeEnum.rightDrive)
+         {
+            LFPower = 0;
+//            LFPower = (forwardGain_Scoop * -leftStickY) - (strafeGain_Scoop * leftStickX) + (steerGain_Scoop * -rightStickX);
+            RFPower = (forwardGain_Scoop * -leftStickY) + (strafeGain_Scoop * leftStickX) - (steerGain_Scoop * -rightStickX);
+            LRPower = 0;
+            //LRPower = (forwardGain_Scoop * -leftStickY) + (strafeGain_Scoop * leftStickX) + (steerGain_Scoop * -rightStickX);
             RRPower = (forwardGain_Scoop * -leftStickY) - (strafeGain_Scoop * leftStickX) - (steerGain_Scoop * -rightStickX);
          }
 

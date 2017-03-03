@@ -42,7 +42,7 @@ public class Crossfire_Hardware
    HardwareMap hwMap = null;
    private ElapsedTime period = new ElapsedTime();
 
-   public enum driveModeEnum {beaconMode, ballLifterMode, scooperMode};
+   public enum driveModeEnum {beaconMode, ballLifterMode, scooperMode, rightDrive, leftDrive};
 
    public enum sensorColor { blue, red, unknown };
 
@@ -315,6 +315,22 @@ public class Crossfire_Hardware
    public void setBeaconMode()
    {
       driveMode = driveModeEnum.beaconMode;
+   }
+
+   /***
+    *
+    */
+   public void setleftDriveMode()
+   {
+      driveMode = driveModeEnum.leftDrive;
+   }
+
+   /***
+    *
+    */
+   public void setrightDriveMode()
+   {
+      driveMode = driveModeEnum.rightDrive;
    }
 
 
