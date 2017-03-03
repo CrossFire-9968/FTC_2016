@@ -73,18 +73,34 @@ public class CF_Manual extends OpMode
       //beaconColor = colorSensor.GetAdafruitColorRight(robot);
 
       // Set steering to ball kicker driving mode
-      if (gamepad1.right_bumper)
+      if (gamepad1.a)
       {
          robot.setBallKickerMode();
       }
 
       // Set steering to beacon driving mode
-      if (gamepad1.left_bumper)
+      if (gamepad1.y)
       {
          robot.setBeaconMode();
       }
 
       //SetBallLifterControls();
+      if (gamepad1.x)
+      {
+         robot.setballLifterMode();
+      }
+
+      //Set strafe mode with only front wheels();
+      if (gamepad1.dpad_left)
+      {
+         robot.setleftDrive();
+      }
+
+      //Set strafe mode with only rear wheels();
+      if (gamepad1.dpad_right)
+      {
+         robot.setrightDrive();
+      }
    }
 
 
@@ -145,6 +161,42 @@ public class CF_Manual extends OpMode
             LRPower = (forwardPriority * -leftStickY) - (strafePriority * leftStickX) - (steerPriority * rightStickX);
             RRPower = (forwardPriority * -leftStickY) + (strafePriority * leftStickX) + (steerPriority * rightStickX);
             telemetry.addData("Mode: ", "Ball Kicker");
+         }
+
+         //The strafe drive mode sets the side of the robot with the cap ball lifter
+         //as the front. To drive forward, the robot strafes.
+         telemetry.addData("Mode: ", "Strafe");
+         if (robot.driveMode == Crossfire_Hardware.driveModeEnum.ballLifterMode)
+         {
+            LFPower = (forwardGain_Lifter * -leftStickX) - (strafeGain_Lifter * -leftStickY) + (steerGain_Lifter * -rightStickX);
+            RFPower = (forwardGain_Lifter * -leftStickX) + (strafeGain_Lifter * -leftStickY) - (steerGain_Lifter * -rightStickX);
+            LRPower = (forwardGain_Lifter * -leftStickX) + (strafeGain_Lifter * -leftStickY) + (steerGain_Lifter * -rightStickX);
+            RRPower = (forwardGain_Lifter * -leftStickX) - (strafeGain_Lifter * -leftStickY) - (steerGain_Lifter * -rightStickX);
+            telemetry.addData("leftStickX", leftStickX);
+         }
+
+         //Drives only the motors on the left side of the robot
+         telemetry.addData("Mode: ", "Left Drive");
+         if (robot.driveMode == Crossfire_Hardware.driveModeEnum.leftDrive)
+         {
+            LFPower = (forwardGain_Scoop * -leftStickX) - (strafeGain_Scoop * -leftStickY) + (steerGain_Scoop * -rightStickX);
+            RFPower = 0;
+            //RFPower = (forwardGain_Scoop * -leftStickY) + (strafeGain_Scoop * leftStickX) - (steerGain_Scoop * -rightStickX);
+            LRPower = (forwardGain_Scoop * -leftStickX) + (strafeGain_Scoop * -leftStickY) + (steerGain_Scoop * -rightStickX);
+            RRPower = 0;
+            //RRPower = (forwardGain_Scoop * -leftStickY) - (strafeGain_Scoop * leftStickX) - (steerGain_Scoop * -rightStickX);
+         }
+
+         //Drives only the motors on the right side of the robot.
+         telemetry.addData("Mode" , "Right Drive");
+         if (robot.driveMode == Crossfire_Hardware.driveModeEnum.rightDrive)
+         {
+            LFPower = 0;
+//            LFPower = (forwardGain_Scoop * -leftStickY) - (strafeGain_Scoop * leftStickX) + (steerGain_Scoop * -rightStickX);
+            RFPower = (forwardGain_Scoop * -leftStickX) + (strafeGain_Scoop * -leftStickY) - (steerGain_Scoop * -rightStickX);
+            LRPower = 0;
+            //LRPower = (forwardGain_Scoop * -leftStickY) + (strafeGain_Scoop * leftStickX) + (steerGain_Scoop * -rightStickX);
+            RRPower = (forwardGain_Scoop * -leftStickX) - (strafeGain_Scoop * -leftStickY) - (steerGain_Scoop * -rightStickX);
          }
 
          telemetry.update();
