@@ -55,8 +55,8 @@ public class CF_Manual extends OpMode
    private static final float strafeGain_Scoop = 1.0f;
    private static final float steerGain_Scoop = 1.0f;
    private static final float forwardGain_Lifter = 0.5f;
-   private static final float strafeGain_Lifter = 0.6f;
-   private static final float steerGain_Lifter = 0.45f;
+   private static final float strafeGain_Lifter = 0.4f;
+   private static final float steerGain_Lifter = 0.3f;
 
    // Beacon button pusher servo increment rate
    private static final double beaconPusherRate = 0.005;
