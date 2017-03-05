@@ -60,13 +60,15 @@ public class CF_BackupAuto extends LinearOpMode
                telemetry.addData("LR:", robot.MotorMecanumLeftRear.getCurrentPosition());
                telemetry.addData("RR:", robot.MotorMecanumRightRear.getCurrentPosition());
 
-               if(!robot.MotorMecanumLeftFront.isBusy())
+               telemetry.update();
+
+               if (!robot.MotorMecanumLeftFront.isBusy())
                {
-                  State = states.STOPBALLSHOOTER;
+                  State = states.STARTBALLSHOOTER;
                }
-               //TimeUnit.MILLISECONDS.sleep(500);
+
                break;
-//            case STARTBALLSHOOTER:
+            case STARTBALLSHOOTER:
 //               AutoFlag = 3;
 //               telemetry.addData("AutoFlag = " , "3");
 //               telemetry.update();
@@ -78,25 +80,31 @@ public class CF_BackupAuto extends LinearOpMode
 //               TimeUnit.SECONDS.sleep(4);
 //               State = states.STOPBALLSHOOTER;
 //               break;
+               robot.setMecanumPowers(0, 0, 0, 0);
+               TimeUnit.SECONDS.sleep(4);
+               State = states.STOPBALLSHOOTER;
+               break;
             case STOPBALLSHOOTER:
                AutoFlag = 4;
+               TimeUnit.SECONDS.sleep(2);
                telemetry.addData("AutoFlag = " , "4");
                telemetry.update();
                //robot.Shooter.setPower(0.0f);
                robot.setMecanumEncoderMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                robot.setMecanumEncoderMode(DcMotor.RunMode.RUN_TO_POSITION);
-               robot.setMecanumEncoderTargetPosition(800, 800, 800, 800);
+               robot.setMecanumEncoderTargetPosition(2100, 2100, 2100, 2100);
                robot.setMecanumPowers(0.4, 0.4, 0.4, 0.4);
-               if(!robot.MotorMecanumLeftFront.isBusy())
-               {
-                  State = states.DRIVETOBALL;
-               }
+               State = states.DRIVETOBALL;
                break;
             case DRIVETOBALL:
                AutoFlag = 5;
                telemetry.addData("AutoFlag = " , "5");
                telemetry.update();
-               State = states.END;
+
+               if (!robot.MotorMecanumLeftFront.isBusy())
+               {
+                  State = states.END;
+               }
                break;
             case END:
                AutoFlag = 6;

@@ -39,9 +39,20 @@ public class CF_Manual extends OpMode
    // Gain values should be set to a value between 0 and 1;
    // Values greater than 1.0f will increase the likelihood of
    // clipping computed power level.
+
+   //    When both of the joysticks used for driving are held at the same time, the
+//    robot cannot fully do both functions. Priority sets the team's driving
+//    priority - whether strafing, turning, or driving straight should have more
+//    importance, causing to robot to perform more of one action than of the others.
    private static final float forwardPriority = 1.0f;
    private static final float strafePriority = 1.0f;
    private static final float steerPriority = 1.0f;
+   private static final float forwardGain_Scoop = 1.0f;
+   private static final float strafeGain_Scoop = 1.0f;
+   private static final float steerGain_Scoop = 1.0f;
+   private static final float forwardGain_Lifter = 0.5f;
+   private static final float strafeGain_Lifter = 0.4f;
+   private static final float steerGain_Lifter = 0.3f;
 
    // Beacon button pusher servo increment rate
    private static final double beaconPusherRate = 0.005;
