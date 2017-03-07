@@ -1,8 +1,10 @@
 package org.firstinspires.ftc.teamcode;
+import com.qualcomm.hardware.adafruit.BNO055IMU;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
 
@@ -79,8 +81,14 @@ public abstract class CF_Library extends LinearOpMode {
       setPower(0.0f);
       setMode(DcMotor.RunMode.RUN_USING_ENCODER);
    }
-   public void encoderStrafeLeft(int count, float power) throws InterruptedException{
+   public void encoderStrafeLeftNew(int count, float power, BNO055IMU inertial) throws InterruptedException{
       boolean keepGoing = true;
+      double ang;
+      double error;
+      double effort;
+      double leftPower;
+      double rightPower;
+      double kP = 0.00045;
       robot.MotorMecanumLeftFront.setPower(power);
       robot.MotorMecanumRightFront.setPower(power);
       robot.MotorMecanumLeftRear.setPower(power/* + 0.05f*/);
@@ -93,11 +101,50 @@ public abstract class CF_Library extends LinearOpMode {
       robot.MotorMecanumRightRear.setTargetPosition(count);
       setMode(DcMotor.RunMode.RUN_TO_POSITION);
       while(keepGoing) {
-         double leftPos = robot.MotorMecanumLeftRear.getCurrentPosition();
-         double rightPos = robot.MotorMecanumRightRear.getCurrentPosition();
 
-         telemetry.addData("Right",rightPos);
-         telemetry.addData("Left",leftPos);
+         error = inertial.getAngularVelocity().toAngleUnit(AngleUnit.DEGREES).thirdAngleRate;
+         effort = kP * error;
+         rightPower = power - effort;
+         leftPower = power + effort;
+         setLeftPower((float) (power + leftPower));
+         setRightPower((float) (power + rightPower));
+         //telemetry.update();
+         if(!robot.MotorMecanumRightRear.isBusy() || !robot.MotorMecanumRightFront.isBusy() || !robot.MotorMecanumLeftFront.isBusy() || !robot.MotorMecanumLeftRear.isBusy()) {
+            keepGoing = false;
+            //setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+         }
+         try {
+            idle();
+         }
+         catch(InterruptedException e) {
+            telemetry.addData("Idle Failed", "Idle Failed");
+         }
+      }
+
+      setPower(0.0f);
+      setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+   }
+   public void encoderStrafeLeft(int count, float power) throws InterruptedException{
+      boolean keepGoing = true;
+      double ang;
+      double error;
+      double effort;
+      double leftPower;
+      double rightPower;
+      double kP = 0.00045;
+      robot.MotorMecanumLeftFront.setPower(power);
+      robot.MotorMecanumRightFront.setPower(power);
+      robot.MotorMecanumLeftRear.setPower(power/* + 0.05f*/);
+      robot.MotorMecanumRightRear.setPower(power/* + 0.05f*/);
+//      setFrontPower(power);
+//      setRearPower(power + 0.05f);
+      robot.MotorMecanumLeftFront.setTargetPosition(count);
+      robot.MotorMecanumRightFront.setTargetPosition(count * -1);
+      robot.MotorMecanumLeftRear.setTargetPosition(count * -1);
+      robot.MotorMecanumRightRear.setTargetPosition(count);
+      setMode(DcMotor.RunMode.RUN_TO_POSITION);
+      while(keepGoing) {
          //telemetry.update();
          if(!robot.MotorMecanumRightRear.isBusy() || !robot.MotorMecanumRightFront.isBusy() || !robot.MotorMecanumLeftFront.isBusy() || !robot.MotorMecanumLeftRear.isBusy()) {
             keepGoing = false;
