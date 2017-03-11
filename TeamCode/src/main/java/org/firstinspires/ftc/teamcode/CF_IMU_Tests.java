@@ -5,6 +5,8 @@ import com.qualcomm.hardware.adafruit.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.I2cController;
 
 import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -22,40 +24,41 @@ import java.util.concurrent.TimeUnit;
  */
 @Autonomous(name = "CF_IMU_Tests", group = "test")
 //@Disabled
-public class CF_IMU_Tests extends CF_Library {
-    BNO055IMU imu;
+public class CF_IMU_Tests extends CF_Library_Test {
 
+    BNO055IMU imu;
     Orientation angles;
     Acceleration gravity;
     Acceleration accel;
-    AngularVelocity ang;
+    Orientation ang;
 
     @Override public void runOpMode() throws  InterruptedException {
+        robot.init(hardwareMap);
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
         parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
-        parameters.calibrationDataFile = "AdafruitIMUCalibration.json";
-        parameters.loggingEnabled = true;
+
         parameters.loggingTag = "IMU";
         parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
 
         imu = hardwareMap.get(BNO055IMU.class, "imu");
         imu.initialize(parameters);
+        setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         waitForStart();
         imu.startAccelerationIntegration(new Position(), new Velocity(), 10);
 
         while(opModeIsActive()) {
-
             telemetry.clear();
-//            accel = imu.getAcceleration();
-            ang = imu.getAngularVelocity().toAngleUnit(AngleUnit.DEGREES);
-            encoderStrafeLeftNew(3000, (float) 0.5, imu);
-            telemetry.addData("Ang Vel", ang.thirdAngleRate);
+           // accel = imu.getAcceleration();
+            ang = imu.getAngularOrientation().toAxesReference(AxesReference.INTRINSIC).toAxesOrder(AxesOrder.XYZ);
+            //encoderStrafeLeft(8000, 0.20f);
+            encoderStrafeLeftNew(20000, 0.20f, imu);
+            telemetry.addData("Ang", ang.thirdAngle);
+            telemetry.addData("Type", ang.angleUnit);
             telemetry.update();
-            idle();
         }
 
-
     }
+
 }

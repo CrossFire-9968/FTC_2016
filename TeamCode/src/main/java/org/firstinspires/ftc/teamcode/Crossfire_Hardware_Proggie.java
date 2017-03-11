@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 /**
  * Created by Ryley on 3/6/17.
@@ -14,6 +15,8 @@ public class Crossfire_Hardware_Proggie {
     public DcMotor MotorMecanumRightRear;
 
     HardwareMap hwMap = null;
+    private ElapsedTime period = new ElapsedTime();
+
 
     public void init(HardwareMap ahwMap) {
         hwMap = ahwMap;
