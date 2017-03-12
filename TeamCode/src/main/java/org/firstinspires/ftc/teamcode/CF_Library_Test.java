@@ -97,16 +97,17 @@ public abstract class CF_Library_Test extends LinearOpMode {
         robot.MotorMecanumRightFront.setDirection(DcMotor.Direction.FORWARD);    // Set to FORWARD if using AndyMark motors
         robot.MotorMecanumRightRear.setDirection(DcMotor.Direction.FORWARD);  // Set to FORWARD if using AndyMark motor
 
+        robot.MotorMecanumLeftFront.setPower(power);
+        robot.MotorMecanumRightFront.setPower(power);
+        robot.MotorMecanumLeftRear.setPower(power);
+        robot.MotorMecanumRightRear.setPower(power);
 
-//      setFrontPower(power);
-//      setRearPower(power + 0.05f);
-//        robot.MotorMecanumLeftFront.setTargetPosition(count);
-//        robot.MotorMecanumRightFront.setTargetPosition(count * -1);
-//        robot.MotorMecanumLeftRear.setTargetPosition(count * -1);
-//        robot.MotorMecanumRightRear.setTargetPosition(count);
-//        setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        while(opModeIsActive()) {
+        robot.MotorMecanumLeftFront.setTargetPosition(count * -1);
+        robot.MotorMecanumRightFront.setTargetPosition(count);
+        robot.MotorMecanumLeftRear.setTargetPosition(count);
+        robot.MotorMecanumRightRear.setTargetPosition(count * -1);
+        setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        while(keepGoing) {
 
             //error = inertial.getAngularVelocity().toAngleUnit(AngleUnit.DEGREES).thirdAngleRate;
             ang = inertial.getAngularOrientation().toAxesReference(AxesReference.INTRINSIC).toAxesOrder(AxesOrder.XYZ);
@@ -114,10 +115,10 @@ public abstract class CF_Library_Test extends LinearOpMode {
             effort = kP * error;
             leftPower = power - effort;
             rightPower = power + effort;
-            robot.MotorMecanumLeftFront.setPower(0 - power - effort);
-            robot.MotorMecanumRightFront.setPower(power + effort);
-            robot.MotorMecanumLeftRear.setPower(power - effort);
-            robot.MotorMecanumRightRear.setPower(0 - power + effort);
+            robot.MotorMecanumLeftFront.setPower(power + effort);
+            robot.MotorMecanumRightFront.setPower(power - effort);
+            robot.MotorMecanumLeftRear.setPower(power + effort);
+            robot.MotorMecanumRightRear.setPower(power - effort);
 
 //            setLeftPower((float)frontPower);
 //            setRightPower((float)rearPower);
@@ -127,23 +128,83 @@ public abstract class CF_Library_Test extends LinearOpMode {
             telemetry.addData("error", effort);
             telemetry.addData("ang", ang);
             telemetry.update();
-            //telemetry.update();
-//            if(!robot.MotorMecanumRightRear.isBusy() || !robot.MotorMecanumRightFront.isBusy() || !robot.MotorMecanumLeftFront.isBusy() || !robot.MotorMecanumLeftRear.isBusy()) {
-//                keepGoing = false;
-//                //setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-//            }
-//            try {
-//                idle();
-//            }
-//            catch(InterruptedException e) {
-//                telemetry.addData("Idle Failed", "Idle Failed");
-//            }
+            if(!robot.MotorMecanumRightRear.isBusy() || !robot.MotorMecanumRightFront.isBusy() || !robot.MotorMecanumLeftFront.isBusy() || !robot.MotorMecanumLeftRear.isBusy()) {
+                keepGoing = false;
+                //setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            }
+            try {
+                idle();
+            }
+            catch(InterruptedException e) {
+                telemetry.addData("Idle Failed", "Idle Failed");
+            }
         }
 
         setPower(0.0f);
         setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
     }
+    public void encoderStrafeRightNew(int count, float power, BNO055IMU inertial) throws InterruptedException{
+        boolean keepGoing = true;
+        Orientation ang;
+        double error;
+        double effort;
+        double leftPower;
+        double rightPower;
+        double kP = 0.025;
+        robot.MotorMecanumLeftFront.setDirection(DcMotor.Direction.REVERSE);     // Set to REVERSE if using AndyMark motors
+        robot.MotorMecanumLeftRear.setDirection(DcMotor.Direction.REVERSE);      // Set to REVERSE if using AndyMark motors
+        robot.MotorMecanumRightFront.setDirection(DcMotor.Direction.FORWARD);    // Set to FORWARD if using AndyMark motors
+        robot.MotorMecanumRightRear.setDirection(DcMotor.Direction.FORWARD);  // Set to FORWARD if using AndyMark motor
+
+        robot.MotorMecanumLeftFront.setPower(power);
+        robot.MotorMecanumRightFront.setPower(power);
+        robot.MotorMecanumLeftRear.setPower(power);
+        robot.MotorMecanumRightRear.setPower(power);
+
+        robot.MotorMecanumLeftFront.setTargetPosition(count * -1);
+        robot.MotorMecanumRightFront.setTargetPosition(count);
+        robot.MotorMecanumLeftRear.setTargetPosition(count);
+        robot.MotorMecanumRightRear.setTargetPosition(count * -1);
+        setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        while(keepGoing) {
+
+            //error = inertial.getAngularVelocity().toAngleUnit(AngleUnit.DEGREES).thirdAngleRate;
+            ang = inertial.getAngularOrientation().toAxesReference(AxesReference.INTRINSIC).toAxesOrder(AxesOrder.XYZ);
+            error = ang.thirdAngle;
+            effort = kP * error;
+            leftPower = power - effort;
+            rightPower = power + effort;
+            robot.MotorMecanumLeftFront.setPower(power - effort);
+            robot.MotorMecanumRightFront.setPower(power + effort);
+            robot.MotorMecanumLeftRear.setPower(power - effort);
+            robot.MotorMecanumRightRear.setPower(power + effort);
+
+//            setLeftPower((float)frontPower);
+//            setRightPower((float)rearPower);
+            telemetry.clearAll();
+            telemetry.addData("front", leftPower);
+            telemetry.addData("rear", rightPower);
+            telemetry.addData("error", effort);
+            telemetry.addData("ang", ang);
+            telemetry.update();
+            if(!robot.MotorMecanumRightRear.isBusy() || !robot.MotorMecanumRightFront.isBusy() || !robot.MotorMecanumLeftFront.isBusy() || !robot.MotorMecanumLeftRear.isBusy()) {
+                keepGoing = false;
+                //setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            }
+            try {
+                idle();
+            }
+            catch(InterruptedException e) {
+                telemetry.addData("Idle Failed", "Idle Failed");
+            }
+        }
+
+        setPower(0.0f);
+        setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+    }
+
     public void encoderStrafeLeft(int count, float power) throws InterruptedException{
         boolean keepGoing = true;
         double ang;
