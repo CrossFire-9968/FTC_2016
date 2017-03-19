@@ -195,6 +195,7 @@ public class CF_Manual extends OpMode
          telemetry.addData("Exception: ", "Interrupted Exception");
       }
       telemetry.addData("Shooter Power", shooterPower);
+      telemetry.addData("RightFront:", robot.MotorMecanumRightFront.getCurrentPosition());
       telemetry.update();
    }
 
