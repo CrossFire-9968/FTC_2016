@@ -35,7 +35,7 @@ public class Crossfire_Hardware
    public DcMotor Shooter;
    public Servo Loader;
    public Servo ButtonPusher;
-   public ColorSensor sensorRGBright;
+   //public ColorSensor sensorRGBright;
    public ColorSensor sensorRGBleft;
 
    /* local OpMode members. */
@@ -65,7 +65,7 @@ public class Crossfire_Hardware
       MotorMecanumLeftRear = hwMap.dcMotor.get("left_rear_drive");
       MotorMecanumRightRear = hwMap.dcMotor.get("right_rear_drive");
       ButtonPusher = hwMap.servo.get("button_pusher");
-      sensorRGBright = hwMap.colorSensor.get("AdafruitRGBright");
+      ////sensorRGBright = hwMap.colorSensor.get("AdafruitRGBright");
       sensorRGBleft = hwMap.colorSensor.get("AdafruitRGBleft");
       Spinner= hwMap.dcMotor.get("spinner");
       Loader = hwMap.servo.get("loader");

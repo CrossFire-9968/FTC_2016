@@ -38,7 +38,7 @@ import org.firstinspires.ftc.robotcore.internal.VuforiaTrackablesImpl;
 public class CF_Manual extends OpMode
 {
    Crossfire_Hardware robot = new Crossfire_Hardware();
-   CF_SensorLibrary colorSensor = new CF_SensorLibrary();
+   //CF_SensorLibrary colorSensor = new CF_SensorLibrary();
 
 // Joystick threshold sets a minimum value for the controller joysticks
 // to reach before the robot will begin to move.
@@ -156,7 +156,7 @@ public class CF_Manual extends OpMode
       // Adjust the beacon button servo and the loader servo
       ServiceServos();
 
-      beaconColor = colorSensor.GetAdafruitColorRight(robot);
+      //beaconColor = colorSensor.GetAdafruitColorRight(robot);
 
       // Set steering to ball lifter driving mode
       if (gamepad1.a)
