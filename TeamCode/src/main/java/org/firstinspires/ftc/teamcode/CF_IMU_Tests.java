@@ -53,7 +53,7 @@ public class CF_IMU_Tests extends CF_Library_Test {
            // accel = imu.getAcceleration();
             ang = imu.getAngularOrientation().toAxesReference(AxesReference.INTRINSIC).toAxesOrder(AxesOrder.XYZ);
             //encoderStrafeLeft(8000, 0.20f);
-            encoderStrafeLeftNew(8000, 0.0f, imu);
+            encoderMoveNew(8000, 0.5f, imu);
             TimeUnit.MILLISECONDS.sleep(20);
             setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             telemetry.addData("Ang", ang.thirdAngle);
