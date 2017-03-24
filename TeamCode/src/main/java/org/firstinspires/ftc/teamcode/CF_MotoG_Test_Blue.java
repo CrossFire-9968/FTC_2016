@@ -2,6 +2,8 @@ package org.firstinspires.ftc.teamcode;
 
 import android.hardware.SensorManager;
 
+import com.qualcomm.hardware.adafruit.BNO055IMU;
+import com.qualcomm.hardware.adafruit.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -14,6 +16,7 @@ import com.vuforia.Vuforia;
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
 import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
@@ -25,10 +28,8 @@ import java.util.concurrent.TimeUnit;
  */
 @Autonomous(name="CF_MotoG_Test_Blue", group ="Blue")
 //@Disabled
-public class CF_MotoG_Test_Blue extends CF_Library{
+public class CF_MotoG_Test_Blue extends CF_Library_Test{
     // Position
-    int count = 0;
-    int countLeft = 0;
     OpenGLMatrix pose;
     VectorF translation = null;
 
@@ -41,8 +42,6 @@ public class CF_MotoG_Test_Blue extends CF_Library{
     int x = stopCount + 100;
     int y;
 
-    // Temp
-    DeviceInterfaceModule left = hardwareMap.deviceInterfaceModule.get("left");
     // Gains for the PID controllers
     double kPy = 0.00097;
     double kPangle = 0.0095;
@@ -82,6 +81,8 @@ public class CF_MotoG_Test_Blue extends CF_Library{
     // Number of seconds for the total time of the auto mode
     final int endTime = 29;
 
+    BNO055IMU imu;
+    Orientation ang;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -95,7 +96,7 @@ public class CF_MotoG_Test_Blue extends CF_Library{
         robot.MotorMecanumRightRear.setDirection(DcMotor.Direction.REVERSE);
 
         // This is a default speed
-        final float speed = 0.5f;
+        final float speed = 0.8f;
 
         // Instantiates a paramaters file for Vuforia
         VuforiaLocalizer.Parameters params = new VuforiaLocalizer.Parameters(R.id.cameraMonitorViewId);
@@ -118,10 +119,22 @@ public class CF_MotoG_Test_Blue extends CF_Library{
         beacons.get(2).setName("Legos");
         beacons.get(3).setName("Gears");
 
+        // Instantiates IMU
+        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+        parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
+        parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+
+        parameters.loggingTag = "IMU";
+        parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
+
+        imu = hardwareMap.get(BNO055IMU.class, "imu");
+        imu.initialize(parameters);
+
         // Instantiates color sensors
         sensorRGBright = hardwareMap.colorSensor.get("AdafruitRGBright");
         sensorRGBleft = hardwareMap.colorSensor.get("AdafruitRGBleft");
 
+        setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         // Instantiates switch enumeration
         driveState State = driveState.FIRSTSTRAFE;
 
@@ -142,16 +155,16 @@ public class CF_MotoG_Test_Blue extends CF_Library{
                     System.out.println("FIRST STRAFE");
                     // This is to get the robot more or less lined up with the picture
                     this.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                    count += 3000;
-                    this.encoderStrafeLeft(count, speed);
+                    setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                    this.encoderStrafeLeftNew(3000, speed, imu);
+                    this.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                     robot.Shooter.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                     robot.Shooter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-                    count += 1100;
-                    this.encoderMove(count, count, 0.6f, 0.6f);
+                    this.encoderMoveNew(1100, 0.6f, imu);
+                    this.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                     robot.Shooter.setPower(-0.31f);
                     //robot.Shooter.setPower(-0.3f);
-                    count += 1950;
-                    this.encoderStrafeLeft(count, speed);
+                    this.encoderStrafeLeftNew(1050, speed, imu);
                     System.out.println("DONE STRAFING");
 
                     // Increment the state to the next state
@@ -235,6 +248,8 @@ public class CF_MotoG_Test_Blue extends CF_Library{
                     // Turns off the shooter
                     robot.Shooter.setPower(0.0f);
                     System.out.println("DONE SHOOTING");
+                    setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                    setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
                     State = driveState.DRIVETOFIRSTBEACON;
                     break;
                 case DRIVETOFIRSTBEACON:
@@ -271,9 +286,9 @@ public class CF_MotoG_Test_Blue extends CF_Library{
                     if(x <= stopCount) {
                         // Stops if close enough to the picture
                         setPower(0.0f);
-                        State = driveState.PUSHFIRSTBEACON;
+                        //State = driveState.PUSHFIRSTBEACON;
 
-                        //breakLoop = true;
+                        breakLoop = true;
                     }
                     break;
                 case PUSHFIRSTBEACON:
@@ -282,9 +297,9 @@ public class CF_MotoG_Test_Blue extends CF_Library{
                     System.out.println("PUSH FIRST BEACON");
                     // Push the beacon button
                     pushBeaconButton();
+                    setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                     // Backs up after pushing the button
-                    count -= 1800;
-                    this.encoderMove(count, count, 0.6f, 0.6f);
+                    this.encoderMove(-1800, -1800, 0.6f, 0.6f);
                     State = driveState.SECONDSTRAFE;
                     //breakLoop = true;
                     break;
@@ -293,12 +308,11 @@ public class CF_MotoG_Test_Blue extends CF_Library{
                     checkTime();
                     System.out.println("SECOND STRAFE");
                     // Move close to the second picture
+                    setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                     // Strafes left to the next beacon
-                    count += 4650;
-                    encoderStrafeLeft(count, 0.63f);
-                    count += 100;
-                    countLeft = count - 200;
-                    encoderMove(count, countLeft, 0.3f, 0.3f);
+                    encoderStrafeLeft(4650, 0.63f);
+                    setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                    encoderMove(100, -100, 0.3f, 0.3f);
                     //encoderStrafeLeftDualPower(3750, 0.7f, 1000, 0.4f);
                     State = driveState.DRIVETOSECONDBEACON;
                     x = stopCount + 10;
@@ -348,10 +362,9 @@ public class CF_MotoG_Test_Blue extends CF_Library{
                     System.out.println("PUSH SECOND BEACON");
                     // Push the beacon button
                     pushBeaconButton();
+                    setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                     // Moves backward after pushing the beacon
-                    count -= 500;
-                    countLeft -= 500;
-                    this.encoderMove(count, countLeft, 0.4f, 0.4f);
+                    this.encoderMove(-500, -500, 0.4f, 0.4f);
                     State = driveState.END;
                     break;
                 case END:
@@ -397,9 +410,11 @@ public class CF_MotoG_Test_Blue extends CF_Library{
         // Reset motor encoders
         setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
+        // Run using encoders
         setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
         // Sends telemetry message to signify encoder reset
-        if(robot.MotorMecanumLeftFront.getMode() == DcMotor.RunMode.STOP_AND_RESET_ENCODER) {
+        if(robot.MotorMecanumLeftFront.getMode() == DcMotor.RunMode.RUN_USING_ENCODER) {
             telemetry.addData("Encoder Reset", "Encoder Reset");
             telemetry.update();
         } else {
