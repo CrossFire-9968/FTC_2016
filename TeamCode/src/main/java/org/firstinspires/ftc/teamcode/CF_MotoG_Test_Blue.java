@@ -156,7 +156,7 @@ public class CF_MotoG_Test_Blue extends CF_Library_Test{
                     // This is to get the robot more or less lined up with the picture
                     this.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                     setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                    this.encoderStrafeLeftNew(3000, speed, imu);
+                    this.encoderStrafeLeftNew(2650, speed, imu);
                     this.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                     robot.Shooter.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                     robot.Shooter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -164,7 +164,7 @@ public class CF_MotoG_Test_Blue extends CF_Library_Test{
                     this.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                     robot.Shooter.setPower(-0.31f);
                     //robot.Shooter.setPower(-0.3f);
-                    this.encoderStrafeLeftNew(1050, speed, imu);
+                    this.encoderStrafeLeftNew(2250, speed, imu);
                     System.out.println("DONE STRAFING");
 
                     // Increment the state to the next state
@@ -427,8 +427,8 @@ public class CF_MotoG_Test_Blue extends CF_Library_Test{
 
     private void pidDrive(int yDist) {
         int error;
-        double kP = 0.00045; // 0.0005
-        double power = 0.2;
+        double kP = 0.0009; // 0.00045
+        double power = 0.15;
         double effort;
         double leftPower;
         double rightPower;
