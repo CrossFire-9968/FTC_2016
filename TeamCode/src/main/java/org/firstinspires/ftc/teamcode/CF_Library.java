@@ -79,7 +79,7 @@ public abstract class CF_Library extends LinearOpMode {
       setPower(0.0f);
       setMode(DcMotor.RunMode.RUN_USING_ENCODER);
    }
-   public void encoderStrafeLeft(int count, float power) throws InterruptedException{
+   public void encoderStrafeRight(int count, float power) throws InterruptedException{
       boolean keepGoing = true;
       robot.MotorMecanumLeftFront.setPower(power);
       robot.MotorMecanumRightFront.setPower(power);
@@ -146,7 +146,7 @@ public abstract class CF_Library extends LinearOpMode {
       setPower(0.0f);
       setMode(DcMotor.RunMode.RUN_USING_ENCODER);
    }
-   public void encoderStrafeRight(int count, float power) throws InterruptedException{
+   public void encoderStrafeLeft(int count, float power) throws InterruptedException{
       boolean keepGoing = true;
       setRightPower(power);
       setLeftPower(power);
