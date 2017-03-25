@@ -241,10 +241,10 @@ public class CF_Manual extends OpMode
          telemetry.addData("Mode: ", "Beacon");
          if (robot.driveMode == Crossfire_Hardware.driveModeEnum.beaconMode)
          {
-            LFPower = (forwardPriority * leftStickY) + (strafePriority * leftStickX) - (steerPriority * rightStickX);
-            RFPower = (forwardPriority * leftStickY) - (strafePriority * leftStickX) + (steerPriority * rightStickX);
-            LRPower = (forwardPriority * leftStickY) - (strafePriority * leftStickX) - (steerPriority * rightStickX);
-            RRPower = (forwardPriority * leftStickY) + (strafePriority * leftStickX) + (steerPriority * rightStickX);
+            LFPower = (forwardPriority * -leftStickY) - (strafePriority * -leftStickX) - (steerPriority * -rightStickX);
+            RFPower = (forwardPriority * -leftStickY) + (strafePriority * -leftStickX) + (steerPriority * -rightStickX);
+            LRPower = (forwardPriority * -leftStickY) + (strafePriority * -leftStickX) - (steerPriority * -rightStickX);
+            RRPower = (forwardPriority * -leftStickY) - (strafePriority * -leftStickX) + (steerPriority * -rightStickX);
          }
 
           //The strafe drive mode sets the side of the robot with the cap ball lifter
@@ -252,10 +252,10 @@ public class CF_Manual extends OpMode
          telemetry.addData("Mode: ", "Strafe");
          if (robot.driveMode == Crossfire_Hardware.driveModeEnum.ballLifterMode)
          {
-            LFPower = (forwardGain_Lifter * -leftStickX) - (strafeGain_Lifter * -leftStickY) + (steerGain_Lifter * -rightStickX);
-            RFPower = (forwardGain_Lifter * -leftStickX) + (strafeGain_Lifter * -leftStickY) - (steerGain_Lifter * -rightStickX);
-            LRPower = (forwardGain_Lifter * -leftStickX) + (strafeGain_Lifter * -leftStickY) + (steerGain_Lifter * -rightStickX);
-            RRPower = (forwardGain_Lifter * -leftStickX) - (strafeGain_Lifter * -leftStickY) - (steerGain_Lifter * -rightStickX);
+            LFPower = (forwardGain_Lifter * leftStickX) + (strafeGain_Lifter * leftStickY) + (steerGain_Lifter * rightStickX);
+            RFPower = (forwardGain_Lifter * leftStickX) - (strafeGain_Lifter * leftStickY) - (steerGain_Lifter * rightStickX);
+            LRPower = (forwardGain_Lifter * leftStickX) - (strafeGain_Lifter * leftStickY) + (steerGain_Lifter * rightStickX);
+            RRPower = (forwardGain_Lifter * leftStickX) + (strafeGain_Lifter * leftStickY) - (steerGain_Lifter * rightStickX);
             telemetry.addData("leftStickX", leftStickX);
          }
 
@@ -263,10 +263,10 @@ public class CF_Manual extends OpMode
          telemetry.addData("Mode: ", "Scoop");
          if (robot.driveMode == Crossfire_Hardware.driveModeEnum.scooperMode)
          {
-            LFPower = (forwardGain_Scoop * -leftStickY) - (strafeGain_Scoop * leftStickX) + (steerGain_Scoop * -rightStickX);
-            RFPower = (forwardGain_Scoop * -leftStickY) + (strafeGain_Scoop * leftStickX) - (steerGain_Scoop * -rightStickX);
-            LRPower = (forwardGain_Scoop * -leftStickY) + (strafeGain_Scoop * leftStickX) + (steerGain_Scoop * -rightStickX);
-            RRPower = (forwardGain_Scoop * -leftStickY) - (strafeGain_Scoop * leftStickX) - (steerGain_Scoop * -rightStickX);
+            LFPower = (forwardGain_Scoop * leftStickY) + (strafeGain_Scoop * -leftStickX) + (steerGain_Scoop * rightStickX);
+            RFPower = (forwardGain_Scoop * leftStickY) - (strafeGain_Scoop * -leftStickX) - (steerGain_Scoop * rightStickX);
+            LRPower = (forwardGain_Scoop * leftStickY) - (strafeGain_Scoop * -leftStickX) + (steerGain_Scoop * rightStickX);
+            RRPower = (forwardGain_Scoop * leftStickY) + (strafeGain_Scoop * -leftStickX) - (steerGain_Scoop * rightStickX);
          }
 
          // Find maximum power commanded to all the mecanum wheels.  Using the above power
