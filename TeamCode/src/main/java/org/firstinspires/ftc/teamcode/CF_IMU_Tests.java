@@ -24,7 +24,9 @@ import java.util.concurrent.TimeUnit;
  */
 @Autonomous(name = "CF_IMU_Tests", group = "test")
 //@Disabled
-public class CF_IMU_Tests extends CF_Library_Test {
+public class CF_IMU_Tests extends LinearOpMode /*extends CF_Library_Test*/ {
+
+    Crossfire_Hardware robot = new Crossfire_Hardware();
 
     BNO055IMU imu;
     Orientation angles;
@@ -43,23 +45,27 @@ public class CF_IMU_Tests extends CF_Library_Test {
 
         imu = hardwareMap.get(BNO055IMU.class, "imu");
         imu.initialize(parameters);
-        setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        //setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.MotorMecanumLeftFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.MotorMecanumLeftFront.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
 
         waitForStart();
         imu.startAccelerationIntegration(new Position(), new Velocity(), 10);
 
-//        while(opModeIsActive()) {
-            telemetry.clear();
-           // accel = imu.getAcceleration();
-            ang = imu.getAngularOrientation().toAxesReference(AxesReference.INTRINSIC).toAxesOrder(AxesOrder.XYZ);
-            //encoderStrafeLeft(8000, 0.20f);
-            encoderStrafeRightNew(5000, 0.5f, imu);
-            TimeUnit.MILLISECONDS.sleep(20);
-            setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            telemetry.addData("Ang", ang.thirdAngle);
-            telemetry.addData("Type", ang.angleUnit);
-            telemetry.update();
-//        }
+        while(opModeIsActive()) {
+            robot.MotorMecanumLeftFront.setPower(1.0f);
+//            telemetry.clear();
+//           // accel = imu.getAcceleration();
+//            ang = imu.getAngularOrientation().toAxesReference(AxesReference.INTRINSIC).toAxesOrder(AxesOrder.XYZ);
+//            //encoderStrafeLeft(8000, 0.20f);
+//            encoderStrafeRightNew(5000, 0.5f, imu);
+//            TimeUnit.MILLISECONDS.sleep(20);
+//            setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//            telemetry.addData("Ang", ang.thirdAngle);
+//            telemetry.addData("Type", ang.angleUnit);
+//            telemetry.update();
+        }
 
     }
 

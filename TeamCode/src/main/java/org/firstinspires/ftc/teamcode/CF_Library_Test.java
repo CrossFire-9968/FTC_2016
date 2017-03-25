@@ -191,9 +191,9 @@ public abstract class CF_Library_Test extends LinearOpMode {
             effort = kP * error;
             leftPower = power - effort;
             rightPower = power + effort;
-            robot.MotorMecanumLeftFront.setPower(power - effort);
+            robot.MotorMecanumLeftFront.setPower((-1 * power) - effort);
             robot.MotorMecanumRightFront.setPower(power + effort);
-            robot.MotorMecanumLeftRear.setPower((-1 * power) - effort);
+            robot.MotorMecanumLeftRear.setPower(power - effort);
             robot.MotorMecanumRightRear.setPower((-1 * power) + effort);
 
 //            setLeftPower((float)frontPower);

@@ -286,9 +286,9 @@ public class CF_MotoG_Test_Blue extends CF_Library_Test{
                     if(x <= stopCount) {
                         // Stops if close enough to the picture
                         setPower(0.0f);
-                        //State = driveState.PUSHFIRSTBEACON;
+                        State = driveState.PUSHFIRSTBEACON;
 
-                        breakLoop = true;
+                        //breakLoop = true;
                     }
                     break;
                 case PUSHFIRSTBEACON:
