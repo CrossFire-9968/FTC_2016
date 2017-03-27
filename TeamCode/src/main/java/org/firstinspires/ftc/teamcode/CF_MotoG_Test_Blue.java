@@ -34,7 +34,7 @@ public class CF_MotoG_Test_Blue extends CF_Library_Test{
     VectorF translation = null;
 
     // This is how far from the picture to stop
-    final int stopCount = 120;
+    final int stopCount = 150;
     boolean breakLoop = false;
 
     // If x is smaller than stopCount, it doesn't work, so we instantiate
@@ -90,13 +90,8 @@ public class CF_MotoG_Test_Blue extends CF_Library_Test{
         robot.init(hardwareMap);
 
         // Set drive motor direction
-        robot.MotorMecanumLeftFront.setDirection(DcMotor.Direction.FORWARD);
-        robot.MotorMecanumLeftRear.setDirection(DcMotor.Direction.FORWARD);
-        robot.MotorMecanumRightFront.setDirection(DcMotor.Direction.REVERSE);
-        robot.MotorMecanumRightRear.setDirection(DcMotor.Direction.REVERSE);
-
         // This is a default speed
-        final float speed = 0.8f;
+        final float speed = 1.0f;
 
         // Instantiates a paramaters file for Vuforia
         VuforiaLocalizer.Parameters params = new VuforiaLocalizer.Parameters(R.id.cameraMonitorViewId);
@@ -160,11 +155,12 @@ public class CF_MotoG_Test_Blue extends CF_Library_Test{
                     this.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                     robot.Shooter.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                     robot.Shooter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-                    this.encoderMoveNew(1100, 0.6f, imu);
-                    this.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                    robot.Shooter.setPower(-0.31f);
+                    this.encoderMoveNew(1100, 0.7f, imu);
+                    //this.encoderMove(1100, 1100, speed, speed);
+                    robot.Shooter.setPower(-0.32f);
                     //robot.Shooter.setPower(-0.3f);
-                    this.encoderStrafeLeftNew(2250, speed, imu);
+                    setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                    this.encoderStrafeLeftNew(2400, speed, imu);
                     System.out.println("DONE STRAFING");
 
                     // Increment the state to the next state
@@ -232,7 +228,6 @@ public class CF_MotoG_Test_Blue extends CF_Library_Test{
                 case BALLONE:
                     // Runs checkTime method
                     checkTime();
-                    TimeUnit.SECONDS.sleep(2);
                     System.out.println("BALL ONE");
                     // Increment the first ball
                     robot.SetLoaderPosition(0.015);
@@ -244,7 +239,7 @@ public class CF_MotoG_Test_Blue extends CF_Library_Test{
                     checkTime();
                     // Increment the second ball
                     robot.SetLoaderPosition(0.0f);
-                    TimeUnit.SECONDS.sleep(1);
+                    TimeUnit.MILLISECONDS.sleep(500);
                     // Turns off the shooter
                     robot.Shooter.setPower(0.0f);
                     System.out.println("DONE SHOOTING");
@@ -299,7 +294,7 @@ public class CF_MotoG_Test_Blue extends CF_Library_Test{
                     pushBeaconButton();
                     setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                     // Backs up after pushing the button
-                    this.encoderMove(-1800, -1800, 0.6f, 0.6f);
+                    this.encoderMoveNew(1800, (speed * -1), imu);
                     State = driveState.SECONDSTRAFE;
                     //breakLoop = true;
                     break;
@@ -310,9 +305,7 @@ public class CF_MotoG_Test_Blue extends CF_Library_Test{
                     // Move close to the second picture
                     setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                     // Strafes left to the next beacon
-                    encoderStrafeLeft(4650, 0.63f);
-                    setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                    encoderMove(100, -100, 0.3f, 0.3f);
+                    encoderStrafeLeftNew(4800, speed, imu);
                     //encoderStrafeLeftDualPower(3750, 0.7f, 1000, 0.4f);
                     State = driveState.DRIVETOSECONDBEACON;
                     x = stopCount + 10;
@@ -327,8 +320,12 @@ public class CF_MotoG_Test_Blue extends CF_Library_Test{
 
                     // Gets the position matrix
                     pose = ((VuforiaTrackableDefaultListener) beacons.get(SECONDPICTURE).getListener()).getRawPose();
-
+//                    telemetry.clearAll();
+//                    telemetry.addData("x", x);
+//                    telemetry.addData("StopCount:", stopCount);
+//                    telemetry.update();
                     if(pose != null && x > stopCount) {
+                        telemetry.clearAll();
                         System.out.println("SEEABLE");
                         // Gets the transation matrix out of the pose matrix
                         translation = pose.getTranslation();
@@ -364,7 +361,7 @@ public class CF_MotoG_Test_Blue extends CF_Library_Test{
                     pushBeaconButton();
                     setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                     // Moves backward after pushing the beacon
-                    this.encoderMove(-500, -500, 0.4f, 0.4f);
+                    this.encoderMoveNew(500, -0.4f, imu);
                     State = driveState.END;
                     break;
                 case END:
@@ -427,7 +424,7 @@ public class CF_MotoG_Test_Blue extends CF_Library_Test{
 
     private void pidDrive(int yDist) {
         int error;
-        double kP = 0.0009; // 0.00045
+        double kP = 0.002; // 0.00045 // 0.00090
         double power = 0.15;
         double effort;
         double leftPower;

@@ -24,9 +24,8 @@ import java.util.concurrent.TimeUnit;
  */
 @Autonomous(name = "CF_IMU_Tests", group = "test")
 //@Disabled
-public class CF_IMU_Tests extends LinearOpMode /*extends CF_Library_Test*/ {
+public class CF_IMU_Tests extends CF_Library_Test {
 
-    Crossfire_Hardware robot = new Crossfire_Hardware();
 
     BNO055IMU imu;
     Orientation angles;
@@ -35,7 +34,6 @@ public class CF_IMU_Tests extends LinearOpMode /*extends CF_Library_Test*/ {
     Orientation ang;
 
     @Override public void runOpMode() throws  InterruptedException {
-        robot.init(hardwareMap);
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
         parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
@@ -53,9 +51,9 @@ public class CF_IMU_Tests extends LinearOpMode /*extends CF_Library_Test*/ {
         waitForStart();
         imu.startAccelerationIntegration(new Position(), new Velocity(), 10);
 
-        while(opModeIsActive()) {
-            robot.MotorMecanumLeftFront.setPower(1.0f);
-//            telemetry.clear();
+        //while(opModeIsActive()) {
+            encoderMove(1000, 1000, 0.2f, 0.2f);
+            //            telemetry.clear();
 //           // accel = imu.getAcceleration();
 //            ang = imu.getAngularOrientation().toAxesReference(AxesReference.INTRINSIC).toAxesOrder(AxesOrder.XYZ);
 //            //encoderStrafeLeft(8000, 0.20f);
@@ -65,7 +63,7 @@ public class CF_IMU_Tests extends LinearOpMode /*extends CF_Library_Test*/ {
 //            telemetry.addData("Ang", ang.thirdAngle);
 //            telemetry.addData("Type", ang.angleUnit);
 //            telemetry.update();
-        }
+       // }
 
     }
 

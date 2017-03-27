@@ -53,7 +53,7 @@ public abstract class CF_Library_Test extends LinearOpMode {
     public void encoderMove(int countLeft, int countRight, double leftPower, double rightPower){
 
         boolean keepGoing = true;
-        this.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         robot.MotorMecanumLeftFront.setPower(leftPower);
         robot.MotorMecanumRightFront.setPower(rightPower);
@@ -85,7 +85,7 @@ public abstract class CF_Library_Test extends LinearOpMode {
         setPower(0.0f);
         setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
-    public void encoderStrafeRightNew(int count, float power, BNO055IMU inertial) throws InterruptedException{
+    public void encoderStrafeLeftNew(int count, float power, BNO055IMU inertial) throws InterruptedException{
         boolean keepGoing = true;
         Orientation ang;
         double error;
@@ -93,11 +93,10 @@ public abstract class CF_Library_Test extends LinearOpMode {
         double leftPower;
         double rightPower;
         double kP = 0.025;
-        int target = ((Math.abs(robot.MotorMecanumLeftFront.getCurrentPosition()) + Math.abs(robot.MotorMecanumRightFront.getCurrentPosition()) + Math.abs(robot.MotorMecanumLeftRear.getCurrentPosition()) + Math.abs(robot.MotorMecanumRightRear.getCurrentPosition())) / 4) + count;
-        robot.MotorMecanumLeftFront.setDirection(DcMotor.Direction.REVERSE);     // Set to REVERSE if using AndyMark motors
-        robot.MotorMecanumLeftRear.setDirection(DcMotor.Direction.REVERSE);      // Set to REVERSE if using AndyMark motors
-        robot.MotorMecanumRightFront.setDirection(DcMotor.Direction.FORWARD);    // Set to FORWARD if using AndyMark motors
-        robot.MotorMecanumRightRear.setDirection(DcMotor.Direction.FORWARD);  // Set to FORWARD if using AndyMark motor
+        setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        int target;
+        target = ((Math.abs(robot.MotorMecanumLeftFront.getCurrentPosition()) + Math.abs(robot.MotorMecanumRightFront.getCurrentPosition()) + Math.abs(robot.MotorMecanumLeftRear.getCurrentPosition()) + Math.abs(robot.MotorMecanumRightRear.getCurrentPosition())) / 4) + count;
+
 
 //        robot.MotorMecanumLeftFront.setPower(power);
 //        robot.MotorMecanumRightFront.setPower(power);
@@ -119,22 +118,19 @@ public abstract class CF_Library_Test extends LinearOpMode {
             Position pos = inertial.getPosition();
             error = ang.thirdAngle;
             effort = kP * error;
-            leftPower = power - effort;
-            rightPower = power + effort;
-            robot.MotorMecanumLeftFront.setPower((-1 *power) - effort);
-            robot.MotorMecanumRightFront.setPower((-1 * power) + effort);
-            robot.MotorMecanumLeftRear.setPower(power - effort);
-            robot.MotorMecanumRightRear.setPower(power + effort);
+
+            robot.MotorMecanumLeftFront.setPower((-1 * power) + effort);
+            robot.MotorMecanumRightFront.setPower(power - effort);
+            robot.MotorMecanumLeftRear.setPower(power + effort);
+            robot.MotorMecanumRightRear.setPower((-1 * power) - effort);
 
 //            setLeftPower((float)frontPower);
 //            setRightPower((float)rearPower);
             telemetry.clearAll();
-            telemetry.addData("front", leftPower);
-            telemetry.addData("rear", rightPower);
             telemetry.addData("error", effort);
             telemetry.addData("ang", ang);
             telemetry.addData("pos", (Math.abs(robot.MotorMecanumLeftFront.getCurrentPosition()) + Math.abs(robot.MotorMecanumRightFront.getCurrentPosition()) + Math.abs(robot.MotorMecanumLeftRear.getCurrentPosition()) + Math.abs(robot.MotorMecanumRightRear.getCurrentPosition())) / 4);
-            //telemetry.update();
+            telemetry.update();
             if(((Math.abs(robot.MotorMecanumLeftFront.getCurrentPosition()) + Math.abs(robot.MotorMecanumRightFront.getCurrentPosition()) + Math.abs(robot.MotorMecanumLeftRear.getCurrentPosition()) + Math.abs(robot.MotorMecanumRightRear.getCurrentPosition())) / 4)  > target) {
                 keepGoing = false;
                 //setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -149,14 +145,10 @@ public abstract class CF_Library_Test extends LinearOpMode {
 
         setPower(0.0f);
         setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        robot.MotorMecanumLeftFront.setDirection(DcMotor.Direction.FORWARD);
-        robot.MotorMecanumLeftRear.setDirection(DcMotor.Direction.FORWARD);
-        robot.MotorMecanumRightFront.setDirection(DcMotor.Direction.REVERSE);
-        robot.MotorMecanumRightRear.setDirection(DcMotor.Direction.REVERSE);
 
 
     }
-    public void encoderStrafeLeftNew(int count, float power, BNO055IMU inertial) throws InterruptedException{
+    public void encoderStrafeRightNew(int count, float power, BNO055IMU inertial) throws InterruptedException{
         boolean keepGoing = true;
         Orientation ang;
         double error;
@@ -165,10 +157,6 @@ public abstract class CF_Library_Test extends LinearOpMode {
         double rightPower;
         double kP = 0.025;
         int target = ((Math.abs(robot.MotorMecanumLeftFront.getCurrentPosition()) + Math.abs(robot.MotorMecanumRightFront.getCurrentPosition()) + Math.abs(robot.MotorMecanumLeftRear.getCurrentPosition()) + Math.abs(robot.MotorMecanumRightRear.getCurrentPosition())) / 4)+ count;
-        robot.MotorMecanumLeftFront.setDirection(DcMotor.Direction.REVERSE);     // Set to REVERSE if using AndyMark motors
-        robot.MotorMecanumLeftRear.setDirection(DcMotor.Direction.REVERSE);      // Set to REVERSE if using AndyMark motors
-        robot.MotorMecanumRightFront.setDirection(DcMotor.Direction.FORWARD);    // Set to FORWARD if using AndyMark motors
-        robot.MotorMecanumRightRear.setDirection(DcMotor.Direction.FORWARD);  // Set to FORWARD if using AndyMark motor
 
 //        robot.MotorMecanumLeftFront.setPower(power);
 //        robot.MotorMecanumRightFront.setPower(power);
@@ -191,10 +179,10 @@ public abstract class CF_Library_Test extends LinearOpMode {
             effort = kP * error;
             leftPower = power - effort;
             rightPower = power + effort;
-            robot.MotorMecanumLeftFront.setPower((-1 * power) - effort);
-            robot.MotorMecanumRightFront.setPower(power + effort);
-            robot.MotorMecanumLeftRear.setPower(power - effort);
-            robot.MotorMecanumRightRear.setPower((-1 * power) + effort);
+            robot.MotorMecanumLeftFront.setPower(power - effort);
+            robot.MotorMecanumRightFront.setPower((-1 * power) + effort);
+            robot.MotorMecanumLeftRear.setPower((-1 * power) - effort);
+            robot.MotorMecanumRightRear.setPower(power + effort);
 
 //            setLeftPower((float)frontPower);
 //            setRightPower((float)rearPower);
@@ -218,11 +206,6 @@ public abstract class CF_Library_Test extends LinearOpMode {
         }
 
         setPower(0.0f);
-        robot.MotorMecanumLeftFront.setDirection(DcMotor.Direction.FORWARD);
-        robot.MotorMecanumLeftRear.setDirection(DcMotor.Direction.FORWARD);
-        robot.MotorMecanumRightFront.setDirection(DcMotor.Direction.REVERSE);
-        robot.MotorMecanumRightRear.setDirection(DcMotor.Direction.REVERSE);
-
 
     }
     public void encoderMoveNew(int count, float power, BNO055IMU inertial) {
@@ -234,10 +217,6 @@ public abstract class CF_Library_Test extends LinearOpMode {
         double rightPower;
         double kP = 0.025;
         int target = ((Math.abs(robot.MotorMecanumLeftFront.getCurrentPosition()) + Math.abs(robot.MotorMecanumRightFront.getCurrentPosition()) + Math.abs(robot.MotorMecanumLeftRear.getCurrentPosition()) + Math.abs(robot.MotorMecanumRightRear.getCurrentPosition())) / 4)+ count;
-        robot.MotorMecanumLeftFront.setDirection(DcMotor.Direction.REVERSE);     // Set to REVERSE if using AndyMark motors
-        robot.MotorMecanumLeftRear.setDirection(DcMotor.Direction.REVERSE);      // Set to REVERSE if using AndyMark motors
-        robot.MotorMecanumRightFront.setDirection(DcMotor.Direction.FORWARD);    // Set to FORWARD if using AndyMark motors
-        robot.MotorMecanumRightRear.setDirection(DcMotor.Direction.FORWARD);  // Set to FORWARD if using AndyMark motor
 
 //        robot.MotorMecanumLeftFront.setPower(power);
 //        robot.MotorMecanumRightFront.setPower(power);
@@ -260,10 +239,10 @@ public abstract class CF_Library_Test extends LinearOpMode {
             effort = kP * error;
             leftPower = power + effort;
             rightPower = power - effort;
-            robot.MotorMecanumLeftFront.setPower(-1 * leftPower);
-            robot.MotorMecanumLeftRear.setPower(-1 * leftPower);
-            robot.MotorMecanumRightFront.setPower(-1 * rightPower);
-            robot.MotorMecanumRightRear.setPower(-1 * rightPower);
+            robot.MotorMecanumLeftFront.setPower(leftPower);
+            robot.MotorMecanumLeftRear.setPower(leftPower);
+            robot.MotorMecanumRightFront.setPower(rightPower);
+            robot.MotorMecanumRightRear.setPower(rightPower);
 
             telemetry.clearAll();
             telemetry.addData("ang", ang);
