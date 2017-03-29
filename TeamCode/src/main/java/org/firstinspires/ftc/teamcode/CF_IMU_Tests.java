@@ -5,6 +5,7 @@ import com.qualcomm.hardware.adafruit.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.I2cController;
 
@@ -34,6 +35,7 @@ public class CF_IMU_Tests extends CF_Library_Test {
     Orientation ang;
 
     @Override public void runOpMode() throws  InterruptedException {
+        robot.init(hardwareMap);
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
         parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
@@ -47,12 +49,19 @@ public class CF_IMU_Tests extends CF_Library_Test {
         robot.MotorMecanumLeftFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.MotorMecanumLeftFront.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
+        ColorSensor sensorRGBright = hardwareMap.colorSensor.get("AdafruitRGBright");
+        ColorSensor sensorRGBleft = hardwareMap.colorSensor.get("AdafruitRGBleft");
 
         waitForStart();
-        imu.startAccelerationIntegration(new Position(), new Velocity(), 10);
+        //imu.startAccelerationIntegration(new Position(), new Velocity(), 10);
 
-        //while(opModeIsActive()) {
-            encoderMove(1000, 1000, 0.2f, 0.2f);
+        while(opModeIsActive()) {
+            telemetry.clearAll();
+            telemetry.addData("LeftRed",sensorRGBleft.red());
+            telemetry.addData("LeftBlue",sensorRGBleft.blue());
+            telemetry.addData("RightRed",sensorRGBright.red());
+            telemetry.addData("RightBlue",sensorRGBright.blue());
+        telemetry.update();
             //            telemetry.clear();
 //           // accel = imu.getAcceleration();
 //            ang = imu.getAngularOrientation().toAxesReference(AxesReference.INTRINSIC).toAxesOrder(AxesOrder.XYZ);
@@ -63,7 +72,7 @@ public class CF_IMU_Tests extends CF_Library_Test {
 //            telemetry.addData("Ang", ang.thirdAngle);
 //            telemetry.addData("Type", ang.angleUnit);
 //            telemetry.update();
-       // }
+        }
 
     }
 

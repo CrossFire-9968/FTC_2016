@@ -53,7 +53,7 @@ public abstract class CF_Library_Test extends LinearOpMode {
     public void encoderMove(int countLeft, int countRight, double leftPower, double rightPower){
 
         boolean keepGoing = true;
-        setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         robot.MotorMecanumLeftFront.setPower(leftPower);
         robot.MotorMecanumRightFront.setPower(rightPower);
@@ -65,13 +65,12 @@ public abstract class CF_Library_Test extends LinearOpMode {
         robot.MotorMecanumLeftRear.setTargetPosition(countLeft);
         robot.MotorMecanumRightRear.setTargetPosition(countRight);
 
-        setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         while(keepGoing) {
             //telemetry.addData("Right",rightPos);
             //telemetry.addData("Left",leftPos);
             //telemetry.update();
-            if(!robot.MotorMecanumRightRear.isBusy() || !robot.MotorMecanumRightFront.isBusy() || !robot.MotorMecanumLeftFront.isBusy() || !robot.MotorMecanumLeftRear.isBusy()) {
+            if((!robot.MotorMecanumRightRear.isBusy() && !robot.MotorMecanumLeftFront.isBusy()) ||  (!robot.MotorMecanumRightFront.isBusy() && !robot.MotorMecanumLeftRear.isBusy())) {
                 keepGoing = false;
                 //setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             }
@@ -259,7 +258,7 @@ public abstract class CF_Library_Test extends LinearOpMode {
 
     }
 
-    public void encoderStrafeLeft(int count, float power) throws InterruptedException{
+    public void encoderStrafeRight(int count, float power) throws InterruptedException{
         boolean keepGoing = true;
         double ang;
         double error;
@@ -267,6 +266,9 @@ public abstract class CF_Library_Test extends LinearOpMode {
         double leftPower;
         double rightPower;
         double kP = 0.00045;
+
+        setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
         robot.MotorMecanumLeftFront.setPower(power);
         robot.MotorMecanumRightFront.setPower(power);
         robot.MotorMecanumLeftRear.setPower(power/* + 0.05f*/);
@@ -277,10 +279,9 @@ public abstract class CF_Library_Test extends LinearOpMode {
         robot.MotorMecanumRightFront.setTargetPosition(count * -1);
         robot.MotorMecanumLeftRear.setTargetPosition(count * -1);
         robot.MotorMecanumRightRear.setTargetPosition(count);
-        setMode(DcMotor.RunMode.RUN_TO_POSITION);
         while(keepGoing) {
             //telemetry.update();
-            if(!robot.MotorMecanumRightRear.isBusy() || !robot.MotorMecanumRightFront.isBusy() || !robot.MotorMecanumLeftFront.isBusy() || !robot.MotorMecanumLeftRear.isBusy()) {
+            if((!robot.MotorMecanumRightRear.isBusy() && !robot.MotorMecanumLeftFront.isBusy()) ||  (!robot.MotorMecanumRightFront.isBusy() && !robot.MotorMecanumLeftRear.isBusy())) {
                 keepGoing = false;
                 //setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             }
@@ -327,8 +328,10 @@ public abstract class CF_Library_Test extends LinearOpMode {
         setPower(0.0f);
         setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
-    public void encoderStrafeRight(int count, float power) throws InterruptedException{
+    public void encoderStrafeLeft(int count, float power) throws InterruptedException{
         boolean keepGoing = true;
+        setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
         setRightPower(power);
         setLeftPower(power);
         setPower(power);
@@ -337,7 +340,7 @@ public abstract class CF_Library_Test extends LinearOpMode {
         robot.MotorMecanumRightFront.setTargetPosition(count);
         robot.MotorMecanumLeftRear.setTargetPosition(count);
         robot.MotorMecanumRightRear.setTargetPosition(count * -1);
-        setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
         while(keepGoing) {
             double leftPos = robot.MotorMecanumLeftRear.getCurrentPosition();
             double rightPos = robot.MotorMecanumRightRear.getCurrentPosition();
@@ -345,7 +348,7 @@ public abstract class CF_Library_Test extends LinearOpMode {
             telemetry.addData("Right",rightPos);
             telemetry.addData("Left",leftPos);
             //telemetry.update();
-            if(!robot.MotorMecanumRightRear.isBusy() || !robot.MotorMecanumRightFront.isBusy() || !robot.MotorMecanumLeftFront.isBusy() || !robot.MotorMecanumLeftRear.isBusy()) {
+            if((!robot.MotorMecanumRightRear.isBusy() && !robot.MotorMecanumLeftFront.isBusy()) ||  (!robot.MotorMecanumRightFront.isBusy() && !robot.MotorMecanumLeftRear.isBusy())) {
                 keepGoing = false;
                 setPower(0.0f);
                 //setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);

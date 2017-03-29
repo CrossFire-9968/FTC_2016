@@ -34,7 +34,7 @@ public class CF_MotoG_Test_Blue extends CF_Library_Test{
     VectorF translation = null;
 
     // This is how far from the picture to stop
-    final int stopCount = 150;
+    final int stopCount = 200;
     boolean breakLoop = false;
 
     // If x is smaller than stopCount, it doesn't work, so we instantiate
@@ -91,7 +91,7 @@ public class CF_MotoG_Test_Blue extends CF_Library_Test{
 
         // Set drive motor direction
         // This is a default speed
-        final float speed = 1.0f;
+        final float speed = 0.8f;
 
         // Instantiates a paramaters file for Vuforia
         VuforiaLocalizer.Parameters params = new VuforiaLocalizer.Parameters(R.id.cameraMonitorViewId);
@@ -290,6 +290,7 @@ public class CF_MotoG_Test_Blue extends CF_Library_Test{
                     // Runs the checkTime method
                     checkTime();
                     System.out.println("PUSH FIRST BEACON");
+                    //telemetry.update();
                     // Push the beacon button
                     pushBeaconButton();
                     setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -305,10 +306,11 @@ public class CF_MotoG_Test_Blue extends CF_Library_Test{
                     // Move close to the second picture
                     setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                     // Strafes left to the next beacon
-                    encoderStrafeLeftNew(4800, speed, imu);
+                    encoderStrafeLeftNew(4950, speed, imu);
                     //encoderStrafeLeftDualPower(3750, 0.7f, 1000, 0.4f);
                     State = driveState.DRIVETOSECONDBEACON;
                     x = stopCount + 10;
+                    setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
                     break;
                 case DRIVETOSECONDBEACON:
                     // Runs the checkTime method
@@ -357,6 +359,7 @@ public class CF_MotoG_Test_Blue extends CF_Library_Test{
                     // Runs the checkTime method
                     checkTime();
                     System.out.println("PUSH SECOND BEACON");
+                    TimeUnit.MILLISECONDS.sleep(10);
                     // Push the beacon button
                     pushBeaconButton();
                     setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -424,7 +427,7 @@ public class CF_MotoG_Test_Blue extends CF_Library_Test{
 
     private void pidDrive(int yDist) {
         int error;
-        double kP = 0.002; // 0.00045 // 0.00090
+        double kP = 0.0015; // 0.00045 // 0.00090
         double power = 0.15;
         double effort;
         double leftPower;
@@ -451,23 +454,8 @@ public class CF_MotoG_Test_Blue extends CF_Library_Test{
         telemetry.addData("Red Left", sensorRGBleft.red());
         TimeUnit.MILLISECONDS.sleep(280);
 //        telemetry.update();
-        if (sensorRGBright.blue() > sensorRGBright.red() && sensorRGBleft.red() > sensorRGBleft.blue()) {
+        if ((sensorRGBright.blue() > sensorRGBright.red()) && (sensorRGBleft.red() > sensorRGBleft.blue())) {
 //            telemetry.update();
-            robot.SetButtonPusherPosition(0.90);
-            this.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            TimeUnit.SECONDS.sleep(1);
-            this.encoderMove(300, 300, 0.2f, 0.2f);
-            beaconFlagFirst = 1;
-            TimeUnit.MILLISECONDS.sleep(250);
-            this.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            int count = 100;
-            while(sensorRGBleft.red() > sensorRGBleft.blue() && count <= 160) {
-                this.encoderMove(count, count, 0.3f, 0.3f);
-                count+=50;
-            }
-            //requestOpModeStop();
-        } else if (sensorRGBright.red() > sensorRGBright.blue() && sensorRGBleft.blue() > sensorRGBleft.red()) {
-            // telemetry.update();
             robot.SetButtonPusherPosition(0.00);
             this.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             TimeUnit.SECONDS.sleep(1);
@@ -476,14 +464,29 @@ public class CF_MotoG_Test_Blue extends CF_Library_Test{
             TimeUnit.MILLISECONDS.sleep(250);
             this.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             int count = 100;
-            while(sensorRGBright.red() > sensorRGBright.blue() && count <= 160){
+            while((sensorRGBleft.red() > sensorRGBleft.blue()) && (count <= 160)) {
                 this.encoderMove(count, count, 0.3f, 0.3f);
                 count+=50;
             }
-        } else {
-            telemetry.addData("unknown", "unknown");
-//            telemetry.update();
-        }
+            //requestOpModeStop();
+        } else if ((sensorRGBright.red() > sensorRGBright.blue()) && (sensorRGBleft.blue() > sensorRGBleft.red())) {
+            // telemetry.update();
+            robot.SetButtonPusherPosition(0.90);
+            this.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            TimeUnit.SECONDS.sleep(1);
+            this.encoderMove(300, 300, 0.2f, 0.2f);
+            beaconFlagFirst = 1;
+            TimeUnit.MILLISECONDS.sleep(250);
+            this.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            int count = 100;
+            while((sensorRGBright.red() > sensorRGBright.blue()) && (count <= 160)){
+                this.encoderMove(count, count, 0.3f, 0.3f);
+                count+=50;
+            }
+        } //else {
+//            telemetry.addData("unknown", "unknown");
+//            //telemetry.update();
+//        }
         //}
     }
 }
