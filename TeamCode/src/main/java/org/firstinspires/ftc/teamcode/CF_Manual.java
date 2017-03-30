@@ -176,17 +176,17 @@ public class CF_Manual extends OpMode
          robot.setBallLifterMode();
       }
 
-      // Set steering to scooper driving mode
-      if (gamepad1.dpad_left)
-      {
-         robot.setleftDriveMode();
-      }
-
-      // Set steering to scooper driving mode
-      if (gamepad1.dpad_right)
-      {
-         robot.setrightDriveMode();
-      }
+//      // Set steering to scooper driving mode
+//      if (gamepad1.dpad_left)
+//      {
+//         robot.setleftDriveMode();
+//      }
+//
+//      // Set steering to scooper driving mode
+//      if (gamepad1.dpad_right)
+//      {
+//         robot.setrightDriveMode();
+//      }
 
       // Runs the drive to beacon method
       if (gamepad1.b) {
@@ -285,29 +285,29 @@ public class CF_Manual extends OpMode
             RRPower = (forwardGain_Scoop * -leftStickY) - (strafeGain_Scoop * leftStickX) - (steerGain_Scoop * -rightStickX);
          }
 
-          //Drives only the motors on the left side of the robot
-         telemetry.addData("Mode: ", "Left Drive");
-         if (robot.driveMode == Crossfire_Hardware.driveModeEnum.leftDrive)
-         {
-            LFPower = (forwardGain_Scoop * -leftStickY) - (strafeGain_Scoop * leftStickX) + (steerGain_Scoop * -rightStickX);
-            RFPower = 0;
-            //RFPower = (forwardGain_Scoop * -leftStickY) + (strafeGain_Scoop * leftStickX) - (steerGain_Scoop * -rightStickX);
-            LRPower = (forwardGain_Scoop * -leftStickY) + (strafeGain_Scoop * leftStickX) + (steerGain_Scoop * -rightStickX);
-            RRPower = 0;
-            //RRPower = (forwardGain_Scoop * -leftStickY) - (strafeGain_Scoop * leftStickX) - (steerGain_Scoop * -rightStickX);
-         }
-
-         //Drives only the motors on the right side of the robot.
-         telemetry.addData("Mode" , "Right Drive");
-         if (robot.driveMode == Crossfire_Hardware.driveModeEnum.rightDrive)
-         {
-            LFPower = 0;
+//          //Drives only the motors on the left side of the robot
+//         telemetry.addData("Mode: ", "Left Drive");
+//         if (robot.driveMode == Crossfire_Hardware.driveModeEnum.leftDrive)
+//         {
 //            LFPower = (forwardGain_Scoop * -leftStickY) - (strafeGain_Scoop * leftStickX) + (steerGain_Scoop * -rightStickX);
-            RFPower = (forwardGain_Scoop * -leftStickY) + (strafeGain_Scoop * leftStickX) - (steerGain_Scoop * -rightStickX);
-            LRPower = 0;
-            //LRPower = (forwardGain_Scoop * -leftStickY) + (strafeGain_Scoop * leftStickX) + (steerGain_Scoop * -rightStickX);
-            RRPower = (forwardGain_Scoop * -leftStickY) - (strafeGain_Scoop * leftStickX) - (steerGain_Scoop * -rightStickX);
-         }
+//            RFPower = 0;
+//            //RFPower = (forwardGain_Scoop * -leftStickY) + (strafeGain_Scoop * leftStickX) - (steerGain_Scoop * -rightStickX);
+//            LRPower = (forwardGain_Scoop * -leftStickY) + (strafeGain_Scoop * leftStickX) + (steerGain_Scoop * -rightStickX);
+//            RRPower = 0;
+//            //RRPower = (forwardGain_Scoop * -leftStickY) - (strafeGain_Scoop * leftStickX) - (steerGain_Scoop * -rightStickX);
+//         }
+//
+//         //Drives only the motors on the right side of the robot.
+//         telemetry.addData("Mode" , "Right Drive");
+//         if (robot.driveMode == Crossfire_Hardware.driveModeEnum.rightDrive)
+//         {
+//            LFPower = 0;
+////            LFPower = (forwardGain_Scoop * -leftStickY) - (strafeGain_Scoop * leftStickX) + (steerGain_Scoop * -rightStickX);
+//            RFPower = (forwardGain_Scoop * -leftStickY) + (strafeGain_Scoop * leftStickX) - (steerGain_Scoop * -rightStickX);
+//            LRPower = 0;
+//            //LRPower = (forwardGain_Scoop * -leftStickY) + (strafeGain_Scoop * leftStickX) + (steerGain_Scoop * -rightStickX);
+//            RRPower = (forwardGain_Scoop * -leftStickY) - (strafeGain_Scoop * leftStickX) - (steerGain_Scoop * -rightStickX);
+//         }
 
          // Find maximum power commanded to all the mecanum wheels.  Using the above power
          // equations, it is possible to calculate a power command greater than 1.0f (100%).
@@ -360,7 +360,7 @@ public class CF_Manual extends OpMode
       firstButtonRight = gamepad1.right_bumper;
       firstButtonLeft = gamepad1.left_bumper;
       if (firstButtonRight && !firstLastRightButton) {
-         if(shooterPower < -1.0f) {
+         if(shooterPower < -0.30f) {
             shooterPower = 0.0f;
          }
          else {
