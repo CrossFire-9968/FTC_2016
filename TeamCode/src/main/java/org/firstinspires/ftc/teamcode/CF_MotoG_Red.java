@@ -26,9 +26,9 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created by Ryley on 12/22/16.
  */
-@Autonomous(name="CF_MotoG_Test_Blue", group ="Blue")
+@Autonomous(name="CF_MotoG_Red", group ="Blue")
 //@Disabled
-public class CF_MotoG_Test_Blue extends CF_Library_Test{
+public class CF_MotoG_Red extends CF_Library_Test{
     // Position
     OpenGLMatrix pose;
     VectorF translation = null;
@@ -42,7 +42,7 @@ public class CF_MotoG_Test_Blue extends CF_Library_Test{
     int x = stopCount + 100;
     int y;
 
-    // Gains for the PID controllers
+    // Gains for the PID controllers.  Only one is in use currently
     double kPy = 0.00097;
     double kPangle = 0.0095;
     double kPangleSmall = 0.0009;
@@ -61,8 +61,8 @@ public class CF_MotoG_Test_Blue extends CF_Library_Test{
     float[] data;
 
     // Picture constants
-    int FIRSTPICTURE = 0;
-    int SECONDPICTURE = 2;
+    int FIRSTPICTURE = 3;
+    int SECONDPICTURE = 1;
 
     int beaconFlagFirst = 0;
 
@@ -151,7 +151,7 @@ public class CF_MotoG_Test_Blue extends CF_Library_Test{
                     // This is to get the robot more or less lined up with the picture
                     this.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                     setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                    this.encoderStrafeLeftNew(2650, speed, imu);
+                    this.encoderStrafeRightNew(2650, speed, imu);
                     this.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                     robot.Shooter.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                     robot.Shooter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -160,7 +160,7 @@ public class CF_MotoG_Test_Blue extends CF_Library_Test{
                     robot.Shooter.setPower(-0.32f);
                     //robot.Shooter.setPower(-0.3f);
                     setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                    this.encoderStrafeLeftNew(2400, speed, imu);
+                    this.encoderStrafeRightNew(2400, speed, imu);
                     System.out.println("DONE STRAFING");
 
                     // Increment the state to the next state
@@ -228,6 +228,7 @@ public class CF_MotoG_Test_Blue extends CF_Library_Test{
                 case BALLONE:
                     // Runs checkTime method
                     checkTime();
+                    TimeUnit.MILLISECONDS.sleep(1000);
                     System.out.println("BALL ONE");
                     // Increment the first ball
                     robot.SetLoaderPosition(0.015);
@@ -290,7 +291,6 @@ public class CF_MotoG_Test_Blue extends CF_Library_Test{
                     // Runs the checkTime method
                     checkTime();
                     System.out.println("PUSH FIRST BEACON");
-                    //telemetry.update();
                     // Push the beacon button
                     pushBeaconButton();
                     setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -305,8 +305,8 @@ public class CF_MotoG_Test_Blue extends CF_Library_Test{
                     System.out.println("SECOND STRAFE");
                     // Move close to the second picture
                     setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                    // Strafes left to the next beacon
-                    encoderStrafeLeftNew(4950, speed, imu);
+                    // Strafes right to the next beacon
+                    encoderStrafeRightNew(4950, speed, imu);
                     //encoderStrafeLeftDualPower(3750, 0.7f, 1000, 0.4f);
                     State = driveState.DRIVETOSECONDBEACON;
                     x = stopCount + 10;
@@ -436,7 +436,7 @@ public class CF_MotoG_Test_Blue extends CF_Library_Test{
         error = yDist;
         // Multiply the error by our gain to get a control effort
         effort = kP * error;
-        // Set the right and left powers by subtracting or adding the control effort from a base power
+        // Set the left and right powers by subtracting or adding the control effort from a base power
         rightPower = power + effort;
         leftPower = power - effort;
         // Set powers
@@ -452,25 +452,12 @@ public class CF_MotoG_Test_Blue extends CF_Library_Test{
         telemetry.addData("Red Right", sensorRGBright.red());
         telemetry.addData("Blue Left", sensorRGBleft.blue());
         telemetry.addData("Red Left", sensorRGBleft.red());
-        TimeUnit.MILLISECONDS.sleep(280);
+        TimeUnit.MILLISECONDS.sleep(750);
 //        telemetry.update();
+        // Checks if the blue is on the right and red is on the left
         if ((sensorRGBright.blue() > sensorRGBright.red()) && (sensorRGBleft.red() > sensorRGBleft.blue())) {
 //            telemetry.update();
-            robot.SetButtonPusherPosition(0.00);
-            this.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            TimeUnit.SECONDS.sleep(1);
-            this.encoderMove(300, 300, 0.2f, 0.2f);
-            beaconFlagFirst = 1;
-            TimeUnit.MILLISECONDS.sleep(250);
-            this.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            int count = 100;
-            while((sensorRGBleft.red() > sensorRGBleft.blue()) && (count <= 160)) {
-                this.encoderMove(count, count, 0.3f, 0.3f);
-                count+=50;
-            }
-            //requestOpModeStop();
-        } else if ((sensorRGBright.red() > sensorRGBright.blue()) && (sensorRGBleft.blue() > sensorRGBleft.red())) {
-            // telemetry.update();
+            // Sets the button pusher servo position
             robot.SetButtonPusherPosition(0.90);
             this.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             TimeUnit.SECONDS.sleep(1);
@@ -479,7 +466,24 @@ public class CF_MotoG_Test_Blue extends CF_Library_Test{
             TimeUnit.MILLISECONDS.sleep(250);
             this.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             int count = 100;
-            while((sensorRGBright.red() > sensorRGBright.blue()) && (count <= 160)){
+            while((sensorRGBleft.red() < sensorRGBleft.blue()) && (count <= 160)) {
+                this.encoderMove(count, count, 0.3f, 0.3f);
+                count+=50;
+            }
+            //requestOpModeStop();
+            // Checks if the red is on the right and the blue is on the left
+        } else if ((sensorRGBright.red() > sensorRGBright.blue()) && (sensorRGBleft.blue() > sensorRGBleft.red())) {
+            // telemetry.update();
+            // Sets the button pusher servo position
+            robot.SetButtonPusherPosition(0.00);
+            this.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            TimeUnit.SECONDS.sleep(1);
+            this.encoderMove(300, 300, 0.2f, 0.2f);
+            beaconFlagFirst = 1;
+            TimeUnit.MILLISECONDS.sleep(250);
+            this.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            int count = 100;
+            while((sensorRGBright.red() < sensorRGBright.blue()) && (count <= 160)){
                 this.encoderMove(count, count, 0.3f, 0.3f);
                 count+=50;
             }

@@ -70,7 +70,7 @@ public abstract class CF_Library_Test extends LinearOpMode {
             //telemetry.addData("Right",rightPos);
             //telemetry.addData("Left",leftPos);
             //telemetry.update();
-            if((!robot.MotorMecanumRightRear.isBusy() && !robot.MotorMecanumLeftFront.isBusy()) ||  (!robot.MotorMecanumRightFront.isBusy() && !robot.MotorMecanumLeftRear.isBusy())) {
+            if(!robot.MotorMecanumRightRear.isBusy() || !robot.MotorMecanumLeftFront.isBusy() || !robot.MotorMecanumRightFront.isBusy() || !robot.MotorMecanumLeftRear.isBusy()) {
                 keepGoing = false;
                 //setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             }
@@ -178,10 +178,10 @@ public abstract class CF_Library_Test extends LinearOpMode {
             effort = kP * error;
             leftPower = power - effort;
             rightPower = power + effort;
-            robot.MotorMecanumLeftFront.setPower(power - effort);
-            robot.MotorMecanumRightFront.setPower((-1 * power) + effort);
-            robot.MotorMecanumLeftRear.setPower((-1 * power) - effort);
-            robot.MotorMecanumRightRear.setPower(power + effort);
+            robot.MotorMecanumLeftFront.setPower(power + effort);
+            robot.MotorMecanumRightFront.setPower((-1 * power) - effort);
+            robot.MotorMecanumLeftRear.setPower((-1 * power) + effort);
+            robot.MotorMecanumRightRear.setPower(power - effort);
 
 //            setLeftPower((float)frontPower);
 //            setRightPower((float)rearPower);
