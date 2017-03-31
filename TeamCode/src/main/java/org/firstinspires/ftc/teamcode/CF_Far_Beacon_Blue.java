@@ -438,7 +438,7 @@ public class CF_Far_Beacon_Blue extends CF_Library{
 //        telemetry.update();
         if (sensorRGBright.blue() > sensorRGBright.red() && sensorRGBleft.red() > sensorRGBleft.blue()) {
 //            telemetry.update();
-            robot.SetButtonPusherPosition(0.90);
+            robot.SetButtonPusherPosition(0.00);
             this.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             TimeUnit.SECONDS.sleep(1);
             this.encoderMove(300, 300, 0.2f, 0.2f);
@@ -453,7 +453,7 @@ public class CF_Far_Beacon_Blue extends CF_Library{
             //requestOpModeStop();
         } else if (sensorRGBright.red() > sensorRGBright.blue() && sensorRGBleft.blue() > sensorRGBleft.red()) {
             // telemetry.update();
-            robot.SetButtonPusherPosition(0.00);
+            robot.SetButtonPusherPosition(0.90);
             this.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             TimeUnit.SECONDS.sleep(1);
             this.encoderMove(300, 300, 0.2f, 0.2f);

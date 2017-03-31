@@ -49,17 +49,23 @@ public abstract class CF_Library extends LinearOpMode {
 
       boolean keepGoing = true;
 
+      setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
       robot.MotorMecanumLeftFront.setPower(leftPower);
       robot.MotorMecanumRightFront.setPower(rightPower);
       robot.MotorMecanumLeftRear.setPower(leftPower);
       robot.MotorMecanumRightRear.setPower(rightPower);
+      robot.MotorMecanumLeftFront.setPower(leftPower);
+      robot.MotorMecanumRightFront.setPower(rightPower);
+      robot.MotorMecanumLeftRear.setPower(leftPower/* + 0.05f*/);
+      robot.MotorMecanumRightRear.setPower(rightPower/* + 0.05f*/);
 
       robot.MotorMecanumLeftFront.setTargetPosition(countLeft);
       robot.MotorMecanumRightFront.setTargetPosition(countRight);
       robot.MotorMecanumLeftRear.setTargetPosition(countLeft);
       robot.MotorMecanumRightRear.setTargetPosition(countRight);
 
-      setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
 
       while(keepGoing) {
          double leftPos = robot.MotorMecanumLeftFront.getCurrentPosition();
@@ -133,6 +139,11 @@ public abstract class CF_Library extends LinearOpMode {
       double leftPower;
       double rightPower;
       double kP = 0.00045;
+      setMode(DcMotor.RunMode.RUN_TO_POSITION);
+      robot.MotorMecanumLeftFront.setPower(power);
+      robot.MotorMecanumRightFront.setPower(power);
+      robot.MotorMecanumLeftRear.setPower(power/* + 0.05f*/);
+      robot.MotorMecanumRightRear.setPower(power/* + 0.05f*/);
       robot.MotorMecanumLeftFront.setPower(power);
       robot.MotorMecanumRightFront.setPower(power);
       robot.MotorMecanumLeftRear.setPower(power/* + 0.05f*/);
@@ -143,7 +154,7 @@ public abstract class CF_Library extends LinearOpMode {
       robot.MotorMecanumRightFront.setTargetPosition(count * -1);
       robot.MotorMecanumLeftRear.setTargetPosition(count * -1);
       robot.MotorMecanumRightRear.setTargetPosition(count);
-      setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
       while(keepGoing) {
          //telemetry.update();
          if(!robot.MotorMecanumRightRear.isBusy() || !robot.MotorMecanumRightFront.isBusy() || !robot.MotorMecanumLeftFront.isBusy() || !robot.MotorMecanumLeftRear.isBusy()) {
@@ -195,15 +206,22 @@ public abstract class CF_Library extends LinearOpMode {
    }
    public void encoderStrafeLeft(int count, float power) throws InterruptedException{
       boolean keepGoing = true;
-      setRightPower(power);
-      setLeftPower(power);
-      setPower(power);
+      setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+      robot.MotorMecanumLeftFront.setPower(power);
+      robot.MotorMecanumRightFront.setPower(power);
+      robot.MotorMecanumLeftRear.setPower(power/* + 0.05f*/);
+      robot.MotorMecanumRightRear.setPower(power/* + 0.05f*/);
+      robot.MotorMecanumLeftFront.setPower(power);
+      robot.MotorMecanumRightFront.setPower(power);
+      robot.MotorMecanumLeftRear.setPower(power/* + 0.05f*/);
+      robot.MotorMecanumRightRear.setPower(power/* + 0.05f*/);
 
       robot.MotorMecanumLeftFront.setTargetPosition(count * -1);
       robot.MotorMecanumRightFront.setTargetPosition(count);
       robot.MotorMecanumLeftRear.setTargetPosition(count);
       robot.MotorMecanumRightRear.setTargetPosition(count * -1);
-      setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
       while(keepGoing) {
          double leftPos = robot.MotorMecanumLeftRear.getCurrentPosition();
          double rightPos = robot.MotorMecanumRightRear.getCurrentPosition();

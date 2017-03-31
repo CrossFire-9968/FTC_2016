@@ -151,13 +151,15 @@ public class CF_MotoG_Blue extends CF_Library_Test{
                     // This is to get the robot more or less lined up with the picture
                     this.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                     setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                    this.encoderStrafeLeftNew(2650, speed, imu);
-                    this.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                     robot.Shooter.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                     robot.Shooter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                    robot.Shooter.setPower(-0.32f);
+                    this.encoderStrafeLeftNew(2650, speed, imu);
+                    this.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
                     this.encoderMoveNew(1100, 0.7f, imu);
                     //this.encoderMove(1100, 1100, speed, speed);
-                    robot.Shooter.setPower(-0.32f);
+
                     //robot.Shooter.setPower(-0.3f);
                     setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                     this.encoderStrafeLeftNew(2400, speed, imu);
@@ -228,7 +230,7 @@ public class CF_MotoG_Blue extends CF_Library_Test{
                 case BALLONE:
                     // Runs checkTime method
                     checkTime();
-                    TimeUnit.MILLISECONDS.sleep(1000);
+                    TimeUnit.MILLISECONDS.sleep(750);
                     System.out.println("BALL ONE");
                     // Increment the first ball
                     robot.SetLoaderPosition(0.015);
@@ -428,7 +430,7 @@ public class CF_MotoG_Blue extends CF_Library_Test{
     private void pidDrive(int yDist) {
         int error;
         double kP = 0.0015; // 0.00045 // 0.00090
-        double power = 0.15;
+        double power = 0.12;
         double effort;
         double leftPower;
         double rightPower;

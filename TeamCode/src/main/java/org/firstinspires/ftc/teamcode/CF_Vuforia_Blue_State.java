@@ -290,7 +290,7 @@ public class CF_Vuforia_Blue_State extends CF_Library{
                     // Move close to the second picture
                     setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                     // Strafes left to the next beacon
-                    encoderStrafeLeft(4650, 0.63f);
+                    encoderStrafeLeft(4800, 0.63f);
                     setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                     encoderMove(100, -100, 0.3f, 0.3f);
                     //encoderStrafeLeftDualPower(3750, 0.7f, 1000, 0.4f);
@@ -408,7 +408,7 @@ public class CF_Vuforia_Blue_State extends CF_Library{
     private void pidDrive(int yDist) {
         int error;
         double kP = 0.00045; // 0.0005
-        double power = 0.2;
+        double power = 0.12;
         double effort;
         double leftPower;
         double rightPower;
@@ -436,7 +436,7 @@ public class CF_Vuforia_Blue_State extends CF_Library{
 //        telemetry.update();
         if (sensorRGBright.blue() > sensorRGBright.red() && sensorRGBleft.red() > sensorRGBleft.blue()) {
 //            telemetry.update();
-            robot.SetButtonPusherPosition(0.90);
+            robot.SetButtonPusherPosition(0.00);
             this.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             TimeUnit.SECONDS.sleep(1);
             this.encoderMove(300, 300, 0.2f, 0.2f);
@@ -451,7 +451,7 @@ public class CF_Vuforia_Blue_State extends CF_Library{
             //requestOpModeStop();
         } else if (sensorRGBright.red() > sensorRGBright.blue() && sensorRGBleft.blue() > sensorRGBleft.red()) {
            // telemetry.update();
-            robot.SetButtonPusherPosition(0.00);
+            robot.SetButtonPusherPosition(0.90);
             this.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             TimeUnit.SECONDS.sleep(1);
             this.encoderMove(300, 300, 0.2f, 0.2f);
