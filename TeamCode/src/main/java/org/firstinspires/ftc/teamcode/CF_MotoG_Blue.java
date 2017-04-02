@@ -297,7 +297,7 @@ public class CF_MotoG_Blue extends CF_Library_Test{
                     pushBeaconButton();
                     setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                     // Backs up after pushing the button
-                    this.encoderMoveNew(1800, (speed * -1), imu);
+                    this.encoderMoveNew(1000, (speed * -1), imu);
                     State = driveState.SECONDSTRAFE;
                     //breakLoop = true;
                     break;
@@ -308,7 +308,7 @@ public class CF_MotoG_Blue extends CF_Library_Test{
                     // Move close to the second picture
                     setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                     // Strafes left to the next beacon
-                    encoderStrafeLeftNew(4950, speed, imu);
+                    encoderStrafeLeftNew(4950, 1.0f, imu);
                     //encoderStrafeLeftDualPower(3750, 0.7f, 1000, 0.4f);
                     State = driveState.DRIVETOSECONDBEACON;
                     x = stopCount + 10;

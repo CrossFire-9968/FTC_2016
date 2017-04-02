@@ -88,6 +88,9 @@ public class CF_Manual extends OpMode
    double rightPower;
    boolean spinnerFlag = false;
    boolean shooterFlag = false;
+   boolean forwards = true;
+   boolean lastLeft = false;
+   boolean left = false;
    VuforiaTrackables beacons;
 
    boolean runShooter = false;
@@ -316,6 +319,10 @@ public class CF_Manual extends OpMode
    //Runs the two rubber coated wheels so they rotate opposite directions and launch
    //the particle balls into the center vortex
    public void runShooterState() throws InterruptedException {
+      left = gamepad2.dpad_left;
+      if(left && !lastLeft) {
+         forwards = !forwards;
+      }
       // Gamepad 1 can modify the speed of the wheels on the fly if need be
       firstButtonRight = gamepad1.right_bumper;
       firstButtonLeft = gamepad1.left_bumper;
@@ -345,7 +352,12 @@ public class CF_Manual extends OpMode
       }
       if(runShooter) {
          robot.Shooter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-         robot.Shooter.setPower(shooterPower);
+         if(forwards) {
+            robot.Shooter.setPower(shooterPower);
+         }
+         if(!forwards) {
+            robot.Shooter.setPower(shooterPower * -1);
+         }
       }
       if(!runShooter) {
          robot.Shooter.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
