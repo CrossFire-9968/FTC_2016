@@ -201,10 +201,10 @@ public class Crossfire_Hardware
    public void setMecanumEncoderTargetPosition(int LFcount, int RFcount, int LRcount, int RRcount)
    {
       // Only want to use absolute values.  Take abs of inputs in case user sent negative value.
-      MotorMecanumLeftFront.setTargetPosition(Math.abs(LFcount));
-      MotorMecanumRightFront.setTargetPosition(Math.abs(RFcount));
-      MotorMecanumLeftRear.setTargetPosition(Math.abs(LRcount));
-      MotorMecanumRightRear.setTargetPosition(Math.abs(RRcount));
+      MotorMecanumLeftFront.setTargetPosition(LFcount);
+      MotorMecanumRightFront.setTargetPosition(RFcount);
+      MotorMecanumLeftRear.setTargetPosition(LRcount);
+      MotorMecanumRightRear.setTargetPosition(RRcount);
    }
 
 
