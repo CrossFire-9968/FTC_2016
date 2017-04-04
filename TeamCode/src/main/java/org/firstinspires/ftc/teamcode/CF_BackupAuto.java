@@ -45,22 +45,25 @@ public class CF_BackupAuto extends LinearOpMode
                AutoFlag = 1;
                telemetry.addData("AutoFlag = ", "1");
                //robot.Loader.setPosition(0.08);
+               telemetry.addData("LF:", robot.MotorMecanumLeftFront.getCurrentPosition());
+               telemetry.addData("RF:", robot.MotorMecanumRightFront.getCurrentPosition());
+               telemetry.addData("LR:", robot.MotorMecanumLeftRear.getCurrentPosition());
+               telemetry.addData("RR:", robot.MotorMecanumRightRear.getCurrentPosition());
                TimeUnit.MILLISECONDS.sleep(500);
                robot.setMecanumEncoderMode(DcMotor.RunMode.RUN_TO_POSITION);
-               robot.setMecanumEncoderTargetPosition(2200, 2200, 2200, 2200);
+               robot.setMecanumEncoderTargetPosition(-2200, -2200, -2200, -2200);
                robot.setMecanumPowers(0.4, 0.4, 0.4, 0.4);
                State = states.DRIVETOPOSITION;
                break;
             case DRIVETOPOSITION:
                AutoFlag = 2;
                telemetry.addData("AutoFlag = ", "2");
-
+               TimeUnit.MILLISECONDS.sleep(3000);
                telemetry.addData("LF:", robot.MotorMecanumLeftFront.getCurrentPosition());
                telemetry.addData("RF:", robot.MotorMecanumRightFront.getCurrentPosition());
                telemetry.addData("LR:", robot.MotorMecanumLeftRear.getCurrentPosition());
                telemetry.addData("RR:", robot.MotorMecanumRightRear.getCurrentPosition());
 
-               telemetry.update();
 
                if (!robot.MotorMecanumLeftFront.isBusy())
                {
@@ -71,10 +74,10 @@ public class CF_BackupAuto extends LinearOpMode
             case STARTBALLSHOOTER:
                AutoFlag = 3;
                telemetry.addData("AutoFlag = " , "3");
-               telemetry.update();
+               //telemetry.update();
                robot.Shooter.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-               robot.Shooter.setTargetPosition(5000);
-               robot.Shooter.setPower(-0.30);
+               robot.Shooter.setTargetPosition(-5000);
+               robot.Shooter.setPower(0.30);
                TimeUnit.SECONDS.sleep(1);
                robot.SetLoaderPosition(0.0);
                TimeUnit.SECONDS.sleep(3);
@@ -83,18 +86,16 @@ public class CF_BackupAuto extends LinearOpMode
             case STOPBALLSHOOTER:
                AutoFlag = 4;
                telemetry.addData("AutoFlag = " , "4");
-               telemetry.update();
                robot.Shooter.setPower(0.0f);
                robot.setMecanumEncoderMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                robot.setMecanumEncoderMode(DcMotor.RunMode.RUN_TO_POSITION);
-               robot.setMecanumEncoderTargetPosition(2100, 2100, 2100, 2100);
+               robot.setMecanumEncoderTargetPosition(-2100, -2100, -2100, -2100);
                robot.setMecanumPowers(0.4, 0.4, 0.4, 0.4);
                State = states.DRIVETOBALL;
                break;
             case DRIVETOBALL:
                AutoFlag = 5;
                telemetry.addData("AutoFlag = " , "5");
-               telemetry.update();
 
                if (!robot.MotorMecanumLeftFront.isBusy())
                {
@@ -104,7 +105,6 @@ public class CF_BackupAuto extends LinearOpMode
             case END:
                AutoFlag = 6;
                telemetry.addData("AutoFlag = " , "6");
-               telemetry.update();
 //                   Set motors to run by encoders and turn off power
                robot.setMecanumPowers(0.0, 0.0, 0.0, 0.0);
                //robot.Shooter.setPower(0.0);
@@ -117,7 +117,7 @@ public class CF_BackupAuto extends LinearOpMode
                //requestOpModeStop();
                break;
          }
-         telemetry.update();
+         //telemetry.update();
          idle();
       }
    }
